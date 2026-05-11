@@ -60,3 +60,14 @@ def get_provider_prefix(model_id: str) -> str:
     if not info:
         raise ValueError(f"Unknown model: {model_id}")
     return info.provider_prefix
+
+
+def estimate_tokens(text: str) -> int:
+    return max(1, int(len(text) / 3.5))
+
+
+def get_context_budget(model_id: str) -> int:
+    info = MODEL_REGISTRY.get(model_id)
+    if not info:
+        return 100000
+    return int(info.context_window * 0.8) - info.max_output_tokens
