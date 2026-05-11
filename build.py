@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Dream Foundry — Build Script
-Packages Python backend (PyInstaller) + Bun TUI into a single dist/.
+Packages Python backend (PyInstaller) + Bun TUI into dist/.
 """
 
 import os
@@ -22,8 +22,12 @@ IS_LINUX = platform.system() == "Linux"
 
 
 def run(cmd, **kwargs):
-    print(f"\033[36m> {' '.join(cmd) if isinstance(cmd, list) else cmd}\033[0m")
-    subprocess.run(cmd, cwd=kwargs.get("cwd", ROOT), check=True, shell=isinstance(cmd, str))
+    if isinstance(cmd, list):
+        display = " ".join(str(c) for c in cmd)
+    else:
+        display = cmd
+    print(f"\033[36m> {display}\033[0m")
+    subprocess.run(cmd, cwd=kwargs.get("cwd", ROOT), check=True, shell=True)
 
 
 def clean():
@@ -101,23 +105,34 @@ def build_tui():
         run(["bun", "install"], cwd=TUI)
 
     tui_dist = DIST / "tui"
-    tui_dist.mkdir(exist_ok=True)
+    if tui_dist.exists():
+        shutil.rmtree(tui_dist)
 
-    run(["bun", "build", "--compile", "--minify", "src/index.tsx", "--outfile", str(tui_dist / "dream-foundry-tui" + (".exe" if IS_WINDOWS else ""))], cwd=TUI)
+    print("Copying TUI sources...")
+    shutil.copytree(TUI, tui_dist, ignore=shutil.ignore_patterns("node_modules", ".git"))
+    shutil.copytree(TUI / "node_modules", tui_dist / "node_modules")
 
-    exe_name = "dream-foundry-tui.exe" if IS_WINDOWS else "dream-foundry-tui"
-    exe_path = tui_dist / exe_name
-    if not exe_path.exists():
-        print(f"ERROR: TUI binary not found at {exe_path}")
-        sys.exit(1)
-    print(f"TUI built: {exe_path}")
+    entry_script = tui_dist / ("start.bat" if IS_WINDOWS else "start.sh")
+    if IS_WINDOWS:
+        entry_script.write_text(
+            '@echo off\nbun run src/index.tsx %*\n',
+            encoding="utf-8",
+        )
+    else:
+        entry_script.write_text(
+            '#!/usr/bin/env bash\nbun run src/index.tsx "$@"\n',
+            encoding="utf-8",
+        )
+        entry_script.chmod(0o755)
+
+    print(f"TUI built: {tui_dist}")
+    print(f"  Run: bun run {tui_dist / 'src' / 'index.tsx'}")
 
 
 def build_launcher():
     print("\n=== Building Launcher ===")
     launcher_path = DIST / ("dream-foundry" + (".bat" if IS_WINDOWS else ".sh"))
     backend_exe = "dream-foundry-server" + (".exe" if IS_WINDOWS else "")
-    tui_exe = "dream-foundry-tui" + (".exe" if IS_WINDOWS else "")
 
     if IS_WINDOWS:
         content = f"""@echo off
@@ -131,9 +146,12 @@ timeout /t 1 /nobreak >nul 2>&1
 curl -s http://127.0.0.1:8000/api/health >nul 2>&1
 if errorlevel 1 goto wait_server
 
-"%~dp0tui\\{tui_exe}"
+cd /d "%~dp0tui"
+bun run src/index.tsx
 
-taskkill /F /IM {backend_exe} >nul 2>&1
+for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq {backend_exe}" /NH 2^>nul ^| findstr /i dream-foundry') do (
+    taskkill /F /PID %%a >nul 2>&1
+)
 """
     else:
         content = f"""#!/usr/bin/env bash
@@ -154,7 +172,7 @@ for i in $(seq 1 30); do
     sleep 1
 done
 
-"$SCRIPT_DIR/tui/{tui_exe}"
+(cd "$SCRIPT_DIR/tui" && bun run src/index.tsx)
 
 kill $SERVER_PID 2>/dev/null
 wait $SERVER_PID 2>/dev/null
