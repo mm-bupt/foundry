@@ -1,11 +1,19 @@
-async def embed_text(text: str) -> bytes:
-    import struct
-    from dream_foundry.config import settings
+import hashlib
+import struct
 
-    try:
-        from pydantic_ai.direct import model_request_sync
-    except ImportError:
-        pass
+from dream_foundry.config import settings
+
+_cache: dict[str, bytes] = {}
+
+
+def _cache_key(text: str) -> str:
+    return hashlib.md5(text.encode()).hexdigest()
+
+
+async def embed_text(text: str) -> bytes:
+    key = _cache_key(text)
+    if key in _cache:
+        return _cache[key]
 
     try:
         import openai
@@ -17,7 +25,10 @@ async def embed_text(text: str) -> bytes:
             dimensions=settings.embedding_dimensions,
         )
         embedding = response.data[0].embedding
-        return struct.pack(f"{len(embedding)}f", *embedding)
+        result = struct.pack(f"{len(embedding)}f", *embedding)
     except Exception:
         dim = settings.embedding_dimensions
-        return struct.pack(f"{dim}f", *([0.0] * dim))
+        result = struct.pack(f"{dim}f", *([0.0] * dim))
+
+    _cache[key] = result
+    return result
