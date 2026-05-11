@@ -2,6 +2,7 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 
 import aiosqlite
+import sqlite_vec
 
 from dream_foundry.config import settings
 
@@ -56,6 +57,11 @@ CREATE INDEX IF NOT EXISTS idx_memory_vectors_session_id ON memory_vectors(sessi
 CREATE INDEX IF NOT EXISTS idx_memory_vectors_category ON memory_vectors(category);
 CREATE INDEX IF NOT EXISTS idx_tool_calls_message_id ON tool_calls(message_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_updated_at ON sessions(updated_at);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS vec_memory USING vec0(
+    id TEXT PRIMARY KEY,
+    embedding float[1536]
+);
 """
 
 
@@ -63,6 +69,9 @@ async def _connect() -> aiosqlite.Connection:
     settings.db_path.parent.mkdir(parents=True, exist_ok=True)
     db = await aiosqlite.connect(str(settings.db_path))
     db.row_factory = aiosqlite.Row
+    await db.enable_load_extension(True)
+    await db.load_extension(sqlite_vec.loadable_path())
+    await db.enable_load_extension(False)
     await db.execute("PRAGMA journal_mode=WAL")
     await db.execute("PRAGMA foreign_keys=ON")
     return db
