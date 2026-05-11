@@ -1,5 +1,6 @@
 from textual.widgets import Static
 from textual.containers import VerticalScroll
+from textual.events import Click
 
 from src.theme.opencode import OpencodeTheme
 
@@ -42,6 +43,13 @@ class SessionItem(Static):
             text.append(self.session_title, style=f"color({t.text_muted})")
         self.update(text)
         self.set_class(self.is_active, "active")
+
+    def on_click(self, event: Click) -> None:
+        if self.is_active:
+            return
+        app = self.app
+        if hasattr(app, "switch_to_session"):
+            app.switch_to_session(self.session_id)
 
     def set_active(self, active: bool) -> None:
         self.is_active = active
