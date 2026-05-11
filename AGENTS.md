@@ -13,12 +13,12 @@ Dream Foundry is a full-stack AI Agent application:
 |-------|-------------|--------|
 | P1 | Backend base — FastAPI + SQLite + Session CRUD | **DONE** |
 | P2 | Agent engine — Pydantic AI + Model Registry + Chat + WS + SSE | **DONE** |
-| P3 | Memory + Context — vector storage + history compression | PENDING |
-| P4 | TUI skeleton — Textual App + 3-panel layout + opencode theme | PENDING |
-| P5 | TUI Chat — message list + markdown + input + WS streaming | PENDING |
-| P6 | TUI Session — sidebar + session list + switching | PENDING |
-| P7 | TUI model selector + context panel + memory viewer | PENDING |
-| P8 | Key bindings + spinner + footer + tests + polish | PENDING |
+| P3 | Memory + Context — sqlite-vec + embedding cache + LLM summarization | **DONE** |
+| P4 | TUI skeleton — Textual App + 3-panel layout + opencode theme | **DONE** |
+| P5 | TUI Chat — WS streaming + delta rendering + tool call display | **DONE** |
+| P6 | TUI Session — sidebar + click to switch + session CRUD | **DONE** |
+| P7 | TUI model selector + context panel + memory viewer | **DONE** |
+| P8 | Key bindings + spinner + footer + polish | **DONE** |
 
 ## Project Structure
 
