@@ -1,19 +1,7 @@
-from textual.widgets import Static
 from textual.containers import Vertical, VerticalScroll
 
 from src.widgets.chat.message import MessageBubble
 from src.widgets.chat.input import ChatInputArea
-
-
-MOCK_MESSAGES = [
-    {"role": "user", "content": "帮我写一个快排算法"},
-    {
-        "role": "assistant",
-        "content": "好的，这是快速排序的实现：\n\n```python\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)\n```\n\n时间复杂度：平均 O(n log n)，最坏 O(n²)。",
-        "model": "claude-sonnet",
-        "duration": 3.2,
-    },
-]
 
 
 class ChatPanel(Vertical):
@@ -31,18 +19,26 @@ class ChatPanel(Vertical):
     def compose(self):
         self.message_list = VerticalScroll(classes="message-list")
         yield self.message_list
-        self.input_area = ChatInputArea(self.model_name)
+        self.input_area = ChatInputArea(self.model_name, self._on_send)
         yield self.input_area
 
-    def on_mount(self) -> None:
-        for msg in MOCK_MESSAGES:
-            bubble = MessageBubble(
-                role=msg["role"],
-                content=msg["content"],
-                model=msg.get("model", ""),
-                duration=msg.get("duration", 0.0),
-            )
-            self.message_list.mount(bubble)
+    def _on_send(self, content: str):
+        if not content.strip():
+            return
+        bubble = MessageBubble(role="user", content=content)
+        self.add_message(bubble)
+        self.scroll_to_bottom()
+        app = self.app
+        if hasattr(app, "send_chat_message"):
+            app.send_chat_message(content)
+
+    def add_message(self, widget) -> None:
+        self.message_list.mount(widget)
+
+    def clear_messages(self) -> None:
+        self.message_list.remove_children()
+
+    def scroll_to_bottom(self) -> None:
         self.message_list.scroll_end(animate=False)
 
     def focus_input(self) -> None:

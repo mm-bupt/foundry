@@ -17,26 +17,34 @@ class MessageBubble(Static):
     }
     """
 
-    def __init__(self, role: str, content: str, model: str = "", duration: float = 0.0):
+    def __init__(self, role: str, content: str, model: str = "", duration: float = 0.0, streaming: bool = False):
         super().__init__()
         self.role = role
         self.content = content
         self.model = model
         self.duration = duration
+        self.streaming = streaming
 
     def on_mount(self) -> None:
-        t = OpencodeTheme
-        from rich.text import Text
-        from rich.markdown import Markdown
+        if self.streaming:
+            from rich.text import Text
+            self.update(Text(self.content + "▌"))
+            self.set_class(True, "assistant")
+        else:
+            self._render_final()
 
-        text = Text()
+    def _render_final(self) -> None:
+        t = OpencodeTheme
         if self.role == "user":
-            text.append(self.content)
-            self.update(text)
+            from rich.text import Text
+            self.update(Text(self.content))
             self.set_class(True, "user")
         else:
-            md = Markdown(self.content)
+            from rich.markdown import Markdown
             from rich.console import Group
+            from rich.text import Text
+
+            md = Markdown(self.content)
             group_items = [md]
             if self.model:
                 meta = Text()
@@ -46,3 +54,14 @@ class MessageBubble(Static):
                 group_items.append(meta)
             self.update(Group(*group_items))
             self.set_class(True, "assistant")
+
+    def update_streaming(self, text: str) -> None:
+        from rich.text import Text
+        self.update(Text(text + "▌"))
+
+    def finalize_stream(self, content: str, model: str = "", duration: float = 0.0) -> None:
+        self.content = content
+        self.model = model
+        self.duration = duration
+        self.streaming = False
+        self._render_final()
