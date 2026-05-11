@@ -35,6 +35,7 @@ Respond in the same language the user uses."""
 class AgentDeps:
     session_id: str
     model_id: str
+    send_event: Callable[[dict], Awaitable[None]] | None = None
 
 
 def create_agent(model_id: str, system_prompt: str = "") -> Agent:
@@ -94,7 +95,7 @@ async def stream_chat(
     history = _load_history(messages[:-1])
 
     agent = create_agent(model_id, session.get("system_prompt", ""))
-    deps = AgentDeps(session_id=session_id, model_id=model_id)
+    deps = AgentDeps(session_id=session_id, model_id=model_id, send_event=send_event)
 
     start_time = time.monotonic()
     assistant_id = None

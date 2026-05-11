@@ -19,9 +19,18 @@ def register_memory_tools(agent: Agent):
         try:
             embedding = await embed_text(content)
             db = await get_db()
-            await crud.store_memory(
+            mem = await crud.store_memory(
                 db, ctx.deps.session_id, content, category, embedding
             )
+            if ctx.deps.send_event:
+                await ctx.deps.send_event(
+                    {
+                        "type": "memory.stored",
+                        "memory_id": mem["id"],
+                        "content": content,
+                        "category": category,
+                    }
+                )
             return f"Stored in memory (category: {category})."
         except Exception as e:
             return f"Failed to store memory: {e}"
