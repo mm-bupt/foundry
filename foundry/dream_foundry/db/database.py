@@ -1,3 +1,5 @@
+import sys
+import os
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -7,6 +9,15 @@ import sqlite_vec
 from dream_foundry.config import settings
 
 _db: aiosqlite.Connection | None = None
+
+
+def _get_vec_extension_path() -> str:
+    if getattr(sys, "frozen", False):
+        base = Path(sys._MEIPASS)
+        dll = base / "sqlite_vec" / "vec0.dll"
+        if dll.exists():
+            return str(dll)
+    return sqlite_vec.loadable_path()
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS sessions (
@@ -70,7 +81,7 @@ async def _connect() -> aiosqlite.Connection:
     db = await aiosqlite.connect(str(settings.db_path))
     db.row_factory = aiosqlite.Row
     await db.enable_load_extension(True)
-    await db.load_extension(sqlite_vec.loadable_path())
+    await db.load_extension(_get_vec_extension_path())
     await db.enable_load_extension(False)
     await db.execute("PRAGMA journal_mode=WAL")
     await db.execute("PRAGMA foreign_keys=ON")

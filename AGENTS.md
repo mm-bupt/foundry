@@ -72,12 +72,16 @@ python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload  # 
 cd tui && bun install && bun run src/index.tsx  # TUI only
 
 # === Production Build ===
-python build.py         # Build all (backend PyInstaller + TUI folder + launcher)
-python build.py backend  # Build backend only (PyInstaller onefile)
-python build.py tui      # Build TUI only (copies sources + node_modules to dist/tui)
+python build.py          # Build all (self-contained folder)
+python build.py backend  # Backend only (PyInstaller onefile)
+python build.py tui      # TUI only (sources + node_modules)
+python build.py bun      # Bundle Bun runtime only
 
-# Output: dist/dream-foundry.bat (or .sh)
-# Note: TUI cannot be compiled to a single exe because @opentui/core uses native binaries
+# Output: dist/dream-foundry/
+#   dream-foundry.bat (or .sh)  ← double-click to run
+#   bin/dream-foundry-server    ← backend
+#   bin/bun                     ← Bun runtime (no install needed)
+#   lib/tui/                    ← TUI sources
 ```
 
 ## API Endpoints (Phase 1 + 2)
