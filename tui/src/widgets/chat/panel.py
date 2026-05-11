@@ -1,7 +1,10 @@
 from textual.containers import Vertical, VerticalScroll
+from textual.widgets import Static
+from rich.text import Text
 
 from src.widgets.chat.message import MessageBubble
 from src.widgets.chat.input import ChatInputArea
+from src.theme.opencode import OpencodeTheme
 
 
 class ChatPanel(Vertical):
@@ -47,3 +50,14 @@ class ChatPanel(Vertical):
     def update_model(self, model_name: str) -> None:
         self.model_name = model_name
         self.input_area.update_model(model_name)
+
+    def show_spinner(self) -> None:
+        t = OpencodeTheme
+        self._spinner = Static(Text(" ⠋ Thinking...", style=f"color({t.primary})"), classes="spinner")
+        self.message_list.mount(self._spinner)
+        self.scroll_to_bottom()
+
+    def hide_spinner(self) -> None:
+        if hasattr(self, '_spinner') and self._spinner is not None:
+            self._spinner.remove()
+            self._spinner = None

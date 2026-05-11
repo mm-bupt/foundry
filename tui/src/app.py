@@ -17,6 +17,7 @@ class DreamFoundryApp(App):
         Binding("ctrl+j", "prev_session", "Prev Session"),
         Binding("ctrl+k", "next_session", "Next Session"),
         Binding("ctrl+m", "switch_model", "Switch Model"),
+        Binding("ctrl+t", "toggle_context", "Context"),
         Binding("ctrl+backslash", "interrupt", "Interrupt"),
     ]
 
@@ -101,7 +102,10 @@ class DreamFoundryApp(App):
     async def _switch_session(self, direction: int):
         sessions = self.store.sessions
         idx = next((i for i, s in enumerate(sessions) if s["id"] == self.store.current_session_id), 0)
-        new_idx = idx + direction
+        if direction == 0:
+            new_idx = idx
+        else:
+            new_idx = idx + direction
         if new_idx < 0 or new_idx >= len(sessions):
             return
         session = sessions[new_idx]
@@ -132,6 +136,20 @@ class DreamFoundryApp(App):
         screen = self.screen_stack[-1] if len(self.screen_stack) > 1 else None
         if screen and hasattr(screen, "refresh_header"):
             screen.refresh_header()
+
+    def switch_to_session(self, session_id: str) -> None:
+        if session_id == self.store.current_session_id:
+            return
+        self.store.current_session_id = session_id
+        session = self.store.get_current_session()
+        if session:
+            self.store.current_model = session.get("model_id", "claude-sonnet")
+        self.run_worker(self._switch_session(0), exclusive=True)
+
+    def action_toggle_context(self) -> None:
+        screen = self.screen_stack[-1] if len(self.screen_stack) > 1 else None
+        if screen and hasattr(screen, "toggle_context"):
+            screen.toggle_context()
 
     def action_interrupt(self) -> None:
         self.run_worker(self.ws.interrupt(), exclusive=True)

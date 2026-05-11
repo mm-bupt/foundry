@@ -6,6 +6,7 @@ from src.widgets.common.footer import AppFooter
 from src.widgets.session.sidebar import SessionSidebar
 from src.widgets.chat.panel import ChatPanel
 from src.widgets.chat.message import MessageBubble
+from src.widgets.context.panel import ContextPanel
 from src.theme.opencode import OpencodeTheme, TOOL_ICONS, DEFAULT_TOOL_ICON
 
 
@@ -27,6 +28,8 @@ class MainScreen(Screen):
         body._add_child(self.sidebar)
         self.chat = ChatPanel()
         body._add_child(self.chat)
+        self.context_panel = ContextPanel()
+        body._add_child(self.context_panel)
         yield body
         self.footer = AppFooter(memory_count=self.app.store.memory_count)
         yield self.footer
@@ -56,6 +59,7 @@ class MainScreen(Screen):
         self.chat.update_model(self.app.store.current_model)
         self.footer.update_memory_count(self.app.store.memory_count)
         self._load_messages()
+        self.run_worker(self._load_memories(), exclusive=True)
 
     def refresh_sessions(self) -> None:
         self.sidebar.update_sessions(self.app.store.sessions, self.app.store.current_session_id)
@@ -67,6 +71,15 @@ class MainScreen(Screen):
     def toggle_sidebar(self) -> None:
         self.sidebar.toggle()
 
+    def toggle_context(self) -> None:
+        if hasattr(self, 'context_panel'):
+            self.context_panel.toggle()
+
+    async def _load_memories(self):
+        memories = await self.app.store.fetch_memories(self.app.store.current_session_id)
+        if hasattr(self, 'context_panel'):
+            self.context_panel.update_memories(memories)
+
     def focus_chat_input(self) -> None:
         self.chat.focus_input()
 
@@ -76,8 +89,10 @@ class MainScreen(Screen):
         if event_type == "stream.delta":
             text = event.get("text", "")
             if self.app._streaming_bubble is None:
+                self.chat.show_spinner()
                 bubble = MessageBubble(role="assistant", content="", streaming=True)
                 self.chat.add_message(bubble)
+                self.chat.hide_spinner()
                 self.app._streaming_bubble = bubble
                 self.app._streaming_text = ""
             self.app._streaming_text += text
@@ -85,6 +100,7 @@ class MainScreen(Screen):
             self.chat.scroll_to_bottom()
 
         elif event_type == "stream.done":
+            self.chat.hide_spinner()
             if self.app._streaming_bubble:
                 self.app._streaming_bubble.finalize_stream(
                     content=self.app._streaming_text,
@@ -95,6 +111,7 @@ class MainScreen(Screen):
                 self.app._streaming_text = ""
 
         elif event_type == "stream.error":
+            self.chat.hide_spinner()
             error = event.get("error", {})
             bubble = MessageBubble(role="assistant", content=f"Error: {error.get('message', 'Unknown error')}")
             self.chat.add_message(bubble)
@@ -139,6 +156,7 @@ class MainScreen(Screen):
         elif event_type == "memory.stored":
             self.app.store.memory_count += 1
             self.footer.update_memory_count(self.app.store.memory_count)
+            self.run_worker(self._load_memories(), exclusive=True)
 
         elif event_type == "connection.lost":
             self.app.store.connection_status = "disconnected"
