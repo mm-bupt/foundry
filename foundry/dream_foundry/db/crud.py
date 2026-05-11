@@ -188,6 +188,10 @@ async def store_memory(
         "INSERT INTO memory_vectors (id, session_id, content, category, embedding, created_at) VALUES (?, ?, ?, ?, ?, ?)",
         (mid, session_id, content, category, embedding, now),
     )
+    await db.execute(
+        "INSERT INTO vec_memory (id, embedding) VALUES (?, ?)",
+        (mid, embedding),
+    )
     await db.commit()
     return {
         "id": mid,
@@ -208,6 +212,7 @@ async def list_memory(db: aiosqlite.Connection, session_id: str) -> list[dict]:
 
 
 async def delete_memory(db: aiosqlite.Connection, memory_id: str) -> bool:
+    await db.execute("DELETE FROM vec_memory WHERE id = ?", (memory_id,))
     cursor = await db.execute("DELETE FROM memory_vectors WHERE id = ?", (memory_id,))
     await db.commit()
     return cursor.rowcount > 0
@@ -216,7 +221,42 @@ async def delete_memory(db: aiosqlite.Connection, memory_id: str) -> bool:
 async def search_memory(
     db: aiosqlite.Connection, session_id: str, query_embedding: bytes, limit: int = 5
 ) -> list[dict]:
+    try:
+        cursor = await db.execute(
+            """
+            SELECT mv.id, mv.session_id, mv.content, mv.category, mv.created_at, vm.distance
+            FROM vec_memory vm
+            JOIN memory_vectors mv ON mv.id = vm.id
+            WHERE mv.session_id = ?
+            ORDER BY vm.embedding <-> ?
+            LIMIT ?
+            """,
+            (session_id, query_embedding, limit),
+        )
+        rows = await cursor.fetchall()
+        results = []
+        for row in rows:
+            r = dict(row)
+            results.append(
+                {
+                    "id": r["id"],
+                    "session_id": r["session_id"],
+                    "content": r["content"],
+                    "category": r["category"],
+                    "created_at": r["created_at"],
+                    "relevance_score": round(1.0 - r["distance"], 4),
+                }
+            )
+        return results
+    except Exception:
+        return await _fallback_search(db, session_id, query_embedding, limit)
+
+
+async def _fallback_search(
+    db: aiosqlite.Connection, session_id: str, query_embedding: bytes, limit: int
+) -> list[dict]:
     import struct
+    from dream_foundry.config import settings
 
     dim = len(query_embedding) // 4
     cursor = await db.execute(
