@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
 
     default_model: str = "claude-sonnet"
+    summary_model: str = "openai:gpt-4o-mini"
     embedding_model: str = "openai:text-embedding-3-small"
     embedding_dimensions: int = 1536
 
