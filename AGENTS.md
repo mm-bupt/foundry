@@ -59,15 +59,24 @@ dream-foundry/
 ## Key Commands
 
 ```bash
-# Install backend
-pip install -e foundry
+# === Dev Mode (backend + TUI together) ===
+# Windows:
+dev.bat
 
-# Run backend server
-python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload
+# Linux/macOS:
+./dev.sh
 
-# API docs (when server running)
-# Swagger: http://localhost:8000/docs
-# ReDoc:   http://localhost:8000/redoc
+# Individual components:
+pip install -e foundry                  # Install backend
+python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
+cd tui && bun install && bun run src/index.tsx  # TUI only
+
+# === Production Build (single app) ===
+python build.py         # Build all (backend + TUI + launcher)
+python build.py backend  # Build backend only
+python build.py tui      # Build TUI only
+
+# Output: dist/dream-foundry.bat (or .sh)
 ```
 
 ## API Endpoints (Phase 1 + 2)
@@ -132,17 +141,32 @@ Full design docs in `docs/`:
 - `06-database.md` — SQLite schema, vector storage
 - `07-implementation-plan.md` — Phase-by-phase roadmap
 
-## Next Steps (Phase 3)
+## Next Steps
 
-Phase 3 will add:
-- Full vector-based long-term memory with sqlite-vec
-- History processors: auto-summarization of old messages
-- Agent tools integration: store_memory / recall_memory wired into agent.core
-- Embedding pipeline for memory search
+All phases P1-P8 complete. Future work:
+- Improved markdown/code rendering with tree-sitter
+- More slash commands and dialog-based interactions
+- Theme system with multiple built-in themes
+- Sound effects and animations
+- Plugin system
 
-## Notes for Developer
+## Project Structure (Updated)
 
-- Backend package name is `dream_foundry` (installed from `foundry/` dir)
-- Database auto-creates on first run at `~/.dream-foundry/dream-foundry.db`
-- WebSocket is default transport; SSE is fallback for restrictive proxies
-- Opencode TUI style reference: `docs/04-tui-design.md` has full color palette + widget specs
+```
+dream-foundry/
+├── build.py                         # Build script (PyInstaller + Bun compile)
+├── dev.sh / dev.bat                 # Dev launcher (backend + TUI)
+├── foundry/                         # Backend (Python/FastAPI/Pydantic AI)
+│   └── dream_foundry/
+│       ├── main.py, config.py
+│       ├── agent/ (core, registry, tools, memory, context)
+│       ├── api/ (sessions, models, ws, sse, memory)
+│       ├── db/ (database, models, crud)
+│       └── schemas/
+├── tui/                             # TUI (Bun/TypeScript/@opentui/solid)
+│   └── src/
+│       ├── index.tsx, App.tsx
+│       ├── api.ts, ws.ts, store.ts, commands.ts, theme.ts
+│       └── components/ (Header, ChatArea, InputBar, Sidebar, Footer, ContextPanel)
+└── docs/                            # Design documents
+```
