@@ -1,4 +1,8 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from dream_foundry.yaml_config import foundry_config
 
 
 @dataclass
@@ -9,9 +13,11 @@ class ModelInfo:
     provider_prefix: str
     context_window: int
     max_output_tokens: int
+    api_base: str = ""
+    api_key: str = ""
 
 
-MODEL_REGISTRY: dict[str, ModelInfo] = {
+_BUILTIN_MODELS: dict[str, ModelInfo] = {
     "gpt-4o": ModelInfo(
         id="gpt-4o",
         name="GPT-4o",
@@ -45,6 +51,41 @@ MODEL_REGISTRY: dict[str, ModelInfo] = {
         max_output_tokens=8192,
     ),
 }
+
+MODEL_REGISTRY: dict[str, ModelInfo] = {}
+
+
+def _build_registry_from_yaml() -> dict[str, ModelInfo]:
+    if not foundry_config.providers:
+        return dict(_BUILTIN_MODELS)
+
+    registry: dict[str, ModelInfo] = {}
+    for prov_name, prov in foundry_config.providers.items():
+        for model_id in prov.models:
+            provider_prefix = f"{prov.type}:{model_id}"
+            display_name = model_id
+            api_base = prov.options.api
+            api_key = prov.options.apiKey
+
+            registry[model_id] = ModelInfo(
+                id=model_id,
+                name=display_name,
+                provider=prov.type,
+                provider_prefix=provider_prefix,
+                context_window=128000,
+                max_output_tokens=16384,
+                api_base=api_base,
+                api_key=api_key,
+            )
+    return registry
+
+
+def init_registry() -> None:
+    global MODEL_REGISTRY
+    MODEL_REGISTRY = _build_registry_from_yaml()
+
+
+init_registry()
 
 
 def get_model_info(model_id: str) -> ModelInfo | None:

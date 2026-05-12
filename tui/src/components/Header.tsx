@@ -2,24 +2,10 @@ import { For, Show, createSignal } from "solid-js"
 import { theme, toolIcons } from "../theme"
 import type { AppStore } from "../store"
 import type { WSClient } from "../ws"
-import * as api from "../api"
 
 export function Header(props: { store: AppStore; ws: WSClient }) {
   const store = props.store
   const ws = props.ws
-
-  async function cycleModel() {
-    const models = store.models()
-    if (models.length === 0) return
-    const cur = store.currentModel()
-    const idx = models.findIndex((m) => m.id === cur)
-    const next = models[(idx + 1) % models.length]
-    store.setCurrentModel(next.id)
-    if (store.currentSessionId()) {
-      await api.updateSession(store.currentSessionId(), { model_id: next.id })
-    }
-    store.setStatusMessage(`Model: ${next.id}`)
-  }
 
   return (
     <box
@@ -35,7 +21,7 @@ export function Header(props: { store: AppStore; ws: WSClient }) {
         <strong>Dream Foundry</strong>
       </text>
       <text fg={theme.textMuted}> ── </text>
-      <box onMouseDown={() => cycleModel()}>
+      <box onMouseDown={() => store.setShowModelPicker(true)}>
         <text fg={theme.accent}>
           ● {store.currentModel()} ▾
         </text>

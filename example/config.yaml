@@ -1,0 +1,18 @@
+provider:
+  zhipuai:
+    options:
+      - api: "https://open.bigmodel.cn/api/coding/paas/v4"
+      - apiKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    type: "openai"
+    models: 
+      - "glm-5.1" 
+      - "glm-5-turbo" 
+      - "glm-4.7"
+  minimax:
+    type: "anthropic",
+    options:
+      - api: "https://api.minimaxi.com/anthropic/v1"
+      - apiKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    models:
+      - "MiniMax-M2.7"
+model: zhipuai:glm-5.1

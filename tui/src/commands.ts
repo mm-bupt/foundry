@@ -56,11 +56,7 @@ export const commands: Command[] = [
         }
         store.setStatusMessage(`Model: ${modelId}`)
       } else {
-        const models = store.models()
-        if (models.length > 0) {
-          const names = models.map((m) => m.id).join(", ")
-          store.setStatusMessage(`Available: ${names}`)
-        }
+        store.setShowModelPicker(true)
       }
     },
   },

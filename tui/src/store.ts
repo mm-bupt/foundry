@@ -57,6 +57,7 @@ export function createAppStore() {
   const [route, setRoute] = createSignal<"home" | "session">("home")
   const [statusMessage, setStatusMessage] = createSignal("")
   const [inputText, setInputText] = createSignal("")
+  const [showModelPicker, setShowModelPicker] = createSignal(false)
 
   function addMessage(msg: Message) {
     setMessages((prev) => [...prev, msg])
@@ -112,6 +113,7 @@ export function createAppStore() {
     route, setRoute,
     statusMessage, setStatusMessage,
     inputText, setInputText,
+    showModelPicker, setShowModelPicker,
     addMessage,
     appendStreamingText,
     finalizeStreamingMessage,

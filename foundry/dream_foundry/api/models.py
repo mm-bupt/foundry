@@ -7,19 +7,17 @@ router = APIRouter(prefix="/api/models", tags=["models"])
 @router.get("")
 async def get_models():
     models = list_models()
-    return {
-        "models": [
-            {
-                "id": m.id,
-                "name": m.name,
-                "provider": m.provider,
-                "provider_prefix": m.provider_prefix,
-                "context_window": m.context_window,
-                "max_output_tokens": m.max_output_tokens,
-            }
-            for m in models
-        ]
-    }
+    return [
+        {
+            "id": m.id,
+            "name": m.name,
+            "provider": m.provider,
+            "provider_prefix": m.provider_prefix,
+            "context_window": m.context_window,
+            "max_output_tokens": m.max_output_tokens,
+        }
+        for m in models
+    ]
 
 
 @router.get("/active")

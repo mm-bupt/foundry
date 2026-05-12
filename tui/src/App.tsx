@@ -10,6 +10,7 @@ import { ChatArea } from "./components/ChatArea"
 import { InputBar } from "./components/InputBar"
 import { Footer } from "./components/Footer"
 import { ContextPanel } from "./components/ContextPanel"
+import { ModelPicker } from "./components/ModelPicker"
 
 export function App() {
   const store = createAppStore()
@@ -124,6 +125,8 @@ export function App() {
       return
     }
 
+    if (store.showModelPicker()) return
+
     if (!store.currentSessionId()) {
       const session = await api.createSession(undefined, store.currentModel())
       if (session) {
@@ -171,6 +174,20 @@ export function App() {
         onSubmit={handleSubmit}
       />
       <Footer store={store} />
+      <Show when={store.showModelPicker()}>
+        <ModelPicker
+          store={store}
+          onSelect={async (modelId: string) => {
+            store.setCurrentModel(modelId)
+            if (store.currentSessionId()) {
+              await api.updateSession(store.currentSessionId(), { model_id: modelId })
+            }
+            store.setShowModelPicker(false)
+            store.setStatusMessage(`Model: ${modelId}`)
+          }}
+          onClose={() => store.setShowModelPicker(false)}
+        />
+      </Show>
     </box>
   )
 }

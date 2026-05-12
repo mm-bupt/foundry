@@ -1,6 +1,8 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings
 
+from dream_foundry.yaml_config import foundry_config
+
 
 class Settings(BaseSettings):
     app_name: str = "Dream Foundry"
@@ -34,3 +36,16 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+if foundry_config.providers:
+    if foundry_config.default_model_id:
+        settings.default_model = foundry_config.default_model_id
+
+    for _name, prov in foundry_config.providers.items():
+        api_key = prov.options.apiKey
+        if not api_key:
+            continue
+        if prov.type == "openai" and not settings.openai_api_key:
+            settings.openai_api_key = api_key
+        elif prov.type == "anthropic" and not settings.anthropic_api_key:
+            settings.anthropic_api_key = api_key

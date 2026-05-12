@@ -18,6 +18,7 @@ from dream_foundry.agent.registry import get_provider_prefix, get_model_info
 from dream_foundry.agent.context import trim_and_summarize
 from dream_foundry.db import crud
 from dream_foundry.db.database import get_db
+from dream_foundry.config import settings
 
 
 SYSTEM_PROMPT = """You are Dream Foundry AI, a helpful coding assistant.
@@ -39,15 +40,58 @@ class AgentDeps:
 
 
 def create_agent(model_id: str, system_prompt: str = "") -> Agent:
+    model_info = get_model_info(model_id)
     model_string = get_provider_prefix(model_id)
-    agent = Agent(
-        model_string,
-        instructions=system_prompt or SYSTEM_PROMPT,
-        deps_type=AgentDeps,
-        history_processors=[trim_and_summarize],
-    )
+
+    if model_info and model_info.api_base:
+        api_key = model_info.api_key or _resolve_api_key(model_info.provider)
+        model_obj = _create_model_client(
+            model_string, model_info.provider, api_key, model_info.api_base
+        )
+        agent = Agent(
+            model_obj,
+            instructions=system_prompt or SYSTEM_PROMPT,
+            deps_type=AgentDeps,
+            history_processors=[trim_and_summarize],
+        )
+    else:
+        agent = Agent(
+            model_string,
+            instructions=system_prompt or SYSTEM_PROMPT,
+            deps_type=AgentDeps,
+            history_processors=[trim_and_summarize],
+        )
     _register_tools(agent)
     return agent
+
+
+def _resolve_api_key(provider: str) -> str:
+    if provider == "openai":
+        return settings.openai_api_key
+    elif provider == "anthropic":
+        return settings.anthropic_api_key
+    return ""
+
+
+def _create_model_client(model_string: str, provider: str, api_key: str, base_url: str):
+    if provider == "anthropic":
+        try:
+            from pydantic_ai.models.anthropic import AnthropicModel
+            import anthropic
+
+            client = anthropic.Anthropic(api_key=api_key, base_url=base_url)
+            return AnthropicModel(anthropic_client=client)
+        except Exception:
+            return model_string
+    else:
+        try:
+            from pydantic_ai.models.openai import OpenAIModel
+            from openai import OpenAI
+
+            client = OpenAI(api_key=api_key, base_url=base_url)
+            return OpenAIModel(openai_client=client)
+        except Exception:
+            return model_string
 
 
 def _register_tools(agent: Agent):
