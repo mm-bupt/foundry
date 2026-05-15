@@ -29,26 +29,26 @@ IS_MACOS = platform.system() == "Darwin"
 IS_LINUX = platform.system() == "Linux"
 
 HIDDEN_IMPORTS = [
-    "dream_foundry",
-    "dream_foundry.main",
-    "dream_foundry.config",
-    "dream_foundry.agent.core",
-    "dream_foundry.agent.registry",
-    "dream_foundry.agent.tools",
-    "dream_foundry.agent.memory",
-    "dream_foundry.agent.context",
-    "dream_foundry.api.sessions",
-    "dream_foundry.api.models",
-    "dream_foundry.api.ws",
-    "dream_foundry.api.sse",
-    "dream_foundry.api.memory",
-    "dream_foundry.db.database",
-    "dream_foundry.db.crud",
-    "dream_foundry.db.models",
-    "dream_foundry.shared_protocol",
-    "dream_foundry.schemas.session",
-    "dream_foundry.schemas.chat",
-    "dream_foundry.schemas.memory",
+    "foundry_app",
+    "foundry_app.main",
+    "foundry_app.config",
+    "foundry_app.agent.core",
+    "foundry_app.agent.registry",
+    "foundry_app.agent.tools",
+    "foundry_app.agent.memory",
+    "foundry_app.agent.context",
+    "foundry_app.api.sessions",
+    "foundry_app.api.models",
+    "foundry_app.api.ws",
+    "foundry_app.api.sse",
+    "foundry_app.api.memory",
+    "foundry_app.db.database",
+    "foundry_app.db.crud",
+    "foundry_app.db.models",
+    "foundry_app.shared_protocol",
+    "foundry_app.schemas.session",
+    "foundry_app.schemas.chat",
+    "foundry_app.schemas.memory",
     "aiosqlite",
     "sqlite_vec",
     "uvicorn.logging",
@@ -142,7 +142,7 @@ def build_backend():
     if os.path.exists(vec_dll):
         cmd += ["--add-binary", f"{vec_dll}{os.pathsep}sqlite_vec"]
 
-    cmd += ["-y", str(FOUNDRY / "dream_foundry" / "__main__.py")]
+    cmd += ["-y", str(FOUNDRY / "foundry_app" / "__main__.py")]
     run(cmd)
 
     shutil.rmtree(DIST.parent / ".build_backend", ignore_errors=True)

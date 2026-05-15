@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from dream_foundry.config import settings
-from dream_foundry.db.database import init_db, get_db, close_db
-from dream_foundry.api import sessions, models, memory
-from dream_foundry.api.ws import router as ws_router
-from dream_foundry.api.sse import router as sse_router
+from foundry_app.config import settings
+from foundry_app.db.database import init_db, get_db, close_db
+from foundry_app.api import sessions, models, memory
+from foundry_app.api.ws import router as ws_router
+from foundry_app.api.sse import router as sse_router
 
 
 @asynccontextmanager

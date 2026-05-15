@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-from dream_foundry.db.database import get_db
-from dream_foundry.db import crud
-from dream_foundry.schemas.session import (
+from foundry_app.db.database import get_db
+from foundry_app.db import crud
+from foundry_app.schemas.session import (
     SessionCreate,
     SessionUpdate,
     SessionResponse,

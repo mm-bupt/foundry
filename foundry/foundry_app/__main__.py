@@ -1,9 +1,9 @@
 import uvicorn
-from dream_foundry.config import settings
+from foundry_app.config import settings
 
 if __name__ == "__main__":
     uvicorn.run(
-        "dream_foundry.main:app",
+        "foundry_app.main:app",
         host=settings.host,
         port=settings.port,
         reload=False,

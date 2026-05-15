@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from dream_foundry.db.database import get_db
-from dream_foundry.db import crud
-from dream_foundry.agent.memory import embed_text
+from foundry_app.db.database import get_db
+from foundry_app.db import crud
+from foundry_app.agent.memory import embed_text
 
 router = APIRouter(prefix="/api/memory", tags=["memory"])
 

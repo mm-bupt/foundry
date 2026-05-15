@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import aiosqlite
 
-from dream_foundry.db.models import Session, Message, MemoryVector, ToolCallRecord
+from foundry_app.db.models import Session, Message, MemoryVector, ToolCallRecord
 
 
 def utcnow() -> str:
@@ -256,7 +256,7 @@ async def _fallback_search(
     db: aiosqlite.Connection, session_id: str, query_embedding: bytes, limit: int
 ) -> list[dict]:
     import struct
-    from dream_foundry.config import settings
+    from foundry_app.config import settings
 
     dim = len(query_embedding) // 4
     cursor = await db.execute(

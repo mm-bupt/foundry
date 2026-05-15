@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 import aiosqlite
 import sqlite_vec
 
-from dream_foundry.config import settings
+from foundry_app.config import settings
 
 _db: aiosqlite.Connection | None = None
 

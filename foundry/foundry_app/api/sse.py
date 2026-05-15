@@ -3,10 +3,10 @@ from sse_starlette.sse import EventSourceResponse
 import asyncio
 import json
 
-from dream_foundry.agent.core import stream_chat
-from dream_foundry.db.database import get_db
-from dream_foundry.db import crud
-from dream_foundry.shared_protocol import to_dict
+from foundry_app.agent.core import stream_chat
+from foundry_app.db.database import get_db
+from foundry_app.db import crud
+from foundry_app.shared_protocol import to_dict
 
 router = APIRouter()
 

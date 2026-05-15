@@ -1,0 +1,18 @@
+{
+  "name": "foundry-tui",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.tsx",
+    "start": "bun run src/index.tsx"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.2.6",
+    "@opentui/solid": "^0.2.6",
+    "solid-js": "^1.9.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/bun": "^1.1.0"
+  }
+}

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from dream_foundry.agent.registry import list_models
+from foundry_app.agent.registry import list_models
 
 router = APIRouter(prefix="/api/models", tags=["models"])
 
@@ -22,8 +22,8 @@ async def get_models():
 
 @router.get("/active")
 async def get_active_model():
-    from dream_foundry.agent.registry import MODEL_REGISTRY
-    from dream_foundry.config import settings
+    from foundry_app.agent.registry import MODEL_REGISTRY
+    from foundry_app.config import settings
 
     model_id = settings.default_model
     info = MODEL_REGISTRY.get(model_id)

@@ -10,7 +10,7 @@ from pydantic_ai.messages import (
     ToolReturnPart,
 )
 
-from dream_foundry.agent.registry import estimate_tokens
+from foundry_app.agent.registry import estimate_tokens
 
 
 async def trim_and_summarize(messages: list[ModelMessage]) -> list[ModelMessage]:
@@ -57,7 +57,7 @@ async def _generate_summary(messages: list[ModelMessage]) -> str:
         return "Previous conversation occurred."
 
     try:
-        from dream_foundry.config import settings
+        from foundry_app.config import settings
 
         agent = Agent(
             settings.summary_model,

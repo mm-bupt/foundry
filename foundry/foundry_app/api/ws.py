@@ -3,8 +3,8 @@ import asyncio
 import json
 import time
 
-from dream_foundry.agent.core import stream_chat
-from dream_foundry.shared_protocol import parse_command, to_dict, Pong
+from foundry_app.agent.core import stream_chat
+from foundry_app.shared_protocol import parse_command, to_dict, Pong
 
 router = APIRouter()
 

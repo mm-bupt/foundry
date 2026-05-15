@@ -219,7 +219,7 @@ Makefile                      # Dev commands
 
 **Single-process mode**:
 ```python
-# python -m dream_foundry
+# python -m foundry_app
 # Starts FastAPI + TUI in one process
 ```
 

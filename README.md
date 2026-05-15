@@ -59,7 +59,7 @@ dev.bat          # Windows
 
 # Or run individually
 pip install -e foundry
-python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload
+python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
 
 cd tui && bun install && bun run src/index.tsx
 ```
@@ -79,7 +79,7 @@ Output goes to `dist/dream-foundry/` with a launcher script.
 ```
 dream-foundry/
 ├── foundry/                          # Backend
-│   └── dream_foundry/
+│   └── foundry_app/
 │       ├── main.py                   # FastAPI entry point
 │       ├── config.py                 # Settings (env + yaml)
 │       ├── yaml_config.py            # ~/.config/foundry/config.yaml parser

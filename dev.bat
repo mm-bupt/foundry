@@ -15,14 +15,14 @@ echo.
 if "%TARGET%"=="all" (
     echo Starting backend...
     cd /d "%ROOT_DIR%foundry"
-    start /B "" python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload
+    start /B "" python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
     cd /d "%ROOT_DIR%"
 )
 
 if "%TARGET%"=="backend" (
     echo Starting backend...
     cd /d "%ROOT_DIR%foundry"
-    python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload
+    python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
     goto :eof
 )
 

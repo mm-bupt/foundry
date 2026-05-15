@@ -28,5 +28,5 @@ cd tui && pip install -e ".[dev]"
 python -m tui.src.app
 
 # Or single-process mode
-python -m dream_foundry
+python -m foundry_app
 ```

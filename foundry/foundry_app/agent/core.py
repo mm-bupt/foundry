@@ -14,11 +14,11 @@ from pydantic_ai.messages import (
     UserPromptPart,
 )
 
-from dream_foundry.agent.registry import get_provider_prefix, get_model_info
-from dream_foundry.agent.context import trim_and_summarize
-from dream_foundry.db import crud
-from dream_foundry.db.database import get_db
-from dream_foundry.config import settings
+from foundry_app.agent.registry import get_provider_prefix, get_model_info
+from foundry_app.agent.context import trim_and_summarize
+from foundry_app.db import crud
+from foundry_app.db.database import get_db
+from foundry_app.config import settings
 
 
 SYSTEM_PROMPT = """You are Dream Foundry AI, a helpful coding assistant.
@@ -95,7 +95,7 @@ def _create_model_client(model_string: str, provider: str, api_key: str, base_ur
 
 
 def _register_tools(agent: Agent):
-    from dream_foundry.agent.tools import register_memory_tools
+    from foundry_app.agent.tools import register_memory_tools
 
     register_memory_tools(agent)
 

@@ -1,7 +1,7 @@
 import hashlib
 import struct
 
-from dream_foundry.config import settings
+from foundry_app.config import settings
 
 _cache: dict[str, bytes] = {}
 

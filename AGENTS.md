@@ -25,7 +25,7 @@ Dream Foundry is a full-stack AI Agent application:
 ```
 dream-foundry/
 ├── foundry/                         # Backend package (pip install -e foundry)
-│   ├── dream_foundry/               # Python package (importable as dream_foundry.*)
+│   ├── foundry_app/               # Python package (importable as foundry_app.*)
 │   │   ├── main.py                  # FastAPI app entry, all routers registered
 │   │   ├── config.py                # Settings (env vars: DREAM_FOUNDRY_*)
 │   │   ├── shared_protocol.py       # WS/SSE message type definitions
@@ -68,7 +68,7 @@ dev.bat
 
 # Individual components:
 pip install -e foundry                  # Install backend
-python -m uvicorn dream_foundry.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
+python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
 cd tui && bun install && bun run src/index.tsx  # TUI only
 
 # === Production Build ===
@@ -162,7 +162,7 @@ dream-foundry/
 ├── build.py                         # Build script (PyInstaller + Bun compile)
 ├── dev.sh / dev.bat                 # Dev launcher (backend + TUI)
 ├── foundry/                         # Backend (Python/FastAPI/Pydantic AI)
-│   └── dream_foundry/
+│   └── foundry_app/
 │       ├── main.py, config.py
 │       ├── agent/ (core, registry, tools, memory, context)
 │       ├── api/ (sessions, models, ws, sse, memory)

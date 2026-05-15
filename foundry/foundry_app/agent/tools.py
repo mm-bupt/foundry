@@ -1,8 +1,8 @@
 from pydantic_ai import Agent, RunContext
-from dream_foundry.agent.core import AgentDeps
-from dream_foundry.db.database import get_db
-from dream_foundry.db import crud
-from dream_foundry.agent.memory import embed_text
+from foundry_app.agent.core import AgentDeps
+from foundry_app.db.database import get_db
+from foundry_app.db import crud
+from foundry_app.agent.memory import embed_text
 
 
 def register_memory_tools(agent: Agent):
