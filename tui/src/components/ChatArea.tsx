@@ -22,7 +22,7 @@ export function ChatArea(props: { store: AppStore }) {
           </box>
         }
       >
-        <scrollbox focused flexDirection="column" flexGrow={1} padding={1}>
+        <scrollbox flexDirection="column" flexGrow={1} padding={1} stickyScroll={true} stickyStart="bottom">
           <For each={props.store.state.messages}>
             {(msg) => <MessageBubble message={msg} store={props.store} />
             }
@@ -31,10 +31,11 @@ export function ChatArea(props: { store: AppStore }) {
             <box flexDirection="column" marginTop={1}>
               <text>
                 <span fg={theme.agent}>▣ </span>
-                <span fg={theme.textMuted}>agent ▸ </span>
-                <span fg={theme.accent}>{props.store.state.currentModel}</span>
+                <span>{props.store.state.currentModel}</span>
               </text>
-              <text>{props.store.state.streamingText}</text>
+              <box paddingLeft={2}>
+                <text>{props.store.state.streamingText}</text>
+              </box>
             </box>
           </Show>
         </scrollbox>

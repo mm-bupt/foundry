@@ -175,3 +175,17 @@ dream-foundry/
 │       └── components/ (Header, ChatArea, InputBar, Sidebar, Footer, ContextPanel)
 └── docs/                            # Design documents
 ```
+
+## React Debugging
+
+- `agent-react-devtools start` — 启动守护进程
+- `agent-react-devtools status` — 检查应用是否已连接
+- `agent-react-devtools get tree [@c1] --depth N` — 获取组件树
+- `agent-react-devtools get component &lt;id&gt;` — 查看 props, state, hooks
+- `agent-react-devtools find &lt;Name&gt;` — 搜索组件
+- `agent-react-devtools errors` — 列出报错组件
+
+## 调试方法
+进行tui调试， 后端使用 调试，pip install -e foundry
+python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+更新后使用uvicorn --reload进行处理， tui使用agent-react-devtools 进行调试。

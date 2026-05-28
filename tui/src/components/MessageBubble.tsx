@@ -7,29 +7,24 @@ export function MessageBubble(props: { message: Message; store: AppStore }) {
   const isUser = () => props.message.role === "user"
 
   return (
-    <box flexDirection="column" marginBottom={1}>
-      <text>
-        {isUser() ? (
-          <span>
-            <span fg={theme.user}>┃</span>
-            <span fg={theme.textMuted}> you</span>
-          </span>
-        ) : (
-          <span>
-            <span fg={theme.agent}>▣</span>
-            <span fg={theme.textMuted}> agent ▸ </span>
-            <span fg={theme.accent}>{props.message.model_id ?? ""}</span>
-          </span>
-        )}
-      </text>
-      <box paddingLeft={2}>
-        <text>{props.message.content}</text>
-      </box>
-      <Show when={!isUser() && props.message.duration_ms}>
+    <box flexDirection="column">
+      <Show when={isUser()}>
+        <text>
+          <span fg={theme.user}>┃</span>
+          <span> </span>
+          <span>{props.message.content}</span>
+        </text>
+      </Show>
+      <Show when={!isUser()}>
+        <text>
+          <span fg={theme.agent}>▣ </span>
+          <span>{props.message.model_id ?? "agent"}</span>
+          <Show when={props.message.duration_ms}>
+            <span fg={theme.textMuted}> · {(props.message.duration_ms! / 1000).toFixed(1)}s</span>
+          </Show>
+        </text>
         <box paddingLeft={2}>
-          <text fg={theme.textMuted}>
-            {(props.message.duration_ms! / 1000).toFixed(1)}s
-          </text>
+          <text>{props.message.content}</text>
         </box>
       </Show>
     </box>

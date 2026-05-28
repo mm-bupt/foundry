@@ -63,7 +63,14 @@ def _parse_provider(name: str, data: dict) -> ProviderConfig:
 
 def load_yaml_config(config_path: str | Path | None = None) -> FoundryConfig:
     if config_path is None:
-        config_path = Path.home() / ".config" / "foundry" / "config.yaml"
+        config_dir = Path.home() / ".config" / "foundry"
+        for name in ("config.yaml", "config.yml"):
+            candidate = config_dir / name
+            if candidate.exists():
+                config_path = candidate
+                break
+        else:
+            return FoundryConfig()
     config_path = Path(config_path)
 
     if not config_path.exists():

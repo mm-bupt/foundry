@@ -1,5 +1,6 @@
 import json
 import time
+import sys
 from typing import Callable, Awaitable
 from dataclasses import dataclass
 
@@ -13,6 +14,7 @@ from pydantic_ai.messages import (
     ToolReturnPart,
     UserPromptPart,
 )
+from pydantic_ai.agent import ModelRequestNode, CallToolsNode
 
 from foundry_app.agent.registry import get_provider_prefix, get_model_info
 from foundry_app.agent.context import trim_and_summarize
@@ -74,23 +76,28 @@ def _resolve_api_key(provider: str) -> str:
 
 
 def _create_model_client(model_string: str, provider: str, api_key: str, base_url: str):
+    model_name = model_string.split(":", 1)[-1] if ":" in model_string else model_string
     if provider == "anthropic":
         try:
             from pydantic_ai.models.anthropic import AnthropicModel
-            import anthropic
+            from pydantic_ai.providers.anthropic import AnthropicProvider
 
-            client = anthropic.Anthropic(api_key=api_key, base_url=base_url)
-            return AnthropicModel(anthropic_client=client)
+            provider_obj = AnthropicProvider(api_key=api_key)
+            return AnthropicModel(model_name, provider=provider_obj)
         except Exception:
+            import traceback
+            traceback.print_exc()
             return model_string
     else:
         try:
             from pydantic_ai.models.openai import OpenAIModel
-            from openai import OpenAI
+            from pydantic_ai.providers.openai import OpenAIProvider
 
-            client = OpenAI(api_key=api_key, base_url=base_url)
-            return OpenAIModel(openai_client=client)
+            provider_obj = OpenAIProvider(base_url=base_url, api_key=api_key)
+            return OpenAIModel(model_name, provider=provider_obj)
         except Exception:
+            import traceback
+            traceback.print_exc()
             return model_string
 
 
@@ -151,11 +158,9 @@ async def stream_chat(
     try:
         async with agent.iter(user_message, message_history=history, deps=deps) as run:
             async for node in run:
-                if isinstance(node, ModelRequest):
-                    pass
-
-                elif isinstance(node, ModelResponse):
-                    for part in node.parts:
+                if isinstance(node, CallToolsNode):
+                    model_response = node.model_response
+                    for part in model_response.parts:
                         if isinstance(part, TextPart):
                             full_text = part.content
                             if not assistant_id:
@@ -194,19 +199,19 @@ async def stream_chat(
                                 }
                             )
 
-                elif isinstance(node, ModelRequest):
-                    for part in node.parts:
-                        if isinstance(part, ToolReturnPart):
-                            tc_id = part.tool_call_id or ""
-                            meta = pending_tool_calls.pop(tc_id, {})
-                            await send_event(
-                                {
-                                    "type": "tool.result",
-                                    "tool_call_id": tc_id,
-                                    "tool_name": meta.get("tool_name", ""),
-                                    "result": str(part.content),
-                                }
-                            )
+                    async with node.stream(run.ctx) as stream:
+                        async for event in stream:
+                            if isinstance(event, ToolReturnPart):
+                                tc_id = event.tool_call_id or ""
+                                meta = pending_tool_calls.pop(tc_id, {})
+                                await send_event(
+                                    {
+                                        "type": "tool.result",
+                                        "tool_call_id": tc_id,
+                                        "tool_name": meta.get("tool_name", ""),
+                                        "result": str(event.content),
+                                    }
+                                )
 
         result = run.result
         if result:
@@ -223,8 +228,8 @@ async def stream_chat(
 
             usage = result.usage()
             if usage:
-                input_tokens = usage.input_tokens
-                output_tokens = usage.output_tokens
+                input_tokens = usage.request_tokens or 0
+                output_tokens = usage.response_tokens or 0
 
             all_msgs = result.all_messages()
             if assistant_id:
@@ -255,6 +260,9 @@ async def stream_chat(
         )
 
     except Exception as e:
+        print(f"[stream_chat] EXCEPTION: {e}", file=sys.stderr, flush=True)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
         await send_event(
             {
                 "type": "stream.error",

@@ -8,6 +8,7 @@ from foundry_app.schemas.session import (
     SessionResponse,
     SessionListResponse,
     SessionDetailResponse,
+    map_message,
 )
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
@@ -44,7 +45,7 @@ async def get_session(session_id: str):
     messages = await crud.list_messages(db, session_id)
     return SessionDetailResponse(
         **session,
-        messages=messages,
+        messages=[map_message(m) for m in messages],
     )
 
 

@@ -28,3 +28,4 @@ venv/
 
 *.log
 node_modules/
+.playground/

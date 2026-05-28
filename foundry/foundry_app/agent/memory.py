@@ -17,8 +17,16 @@ async def embed_text(text: str) -> bytes:
 
     try:
         import openai
+        import httpx
 
-        client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+        api_key = settings.openai_api_key
+        if not api_key:
+            raise ValueError("No OpenAI API key configured for embeddings")
+
+        client = openai.AsyncOpenAI(
+            api_key=api_key,
+            http_client=httpx.AsyncClient(timeout=10.0),
+        )
         response = await client.embeddings.create(
             model="text-embedding-3-small",
             input=text,

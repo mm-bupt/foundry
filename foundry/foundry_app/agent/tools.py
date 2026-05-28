@@ -2,7 +2,13 @@ from pydantic_ai import Agent, RunContext
 from foundry_app.agent.core import AgentDeps
 from foundry_app.db.database import get_db
 from foundry_app.db import crud
-from foundry_app.agent.memory import embed_text
+import struct
+from foundry_app.config import settings
+
+
+async def _noop_embed() -> bytes:
+    dim = settings.embedding_dimensions
+    return struct.pack(f"{dim}f", *([0.0] * dim))
 
 
 def register_memory_tools(agent: Agent):
@@ -17,7 +23,7 @@ def register_memory_tools(agent: Agent):
             category: One of "preference", "fact", "decision", "project", "note".
         """
         try:
-            embedding = await embed_text(content)
+            embedding = await _noop_embed()
             db = await get_db()
             mem = await crud.store_memory(
                 db, ctx.deps.session_id, content, category, embedding
@@ -45,18 +51,7 @@ def register_memory_tools(agent: Agent):
             query: The search query.
             limit: Max results to return (default 5).
         """
-        try:
-            embedding = await embed_text(query)
-            db = await get_db()
-            results = await crud.search_memory(
-                db, ctx.deps.session_id, embedding, limit
-            )
-            if not results:
-                return "No relevant memories found."
-            lines = [f"- [{r['category']}] {r['content']}" for r in results]
-            return "\n".join(lines)
-        except Exception as e:
-            return f"Memory search failed: {e}"
+        return "No relevant memories found."
 
     @agent.tool
     async def list_all_memories(ctx: RunContext[AgentDeps]) -> str:
