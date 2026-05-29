@@ -1,10 +1,9 @@
-import { useState, useCallback } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-import { CodeHighlighter } from "@ant-design/x"
+import { useState, useCallback, type ReactNode } from "react"
+import XMarkdown from "@ant-design/x-markdown"
+import type { ComponentProps } from "@ant-design/x-markdown"
+import { CodeHighlighter, Mermaid } from "@ant-design/x"
 import { Button, Tooltip } from "antd"
 import { CopyOutlined, CheckOutlined } from "@ant-design/icons"
-import type { Components } from "react-markdown"
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -29,30 +28,28 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function CodeBlock({
-  className,
-  children,
-}: {
-  className?: string
-  children?: React.ReactNode
-}) {
-  const match = /language-(\w+)/.exec(className || "")
-  const lang = match ? match[1] : ""
-  const code = String(children).replace(/\n$/, "")
+function extractText(domNode: ComponentProps["domNode"]): string {
+  if (!domNode) return ""
+  if (domNode.type === "text") return (domNode as { data: string }).data || ""
+  if ("children" in domNode && Array.isArray(domNode.children)) {
+    return (domNode.children as ComponentProps["domNode"][]).map(extractText).join("")
+  }
+  return ""
+}
 
-  if (!lang) {
+function CodeBlock({ domNode, lang, block, children }: ComponentProps) {
+  const code = extractText(domNode).replace(/\n$/, "")
+
+  if (!block) {
     return (
-      <code
-        style={{
-          background: "#f5f5f5",
-          padding: "2px 6px",
-          borderRadius: 4,
-          fontSize: 13,
-        }}
-      >
-        {code}
+      <code style={{ background: "#f5f5f5", padding: "2px 6px", borderRadius: 4, fontSize: 13 }}>
+        {children}
       </code>
     )
+  }
+
+  if (lang === "mermaid") {
+    return <Mermaid style={{ margin: "8px 0" }}>{code}</Mermaid>
   }
 
   return (
@@ -71,107 +68,35 @@ function CodeBlock({
   )
 }
 
-const components: Components = {
-  code({ className, children, ...props }) {
-    const isBlock = (children as string)?.includes("\n")
-    if (isBlock || className) {
-      return <CodeBlock className={className}>{children}</CodeBlock>
-    }
-    return (
-      <code
-        style={{
-          background: "#f5f5f5",
-          padding: "2px 6px",
-          borderRadius: 4,
-          fontSize: 13,
-        }}
-        {...props}
-      >
-        {children}
-      </code>
-    )
+function withStyle(tag: string, style: React.CSSProperties) {
+  function Styled({ children }: ComponentProps) {
+    const Tag = tag as keyof JSX.IntrinsicElements
+    return <Tag style={style}>{children as ReactNode}</Tag>
+  }
+  Styled.displayName = `Styled_${tag}`
+  return Styled
+}
+
+const components: Record<string, React.ComponentType<ComponentProps>> = {
+  code: CodeBlock,
+  pre({ children }: ComponentProps) {
+    return <>{children as ReactNode}</>
   },
-  pre({ children }) {
-    return <>{children}</>
-  },
-  p({ children }) {
-    return <p style={{ margin: "4px 0", lineHeight: 1.7 }}>{children}</p>
-  },
-  ul({ children }) {
-    return <ul style={{ margin: "4px 0", paddingLeft: 20 }}>{children}</ul>
-  },
-  ol({ children }) {
-    return <ol style={{ margin: "4px 0", paddingLeft: 20 }}>{children}</ol>
-  },
-  li({ children }) {
-    return <li style={{ margin: "2px 0", lineHeight: 1.6 }}>{children}</li>
-  },
-  blockquote({ children }) {
-    return (
-      <blockquote
-        style={{
-          borderLeft: "3px solid #d9d9d9",
-          margin: "8px 0",
-          padding: "4px 12px",
-          color: "#666",
-        }}
-      >
-        {children}
-      </blockquote>
-    )
-  },
-  h1({ children }) {
-    return <h1 style={{ margin: "12px 0 8px", fontSize: 20 }}>{children}</h1>
-  },
-  h2({ children }) {
-    return <h2 style={{ margin: "10px 0 6px", fontSize: 18 }}>{children}</h2>
-  },
-  h3({ children }) {
-    return <h3 style={{ margin: "8px 0 4px", fontSize: 16 }}>{children}</h3>
-  },
-  table({ children }) {
-    return (
-      <table
-        style={{
-          borderCollapse: "collapse",
-          margin: "8px 0",
-          width: "100%",
-        }}
-      >
-        {children}
-      </table>
-    )
-  },
-  th({ children }) {
-    return (
-      <th
-        style={{
-          border: "1px solid #d9d9d9",
-          padding: "6px 12px",
-          background: "#fafafa",
-          textAlign: "left",
-        }}
-      >
-        {children}
-      </th>
-    )
-  },
-  td({ children }) {
-    return (
-      <td
-        style={{
-          border: "1px solid #d9d9d9",
-          padding: "6px 12px",
-        }}
-      >
-        {children}
-      </td>
-    )
-  },
-  a({ href, children }) {
+  p: withStyle("p", { margin: "4px 0", lineHeight: 1.7 }),
+  ul: withStyle("ul", { margin: "4px 0", paddingLeft: 20 }),
+  ol: withStyle("ol", { margin: "4px 0", paddingLeft: 20 }),
+  li: withStyle("li", { margin: "2px 0", lineHeight: 1.6 }),
+  blockquote: withStyle("blockquote", { borderLeft: "3px solid #d9d9d9", margin: "8px 0", padding: "4px 12px", color: "#666" }),
+  h1: withStyle("h1", { margin: "12px 0 8px", fontSize: 20 }),
+  h2: withStyle("h2", { margin: "10px 0 6px", fontSize: 18 }),
+  h3: withStyle("h3", { margin: "8px 0 4px", fontSize: 16 }),
+  table: withStyle("table", { borderCollapse: "collapse", margin: "8px 0", width: "100%" }),
+  th: withStyle("th", { border: "1px solid #d9d9d9", padding: "6px 12px", background: "#fafafa", textAlign: "left" }),
+  td: withStyle("td", { border: "1px solid #d9d9d9", padding: "6px 12px" }),
+  a({ href, children }: ComponentProps & { href?: string }) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: "#1677ff" }}>
-        {children}
+        {children as ReactNode}
       </a>
     )
   },
@@ -183,8 +108,8 @@ interface MarkdownContentProps {
 
 export function MarkdownContent({ children }: MarkdownContentProps) {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+    <XMarkdown components={components} openLinksInNewTab>
       {children}
-    </ReactMarkdown>
+    </XMarkdown>
   )
 }
