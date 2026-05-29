@@ -75,6 +75,13 @@ class Pong:
     type: str = "pong"
 
 
+@dataclass
+class SessionTitleUpdated:
+    type: str = "session.title_updated"
+    session_id: str = ""
+    title: str = ""
+
+
 def parse_command(data: dict) -> ChatMessageCmd | None:
     msg_type = data.get("type", "")
     if msg_type == "chat.message":

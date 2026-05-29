@@ -186,6 +186,34 @@ dream-foundry/
 - `agent-react-devtools errors` — 列出报错组件
 
 ## 调试方法
-进行tui调试， 后端使用 调试，pip install -e foundry
+
+### 后端调试
+```bash
+pip install -e foundry
 python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
-更新后使用uvicorn --reload进行处理， tui使用agent-react-devtools 进行调试。
+```
+更新后使用 uvicorn --reload 自动重载。
+
+### TUI 调试
+使用 `agent-react-devtools` 进行调试，参见上方 React Debugging 章节。
+
+### Web UI 调试（Playwright CLI）
+使用 playwright-cli 对 webui 页面进行自动化调试和交互：
+
+```bash
+# 启动 webui 开发服务器
+cd webui && bun install && bun run dev   # 默认 http://localhost:5173
+
+# 使用 playwright-cli 打开页面并调试
+npx @anthropic-ai/playwright-cli@latest open http://localhost:5173
+
+# 常用 playwright-cli 命令：
+# 截图              npx @anthropic-ai/playwright-cli@latest screenshot http://localhost:5173
+# 点击元素          npx @anthropic-ai/playwright-cli@latest click "button.submit"
+# 填写表单          npx @anthropic-ai/playwright-cli@latest fill "input[name=email]" "test@example.com"
+# 获取页面内容      npx @anthropic-ai/playwright-cli@latest content http://localhost:5173
+# 执行 JS           npx @anthropic-ai/playwright-cli@latest evaluate "document.title"
+# 等待选择器出现    npx @anthropic-ai/playwright-cli@latest wait "div.chat-message"
+```
+
+调试记录保存在 `.playwright-cli/` 目录下。

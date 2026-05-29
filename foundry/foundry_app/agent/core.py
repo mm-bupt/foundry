@@ -1,3 +1,4 @@
+import asyncio
 import json
 import time
 import sys
@@ -13,6 +14,14 @@ from pydantic_ai.messages import (
     ToolCallPart,
     ToolReturnPart,
     UserPromptPart,
+    ThinkingPart,
+    TextPartDelta,
+    ThinkingPartDelta,
+    PartStartEvent,
+    PartDeltaEvent,
+    PartEndEvent,
+    FunctionToolCallEvent,
+    FunctionToolResultEvent,
 )
 from pydantic_ai.agent import ModelRequestNode, CallToolsNode
 
@@ -151,6 +160,7 @@ async def stream_chat(
     start_time = time.monotonic()
     assistant_id = None
     full_text = ""
+    thinking_text = ""
     input_tokens = 0
     output_tokens = 0
     pending_tool_calls: dict[str, dict] = {}
@@ -158,60 +168,103 @@ async def stream_chat(
     try:
         async with agent.iter(user_message, message_history=history, deps=deps) as run:
             async for node in run:
-                if isinstance(node, CallToolsNode):
-                    model_response = node.model_response
-                    for part in model_response.parts:
-                        if isinstance(part, TextPart):
-                            full_text = part.content
-                            if not assistant_id:
-                                assistant_id = (
-                                    await crud.create_message(
-                                        db,
-                                        session_id,
-                                        "assistant",
-                                        "",
-                                        model_id=model_id,
+                if isinstance(node, ModelRequestNode):
+                    async with node.stream(run.ctx) as agent_stream:
+                        async for event in agent_stream:
+                            if isinstance(event, PartStartEvent):
+                                part = event.part
+                                if isinstance(part, ThinkingPart):
+                                    await send_event(
+                                        {
+                                            "type": "thinking.start",
+                                            "message_id": user_msg["id"],
+                                        }
                                     )
-                                )["id"]
-                            await send_event(
-                                {
-                                    "type": "stream.delta",
-                                    "message_id": user_msg["id"],
-                                    "part_id": assistant_id,
-                                    "text": part.content,
-                                }
-                            )
-                        elif isinstance(part, ToolCallPart):
-                            tc_id = part.tool_call_id or ""
-                            tool_name = part.tool_name
-                            args = (
-                                part.args_as_dict()
-                                if hasattr(part, "args_as_dict")
-                                else (part.args if isinstance(part.args, dict) else {})
-                            )
-                            pending_tool_calls[tc_id] = {"tool_name": tool_name}
-                            await send_event(
-                                {
-                                    "type": "tool.call",
-                                    "tool_call_id": tc_id,
-                                    "tool_name": tool_name,
-                                    "args": args,
-                                }
-                            )
+                                elif isinstance(part, TextPart):
+                                    if not assistant_id:
+                                        assistant_id = (
+                                            await crud.create_message(
+                                                db,
+                                                session_id,
+                                                "assistant",
+                                                "",
+                                                model_id=model_id,
+                                            )
+                                        )["id"]
+                                    if thinking_text:
+                                        await send_event(
+                                            {
+                                                "type": "thinking.end",
+                                                "message_id": user_msg["id"],
+                                            }
+                                        )
+                            elif isinstance(event, PartDeltaEvent):
+                                delta = event.delta
+                                if isinstance(delta, TextPartDelta):
+                                    full_text += delta.content_delta
+                                    await send_event(
+                                        {
+                                            "type": "stream.delta",
+                                            "message_id": user_msg["id"],
+                                            "part_id": assistant_id or "",
+                                            "text": delta.content_delta,
+                                        }
+                                    )
+                                elif isinstance(delta, ThinkingPartDelta):
+                                    if delta.content_delta:
+                                        thinking_text += delta.content_delta
+                                        await send_event(
+                                            {
+                                                "type": "thinking.delta",
+                                                "message_id": user_msg["id"],
+                                                "text": delta.content_delta,
+                                            }
+                                        )
 
-                    async with node.stream(run.ctx) as stream:
-                        async for event in stream:
-                            if isinstance(event, ToolReturnPart):
-                                tc_id = event.tool_call_id or ""
-                                meta = pending_tool_calls.pop(tc_id, {})
+                        model_response = agent_stream.response
+                        for part in model_response.parts:
+                            if isinstance(part, ToolCallPart):
+                                tc_id = part.tool_call_id or ""
+                                tool_name = part.tool_name
+                                args = (
+                                    part.args_as_dict()
+                                    if hasattr(part, "args_as_dict")
+                                    else (
+                                        part.args
+                                        if isinstance(part.args, dict)
+                                        else {}
+                                    )
+                                )
+                                pending_tool_calls[tc_id] = {
+                                    "tool_name": tool_name
+                                }
                                 await send_event(
                                     {
-                                        "type": "tool.result",
+                                        "type": "tool.call",
                                         "tool_call_id": tc_id,
-                                        "tool_name": meta.get("tool_name", ""),
-                                        "result": str(event.content),
+                                        "tool_name": tool_name,
+                                        "args": args,
                                     }
                                 )
+
+                elif isinstance(node, CallToolsNode):
+                    async with node.stream(run.ctx) as stream:
+                        async for event in stream:
+                            if isinstance(event, FunctionToolResultEvent):
+                                result_part = event.result
+                                if isinstance(result_part, ToolReturnPart):
+                                    tc_id = result_part.tool_call_id or ""
+                                    meta = pending_tool_calls.pop(tc_id, {})
+                                    await send_event(
+                                        {
+                                            "type": "tool.result",
+                                            "tool_call_id": tc_id,
+                                            "tool_name": meta.get(
+                                                "tool_name", ""
+                                            ),
+                                            "result": str(result_part.content),
+                                        }
+                                    )
 
         result = run.result
         if result:
@@ -220,7 +273,11 @@ async def stream_chat(
                 if not assistant_id:
                     assistant_id = (
                         await crud.create_message(
-                            db, session_id, "assistant", full_text, model_id=model_id
+                            db,
+                            session_id,
+                            "assistant",
+                            full_text,
+                            model_id=model_id,
                         )
                     )["id"]
                 else:
@@ -258,6 +315,16 @@ async def stream_chat(
                 "duration_ms": duration,
             }
         )
+
+        if (
+            session.get("title") == "New Chat"
+            and len(messages) <= 1
+        ):
+            from foundry_app.agent.title import generate_title
+
+            asyncio.create_task(
+                generate_title(session_id, model_id, user_message, send_event)
+            )
 
     except Exception as e:
         print(f"[stream_chat] EXCEPTION: {e}", file=sys.stderr, flush=True)

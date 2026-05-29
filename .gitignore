@@ -29,3 +29,6 @@ venv/
 *.log
 node_modules/
 .playground/
+nul
+/.playwright-cli
+/backend

@@ -1,0 +1,839 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "foundry-webui",
+      "dependencies": {
+        "@ant-design/x": "^2.1.0",
+        "antd": "^5.24.0",
+        "mermaid": "^11.15.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-markdown": "^10.1.0",
+        "remark-gfm": "^4.0.1",
+        "zustand": "^5.0.0",
+      },
+      "devDependencies": {
+        "@types/react": "^18.3.0",
+        "@types/react-dom": "^18.3.0",
+        "@vitejs/plugin-react": "^4.3.0",
+        "typescript": "^5.7.0",
+        "vite": "^6.3.0",
+      },
+    },
+  },
+  "packages": {
+    "@ant-design/colors": ["@ant-design/colors@8.0.1", "https://registry.npm.qianxin-inc.cn/@ant-design/colors/download/@ant-design/colors-8.0.1.tgz", { "dependencies": { "@ant-design/fast-color": "^3.0.0" } }, "sha1-a1RE8qtAYcexqkvHdq2wI7AlMWE="],
+
+    "@ant-design/cssinjs": ["@ant-design/cssinjs@2.1.2", "https://registry.npm.qianxin-inc.cn/@ant-design/cssinjs/download/@ant-design/cssinjs-2.1.2.tgz", { "dependencies": { "@babel/runtime": "^7.11.1", "@emotion/hash": "^0.8.0", "@emotion/unitless": "^0.7.5", "@rc-component/util": "^1.4.0", "clsx": "^2.1.1", "csstype": "^3.1.3", "stylis": "^4.3.4" }, "peerDependencies": { "react": ">=16.0.0", "react-dom": ">=16.0.0" } }, "sha1-Ahnjev3ZVySLENo2b+uuHkAByVI="],
+
+    "@ant-design/cssinjs-utils": ["@ant-design/cssinjs-utils@2.1.2", "https://registry.npm.qianxin-inc.cn/@ant-design/cssinjs-utils/download/@ant-design/cssinjs-utils-2.1.2.tgz", { "dependencies": { "@ant-design/cssinjs": "^2.1.2", "@babel/runtime": "^7.23.2", "@rc-component/util": "^1.4.0" }, "peerDependencies": { "react": ">=18", "react-dom": ">=18" } }, "sha1-pKV+At1+fDcyq38d9AbfmLVULRI="],
+
+    "@ant-design/fast-color": ["@ant-design/fast-color@3.0.1", "https://registry.npm.qianxin-inc.cn/@ant-design/fast-color/download/@ant-design/fast-color-3.0.1.tgz", {}, "sha1-/uVrlUJ8C1WyFsk9mn80c/MWFbU="],
+
+    "@ant-design/icons": ["@ant-design/icons@6.2.3", "https://registry.npm.qianxin-inc.cn/@ant-design/icons/download/@ant-design/icons-6.2.3.tgz", { "dependencies": { "@ant-design/colors": "^8.0.1", "@ant-design/icons-svg": "^4.4.2", "@rc-component/util": "^1.10.1", "clsx": "^2.1.1" }, "peerDependencies": { "react": ">=16.0.0", "react-dom": ">=16.0.0" } }, "sha1-ZuHH/eoAm5w/q2lkBivtx28witg="],
+
+    "@ant-design/icons-svg": ["@ant-design/icons-svg@4.4.2", "https://registry.npm.qianxin-inc.cn/@ant-design/icons-svg/download/@ant-design/icons-svg-4.4.2.tgz", {}, "sha1-7Svn+02CrH4dRaVKWwbWzs+L5vY="],
+
+    "@ant-design/react-slick": ["@ant-design/react-slick@1.1.2", "https://registry.npm.qianxin-inc.cn/@ant-design/react-slick/download/@ant-design/react-slick-1.1.2.tgz", { "dependencies": { "@babel/runtime": "^7.10.4", "classnames": "^2.2.5", "json2mq": "^0.2.0", "resize-observer-polyfill": "^1.5.1", "throttle-debounce": "^5.0.0" }, "peerDependencies": { "react": ">=16.9.0" } }, "sha1-+Ezj5NDclB8CsW8dHW16Nx/7tPE="],
+
+    "@ant-design/x": ["@ant-design/x@2.3.0", "https://registry.npm.qianxin-inc.cn/@ant-design/x/download/@ant-design/x-2.3.0.tgz", { "dependencies": { "@ant-design/colors": "^8.0.0", "@ant-design/cssinjs": "^2.0.1", "@ant-design/cssinjs-utils": "^2.0.2", "@ant-design/fast-color": "^3.0.0", "@ant-design/icons": "^6.0.0", "@babel/runtime": "^7.25.6", "@rc-component/motion": "^1.1.6", "@rc-component/resize-observer": "^1.0.1", "@rc-component/util": "^1.4.0", "clsx": "^2.1.1", "lodash.throttle": "^4.1.1", "mermaid": "^11.12.1", "react-syntax-highlighter": "^16.1.0" }, "peerDependencies": { "antd": "^6.1.1", "react": ">=18.0.0", "react-dom": ">=18.0.0" } }, "sha1-XUhvkgfXcgT8fca/LgzKFLDYJag="],
+
+    "@antfu/install-pkg": ["@antfu/install-pkg@1.1.0", "https://registry.npm.qianxin-inc.cn/@antfu/install-pkg/download/@antfu/install-pkg-1.1.0.tgz", { "dependencies": { "package-manager-detector": "^1.3.0", "tinyexec": "^1.0.1" } }, "sha1-ePoDa+GmCBtad6XPWfUMd1K2uiY="],
+
+    "@babel/code-frame": ["@babel/code-frame@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/code-frame/download/@babel/code-frame-7.29.7.tgz", { "dependencies": { "@babel/helper-validator-identifier": "^7.29.7", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha1-8vu/6ofESiFZDsUVt3iywm2IZuc="],
+
+    "@babel/compat-data": ["@babel/compat-data@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/compat-data/download/@babel/compat-data-7.29.7.tgz", {}, "sha1-bwI38PNtLlHAVwpjb67Z0tDv5ik="],
+
+    "@babel/core": ["@babel/core@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/core/download/@babel/core-7.29.7.tgz", { "dependencies": { "@babel/code-frame": "^7.29.7", "@babel/generator": "^7.29.7", "@babel/helper-compilation-targets": "^7.29.7", "@babel/helper-module-transforms": "^7.29.7", "@babel/helpers": "^7.29.7", "@babel/parser": "^7.29.7", "@babel/template": "^7.29.7", "@babel/traverse": "^7.29.7", "@babel/types": "^7.29.7", "@jridgewell/remapping": "^2.3.5", "convert-source-map": "^2.0.0", "debug": "^4.1.0", "gensync": "^1.0.0-beta.2", "json5": "^2.2.3", "semver": "^6.3.1" } }, "sha1-gMELFySAgpaLV6hXuRZAlx8gcPc="],
+
+    "@babel/generator": ["@babel/generator@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/generator/download/@babel/generator-7.29.7.tgz", { "dependencies": { "@babel/parser": "^7.29.7", "@babel/types": "^7.29.7", "@jridgewell/gen-mapping": "^0.3.12", "@jridgewell/trace-mapping": "^0.3.28", "jsesc": "^3.0.2" } }, "sha1-zKC4gn5rzzuhdniOfzsYCtbbL6M="],
+
+    "@babel/helper-compilation-targets": ["@babel/helper-compilation-targets@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-compilation-targets/download/@babel/helper-compilation-targets-7.29.7.tgz", { "dependencies": { "@babel/compat-data": "^7.29.7", "@babel/helper-validator-option": "^7.29.7", "browserslist": "^4.24.0", "lru-cache": "^5.1.1", "semver": "^6.3.1" } }, "sha1-eh3vcEMCQBxH9k+oVYnpdK4hcEI="],
+
+    "@babel/helper-globals": ["@babel/helper-globals@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-globals/download/@babel/helper-globals-7.29.7.tgz", {}, "sha1-8EqW+9hHMkGxB5JD9bPwOjAQq3s="],
+
+    "@babel/helper-module-imports": ["@babel/helper-module-imports@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-module-imports/download/@babel/helper-module-imports-7.29.7.tgz", { "dependencies": { "@babel/traverse": "^7.29.7", "@babel/types": "^7.29.7" } }, "sha1-7yUEilGOgo1zk/rFiC3dc5Idc5Y="],
+
+    "@babel/helper-module-transforms": ["@babel/helper-module-transforms@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-module-transforms/download/@babel/helper-module-transforms-7.29.7.tgz", { "dependencies": { "@babel/helper-module-imports": "^7.29.7", "@babel/helper-validator-identifier": "^7.29.7", "@babel/traverse": "^7.29.7" }, "peerDependencies": { "@babel/core": "^7.0.0" } }, "sha1-sGJ0elmXuhOGNyATKLv/d5YFdK4="],
+
+    "@babel/helper-plugin-utils": ["@babel/helper-plugin-utils@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-plugin-utils/download/@babel/helper-plugin-utils-7.29.7.tgz", {}, "sha1-wKB2bxoTYX2KF0B9erj51IYiXqQ="],
+
+    "@babel/helper-string-parser": ["@babel/helper-string-parser@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-string-parser/download/@babel/helper-string-parser-7.29.7.tgz", {}, "sha1-fwhx2Zgk0jE31g+G/PYTD9WhtR8="],
+
+    "@babel/helper-validator-identifier": ["@babel/helper-validator-identifier@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-validator-identifier/download/@babel/helper-validator-identifier-7.29.7.tgz", {}, "sha1-vYcITO0MeW7Ea9pJLeboPSnon8I="],
+
+    "@babel/helper-validator-option": ["@babel/helper-validator-option@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helper-validator-option/download/@babel/helper-validator-option-7.29.7.tgz", {}, "sha1-zzFb6UAhOzVOtKvMC9Aevj9zvCo="],
+
+    "@babel/helpers": ["@babel/helpers@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/helpers/download/@babel/helpers-7.29.7.tgz", { "dependencies": { "@babel/template": "^7.29.7", "@babel/types": "^7.29.7" } }, "sha1-Rav951SJl+NDdsPmn+tHXP+0pgc="],
+
+    "@babel/parser": ["@babel/parser@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/parser/download/@babel/parser-7.29.7.tgz", { "dependencies": { "@babel/types": "^7.29.7" }, "bin": "./bin/babel-parser.js" }, "sha1-g3uHOHy/XsVTDLY0s8Yi9o7bkzQ="],
+
+    "@babel/plugin-transform-react-jsx-self": ["@babel/plugin-transform-react-jsx-self@7.27.1", "https://registry.npm.qianxin-inc.cn/@babel/plugin-transform-react-jsx-self/download/@babel/plugin-transform-react-jsx-self-7.27.1.tgz", { "dependencies": { "@babel/helper-plugin-utils": "^7.27.1" }, "peerDependencies": { "@babel/core": "^7.0.0-0" } }, "sha1-r2eNhQas9SxXfKxz/3/mYVyF/JI="],
+
+    "@babel/plugin-transform-react-jsx-source": ["@babel/plugin-transform-react-jsx-source@7.27.1", "https://registry.npm.qianxin-inc.cn/@babel/plugin-transform-react-jsx-source/download/@babel/plugin-transform-react-jsx-source-7.27.1.tgz", { "dependencies": { "@babel/helper-plugin-utils": "^7.27.1" }, "peerDependencies": { "@babel/core": "^7.0.0-0" } }, "sha1-3P4sJAlLt1e/c5YDdOfFXkNPGfA="],
+
+    "@babel/runtime": ["@babel/runtime@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/runtime/download/@babel/runtime-7.29.7.tgz", {}, "sha1-EgIkUMRaTabY2Ch7GKT/Ldsj92g="],
+
+    "@babel/template": ["@babel/template@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/template/download/@babel/template-7.29.7.tgz", { "dependencies": { "@babel/code-frame": "^7.29.7", "@babel/parser": "^7.29.7", "@babel/types": "^7.29.7" } }, "sha1-TZ1ABPZFzdME3pWMclFieE7KxwA="],
+
+    "@babel/traverse": ["@babel/traverse@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/traverse/download/@babel/traverse-7.29.7.tgz", { "dependencies": { "@babel/code-frame": "^7.29.7", "@babel/generator": "^7.29.7", "@babel/helper-globals": "^7.29.7", "@babel/parser": "^7.29.7", "@babel/template": "^7.29.7", "@babel/types": "^7.29.7", "debug": "^4.3.1" } }, "sha1-xHsHpBuV2gkH0Ca13YlNmN59Ly0="],
+
+    "@babel/types": ["@babel/types@7.29.7", "https://registry.npm.qianxin-inc.cn/@babel/types/download/@babel/types-7.29.7.tgz", { "dependencies": { "@babel/helper-string-parser": "^7.29.7", "@babel/helper-validator-identifier": "^7.29.7" } }, "sha1-gAXjHYJxLuetrvbiPGO3GmJ3CpI="],
+
+    "@braintree/sanitize-url": ["@braintree/sanitize-url@7.1.2", "https://registry.npm.qianxin-inc.cn/@braintree/sanitize-url/download/@braintree/sanitize-url-7.1.2.tgz", {}, "sha1-yiA1sP7+lWqGdv8Maa9z5gX82B8="],
+
+    "@chevrotain/types": ["@chevrotain/types@11.1.2", "https://registry.npm.qianxin-inc.cn/@chevrotain/types/download/@chevrotain/types-11.1.2.tgz", {}, "sha1-6DoaJwTwxeSedZKyFAMaD0o01+U="],
+
+    "@emotion/hash": ["@emotion/hash@0.8.0", "https://registry.npm.qianxin-inc.cn/@emotion/hash/download/@emotion/hash-0.8.0.tgz", {}, "sha1-u7/2iXj+/b5ozLUzvIy+HRr7VBM="],
+
+    "@emotion/unitless": ["@emotion/unitless@0.7.5", "https://registry.npm.qianxin-inc.cn/@emotion/unitless/download/@emotion/unitless-0.7.5.tgz", {}, "sha1-dyESkcGQCnALinjPr9oxYNdpSe0="],
+
+    "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/aix-ppc64/download/@esbuild/aix-ppc64-0.25.12.tgz", { "os": "aix", "cpu": "ppc64" }, "sha1-gPy+NhMOWLdnBRHoiLjoiiWe12w="],
+
+    "@esbuild/android-arm": ["@esbuild/android-arm@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/android-arm/download/@esbuild/android-arm-0.25.12.tgz", { "os": "android", "cpu": "arm" }, "sha1-MAcSEB9/UPHSYnoWLm4JsQm2dno="],
+
+    "@esbuild/android-arm64": ["@esbuild/android-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/android-arm64/download/@esbuild/android-arm64-0.25.12.tgz", { "os": "android", "cpu": "arm64" }, "sha1-iqSWX40KeYLcIXNL9mATI6Ztp1I="],
+
+    "@esbuild/android-x64": ["@esbuild/android-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/android-x64/download/@esbuild/android-x64-0.25.12.tgz", { "os": "android", "cpu": "x64" }, "sha1-h9+ycWEgK9yVjvSLthsJx1j67hY="],
+
+    "@esbuild/darwin-arm64": ["@esbuild/darwin-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/darwin-arm64/download/@esbuild/darwin-arm64-0.25.12.tgz", { "os": "darwin", "cpu": "arm64" }, "sha1-eRl4mOwf90XSHAceHHzDyALwwf0="],
+
+    "@esbuild/darwin-x64": ["@esbuild/darwin-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/darwin-x64/download/@esbuild/darwin-x64-0.25.12.tgz", { "os": "darwin", "cpu": "x64" }, "sha1-FGQAqFYhM/RcTS6tzzfd0JcYB54="],
+
+    "@esbuild/freebsd-arm64": ["@esbuild/freebsd-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/freebsd-arm64/download/@esbuild/freebsd-arm64-0.25.12.tgz", { "os": "freebsd", "cpu": "arm64" }, "sha1-HF+bpyBuFY/SskxZ+i0si7R8oP4="],
+
+    "@esbuild/freebsd-x64": ["@esbuild/freebsd-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/freebsd-x64/download/@esbuild/freebsd-x64-0.25.12.tgz", { "os": "freebsd", "cpu": "x64" }, "sha1-6mMfSja+qsS5J5+g/MbKKerusrM="],
+
+    "@esbuild/linux-arm": ["@esbuild/linux-arm@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-arm/download/@esbuild/linux-arm-0.25.12.tgz", { "os": "linux", "cpu": "arm" }, "sha1-RSzWayCTLQi9xTqLYcDjC69DSLk="],
+
+    "@esbuild/linux-arm64": ["@esbuild/linux-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-arm64/download/@esbuild/linux-arm64-0.25.12.tgz", { "os": "linux", "cpu": "arm64" }, "sha1-4QZrzlg5TxsRQd7shVel8KIvWXc="],
+
+    "@esbuild/linux-ia32": ["@esbuild/linux-ia32@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-ia32/download/@esbuild/linux-ia32-0.25.12.tgz", { "os": "linux", "cpu": "ia32" }, "sha1-sk+KzEW89UGSx/LzvhtT5lUer+A="],
+
+    "@esbuild/linux-loong64": ["@esbuild/linux-loong64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-loong64/download/@esbuild/linux-loong64-0.25.12.tgz", { "os": "linux", "cpu": "none" }, "sha1-+c//p/yDIlcfvEyLMmjK8VvYGtA="],
+
+    "@esbuild/linux-mips64el": ["@esbuild/linux-mips64el@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-mips64el/download/@esbuild/linux-mips64el-0.25.12.tgz", { "os": "linux", "cpu": "none" }, "sha1-V1oUvXRkT/q4ka3H1+YNJ1KW8s0="],
+
+    "@esbuild/linux-ppc64": ["@esbuild/linux-ppc64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-ppc64/download/@esbuild/linux-ppc64-0.25.12.tgz", { "os": "linux", "cpu": "ppc64" }, "sha1-dbmccKlfvV93OddpK+/mBgFZGGk="],
+
+    "@esbuild/linux-riscv64": ["@esbuild/linux-riscv64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-riscv64/download/@esbuild/linux-riscv64-0.25.12.tgz", { "os": "linux", "cpu": "none" }, "sha1-LjJZRAMhpE553fdTXDJQV9qHXNY="],
+
+    "@esbuild/linux-s390x": ["@esbuild/linux-s390x@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-s390x/download/@esbuild/linux-s390x-0.25.12.tgz", { "os": "linux", "cpu": "s390x" }, "sha1-F2dsq7/lko2lsqDW311YzQjbJmM="],
+
+    "@esbuild/linux-x64": ["@esbuild/linux-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/linux-x64/download/@esbuild/linux-x64-0.25.12.tgz", { "os": "linux", "cpu": "x64" }, "sha1-BYN3VoXKggZtBMNQfwlSTTzXowY="],
+
+    "@esbuild/netbsd-arm64": ["@esbuild/netbsd-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/netbsd-arm64/download/@esbuild/netbsd-arm64-0.25.12.tgz", { "os": "none", "cpu": "arm64" }, "sha1-8ExAScsuJS/paxb+2Q9wdGsT9KQ="],
+
+    "@esbuild/netbsd-x64": ["@esbuild/netbsd-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/netbsd-x64/download/@esbuild/netbsd-x64-0.25.12.tgz", { "os": "none", "cpu": "x64" }, "sha1-d9oNCg2CbXySHuo9QCklSLJYoHY="],
+
+    "@esbuild/openbsd-arm64": ["@esbuild/openbsd-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/openbsd-arm64/download/@esbuild/openbsd-arm64-0.25.12.tgz", { "os": "openbsd", "cpu": "arm64" }, "sha1-Ypb1hnrt7yioGyKrIAnHhqlS3M0="],
+
+    "@esbuild/openbsd-x64": ["@esbuild/openbsd-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/openbsd-x64/download/@esbuild/openbsd-x64-0.25.12.tgz", { "os": "openbsd", "cpu": "x64" }, "sha1-+NIzAzYOJ7Fs8GWyO7/0PBQUJnk="],
+
+    "@esbuild/openharmony-arm64": ["@esbuild/openharmony-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/openharmony-arm64/download/@esbuild/openharmony-arm64-0.25.12.tgz", { "os": "none", "cpu": "arm64" }, "sha1-SeC3aHRKOSS+DX/ZfdbOmykj2I0="],
+
+    "@esbuild/sunos-x64": ["@esbuild/sunos-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/sunos-x64/download/@esbuild/sunos-x64-0.25.12.tgz", { "os": "sunos", "cpu": "x64" }, "sha1-pu19Z3jWflKMgfsWWyP0kRubE9Y="],
+
+    "@esbuild/win32-arm64": ["@esbuild/win32-arm64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/win32-arm64/download/@esbuild/win32-arm64-0.25.12.tgz", { "os": "win32", "cpu": "arm64" }, "sha1-msFMN44bZTrxfQjn0840yu9YcyM="],
+
+    "@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/win32-ia32/download/@esbuild/win32-ia32-0.25.12.tgz", { "os": "win32", "cpu": "ia32" }, "sha1-kYlC3LuzXMFPyjmvuRteaj0Scmc="],
+
+    "@esbuild/win32-x64": ["@esbuild/win32-x64@0.25.12", "https://registry.npm.qianxin-inc.cn/@esbuild/win32-x64/download/@esbuild/win32-x64-0.25.12.tgz", { "os": "win32", "cpu": "x64" }, "sha1-m9rYF2vngRrRSNH4dyNZBB9GxsU="],
+
+    "@iconify/types": ["@iconify/types@2.0.0", "https://registry.npm.qianxin-inc.cn/@iconify/types/download/@iconify/types-2.0.0.tgz", {}, "sha1-qw6epoHWyKEhTzDNdB/jogzFf1c="],
+
+    "@iconify/utils": ["@iconify/utils@3.1.3", "https://registry.npm.qianxin-inc.cn/@iconify/utils/download/@iconify/utils-3.1.3.tgz", { "dependencies": { "@antfu/install-pkg": "^1.1.0", "@iconify/types": "^2.0.0", "import-meta-resolve": "^4.2.0" } }, "sha1-ce/Wj57S6jyR/ToBwAMvcKhwJ7c="],
+
+    "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "https://registry.npm.qianxin-inc.cn/@jridgewell/gen-mapping/download/@jridgewell/gen-mapping-0.3.13.tgz", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha1-Y0Khn0Q0dRjJPkOxrGnes8Rlah8="],
+
+    "@jridgewell/remapping": ["@jridgewell/remapping@2.3.5", "https://registry.npm.qianxin-inc.cn/@jridgewell/remapping/download/@jridgewell/remapping-2.3.5.tgz", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha1-N1xHbRlylHhRuh4Vro8SMEdEWqE="],
+
+    "@jridgewell/resolve-uri": ["@jridgewell/resolve-uri@3.1.2", "https://registry.npm.qianxin-inc.cn/@jridgewell/resolve-uri/download/@jridgewell/resolve-uri-3.1.2.tgz", {}, "sha1-eg7mAfYPmaIMfHxf8MgDiMEYm9Y="],
+
+    "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.5.5", "https://registry.npm.qianxin-inc.cn/@jridgewell/sourcemap-codec/download/@jridgewell/sourcemap-codec-1.5.5.tgz", {}, "sha1-aRKwDSxjHA0Vzhp6tXzWV/Ko+Lo="],
+
+    "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "https://registry.npm.qianxin-inc.cn/@jridgewell/trace-mapping/download/@jridgewell/trace-mapping-0.3.31.tgz", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha1-2xXWeByTHzolGj2sOVAcmKYIL9A="],
+
+    "@mermaid-js/parser": ["@mermaid-js/parser@1.1.1", "https://registry.npm.qianxin-inc.cn/@mermaid-js/parser/download/@mermaid-js/parser-1.1.1.tgz", { "dependencies": { "@chevrotain/types": "~11.1.1" } }, "sha1-MPOraNgWkS5D8kWnKg1Agb9p2WY="],
+
+    "@rc-component/async-validator": ["@rc-component/async-validator@5.1.0", "https://registry.npm.qianxin-inc.cn/@rc-component/async-validator/download/@rc-component/async-validator-5.1.0.tgz", { "dependencies": { "@babel/runtime": "^7.24.4" } }, "sha1-6B8x5nbZytxx5DELvxdJx6WIIpE="],
+
+    "@rc-component/color-picker": ["@rc-component/color-picker@2.0.1", "https://registry.npm.qianxin-inc.cn/@rc-component/color-picker/download/@rc-component/color-picker-2.0.1.tgz", { "dependencies": { "@ant-design/fast-color": "^2.0.6", "@babel/runtime": "^7.23.6", "classnames": "^2.2.6", "rc-util": "^5.38.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-a5uWFSRmqdRHXL5ytAtZS/2hZL4="],
+
+    "@rc-component/context": ["@rc-component/context@1.4.0", "https://registry.npm.qianxin-inc.cn/@rc-component/context/download/@rc-component/context-1.4.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "rc-util": "^5.27.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-3G+wIdZ3NUavjwFq5M6a6giDleg="],
+
+    "@rc-component/mini-decimal": ["@rc-component/mini-decimal@1.1.0", "https://registry.npm.qianxin-inc.cn/@rc-component/mini-decimal/download/@rc-component/mini-decimal-1.1.0.tgz", { "dependencies": { "@babel/runtime": "^7.18.0" } }, "sha1-e3o2KxSgpUy1vG/SuCcx8p8R2bA="],
+
+    "@rc-component/motion": ["@rc-component/motion@1.3.2", "https://registry.npm.qianxin-inc.cn/@rc-component/motion/download/@rc-component/motion-1.3.2.tgz", { "dependencies": { "@rc-component/util": "^1.2.0", "clsx": "^2.1.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-vZbg/RbunZjB2b4UGY8APjZ9j+s="],
+
+    "@rc-component/mutate-observer": ["@rc-component/mutate-observer@1.1.0", "https://registry.npm.qianxin-inc.cn/@rc-component/mutate-observer/download/@rc-component/mutate-observer-1.1.0.tgz", { "dependencies": { "@babel/runtime": "^7.18.0", "classnames": "^2.3.2", "rc-util": "^5.24.4" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-7lPMiLeKrePNBlNgkhWkR3k4b9g="],
+
+    "@rc-component/portal": ["@rc-component/portal@1.1.2", "https://registry.npm.qianxin-inc.cn/@rc-component/portal/download/@rc-component/portal-1.1.2.tgz", { "dependencies": { "@babel/runtime": "^7.18.0", "classnames": "^2.3.2", "rc-util": "^5.24.4" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-VdseUdeE4DRELpcAU2+qpqtj/HE="],
+
+    "@rc-component/qrcode": ["@rc-component/qrcode@1.1.1", "https://registry.npm.qianxin-inc.cn/@rc-component/qrcode/download/@rc-component/qrcode-1.1.1.tgz", { "dependencies": { "@babel/runtime": "^7.24.7" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-kJ8YG7mnRp0ypulsfzVHbUvZIAg="],
+
+    "@rc-component/resize-observer": ["@rc-component/resize-observer@1.1.2", "https://registry.npm.qianxin-inc.cn/@rc-component/resize-observer/download/@rc-component/resize-observer-1.1.2.tgz", { "dependencies": { "@rc-component/util": "^1.2.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-WJfmXX/tXG52jc/YvewYGjMJqY8="],
+
+    "@rc-component/tour": ["@rc-component/tour@1.15.1", "https://registry.npm.qianxin-inc.cn/@rc-component/tour/download/@rc-component/tour-1.15.1.tgz", { "dependencies": { "@babel/runtime": "^7.18.0", "@rc-component/portal": "^1.0.0-9", "@rc-component/trigger": "^2.0.0", "classnames": "^2.3.2", "rc-util": "^5.24.4" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-m3mAglQYX8GelkFy2Z4l6MaADe0="],
+
+    "@rc-component/trigger": ["@rc-component/trigger@2.3.1", "https://registry.npm.qianxin-inc.cn/@rc-component/trigger/download/@rc-component/trigger-2.3.1.tgz", { "dependencies": { "@babel/runtime": "^7.23.2", "@rc-component/portal": "^1.1.0", "classnames": "^2.3.2", "rc-motion": "^2.0.0", "rc-resize-observer": "^1.3.1", "rc-util": "^5.44.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-g/wMQWWlj9xmvZFxCC0IrPMb5rs="],
+
+    "@rc-component/util": ["@rc-component/util@1.11.1", "https://registry.npm.qianxin-inc.cn/@rc-component/util/download/@rc-component/util-1.11.1.tgz", { "dependencies": { "is-mobile": "^5.0.0", "react-is": "^18.2.0" }, "peerDependencies": { "react": ">=18.0.0", "react-dom": ">=18.0.0" } }, "sha1-B9aYkIM5xVZI5Pl0r6c5NF5ltIM="],
+
+    "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-beta.27", "https://registry.npm.qianxin-inc.cn/@rolldown/pluginutils/download/@rolldown/pluginutils-1.0.0-beta.27.tgz", {}, "sha1-R9K/TO9tRwsi9YMbQg+JZOC/dV8="],
+
+    "@rollup/rollup-linux-x64-musl": ["@rollup/rollup-linux-x64-musl@4.60.4", "https://registry.npm.qianxin-inc.cn/@rollup/rollup-linux-x64-musl/download/@rollup/rollup-linux-x64-musl-4.60.4.tgz", { "os": "linux", "cpu": "x64" }, "sha1-l5Qca5TWf+Jc3g8CfBChny0f3Tk="],
+
+    "@rollup/rollup-win32-ia32-msvc": ["@rollup/rollup-win32-ia32-msvc@4.60.4", "https://registry.npm.qianxin-inc.cn/@rollup/rollup-win32-ia32-msvc/download/@rollup/rollup-win32-ia32-msvc-4.60.4.tgz", { "os": "win32", "cpu": "ia32" }, "sha1-+jCsJOPwIyE50qR1AFYKKGlXZNQ="],
+
+    "@rollup/rollup-win32-x64-gnu": ["@rollup/rollup-win32-x64-gnu@4.60.4", "https://registry.npm.qianxin-inc.cn/@rollup/rollup-win32-x64-gnu/download/@rollup/rollup-win32-x64-gnu-4.60.4.tgz", { "os": "win32", "cpu": "x64" }, "sha1-Ij4ryT+G4HB1aOH621tTflDJdsc="],
+
+    "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.60.4", "https://registry.npm.qianxin-inc.cn/@rollup/rollup-win32-x64-msvc/download/@rollup/rollup-win32-x64-msvc-4.60.4.tgz", { "os": "win32", "cpu": "x64" }, "sha1-2k8Wdth+K990QpG1BLCreVUMPmE="],
+
+    "@types/babel__core": ["@types/babel__core@7.20.5", "https://registry.npm.qianxin-inc.cn/@types/babel__core/download/@types/babel__core-7.20.5.tgz", { "dependencies": { "@babel/parser": "^7.20.7", "@babel/types": "^7.20.7", "@types/babel__generator": "*", "@types/babel__template": "*", "@types/babel__traverse": "*" } }, "sha1-PfFfJ7qFMZyqB7oI0HIYibs5wBc="],
+
+    "@types/babel__generator": ["@types/babel__generator@7.27.0", "https://registry.npm.qianxin-inc.cn/@types/babel__generator/download/@types/babel__generator-7.27.0.tgz", { "dependencies": { "@babel/types": "^7.0.0" } }, "sha1-tYGSlMUReZV6+uw0FEL5NB5BCKk="],
+
+    "@types/babel__template": ["@types/babel__template@7.4.4", "https://registry.npm.qianxin-inc.cn/@types/babel__template/download/@types/babel__template-7.4.4.tgz", { "dependencies": { "@babel/parser": "^7.1.0", "@babel/types": "^7.0.0" } }, "sha1-VnJRNwHBshmbxtrWNqnXSRWGdm8="],
+
+    "@types/babel__traverse": ["@types/babel__traverse@7.28.0", "https://registry.npm.qianxin-inc.cn/@types/babel__traverse/download/@types/babel__traverse-7.28.0.tgz", { "dependencies": { "@babel/types": "^7.28.2" } }, "sha1-B9cT1szg0mXJhJ2wy+YtP2Hzb3Q="],
+
+    "@types/d3": ["@types/d3@7.4.3", "https://registry.npm.qianxin-inc.cn/@types/d3/download/@types/d3-7.4.3.tgz", { "dependencies": { "@types/d3-array": "*", "@types/d3-axis": "*", "@types/d3-brush": "*", "@types/d3-chord": "*", "@types/d3-color": "*", "@types/d3-contour": "*", "@types/d3-delaunay": "*", "@types/d3-dispatch": "*", "@types/d3-drag": "*", "@types/d3-dsv": "*", "@types/d3-ease": "*", "@types/d3-fetch": "*", "@types/d3-force": "*", "@types/d3-format": "*", "@types/d3-geo": "*", "@types/d3-hierarchy": "*", "@types/d3-interpolate": "*", "@types/d3-path": "*", "@types/d3-polygon": "*", "@types/d3-quadtree": "*", "@types/d3-random": "*", "@types/d3-scale": "*", "@types/d3-scale-chromatic": "*", "@types/d3-selection": "*", "@types/d3-shape": "*", "@types/d3-time": "*", "@types/d3-time-format": "*", "@types/d3-timer": "*", "@types/d3-transition": "*", "@types/d3-zoom": "*" } }, "sha1-1FUKhdCPSXj68KTDa4SMYeqsB+I="],
+
+    "@types/d3-array": ["@types/d3-array@3.2.2", "https://registry.npm.qianxin-inc.cn/@types/d3-array/download/@types/d3-array-3.2.2.tgz", {}, "sha1-4CFRRk0C1KG0RkbQ/NuT+viP3ow="],
+
+    "@types/d3-axis": ["@types/d3-axis@3.0.6", "https://registry.npm.qianxin-inc.cn/@types/d3-axis/download/@types/d3-axis-3.0.6.tgz", { "dependencies": { "@types/d3-selection": "*" } }, "sha1-52DldluBiLHe+jK8i7YGL4Hkx5U="],
+
+    "@types/d3-brush": ["@types/d3-brush@3.0.6", "https://registry.npm.qianxin-inc.cn/@types/d3-brush/download/@types/d3-brush-3.0.6.tgz", { "dependencies": { "@types/d3-selection": "*" } }, "sha1-wvQ2KwRdRy4bGGzb7DKbpSva7mw="],
+
+    "@types/d3-chord": ["@types/d3-chord@3.0.6", "https://registry.npm.qianxin-inc.cn/@types/d3-chord/download/@types/d3-chord-3.0.6.tgz", {}, "sha1-FwbKQM9+pZoK3Y9EVu//j4d1eT0="],
+
+    "@types/d3-color": ["@types/d3-color@3.1.3", "https://registry.npm.qianxin-inc.cn/@types/d3-color/download/@types/d3-color-3.1.3.tgz", {}, "sha1-NoyWGhjech2oIA6AvzlD+1MTavI="],
+
+    "@types/d3-contour": ["@types/d3-contour@3.0.6", "https://registry.npm.qianxin-inc.cn/@types/d3-contour/download/@types/d3-contour-3.0.6.tgz", { "dependencies": { "@types/d3-array": "*", "@types/geojson": "*" } }, "sha1-mto/qcTQDjpQk/7QNWx6uSlgQjE="],
+
+    "@types/d3-delaunay": ["@types/d3-delaunay@6.0.4", "https://registry.npm.qianxin-inc.cn/@types/d3-delaunay/download/@types/d3-delaunay-6.0.4.tgz", {}, "sha1-GFwagMyAf92io/6WD3wRxKJ5UuE="],
+
+    "@types/d3-dispatch": ["@types/d3-dispatch@3.0.7", "https://registry.npm.qianxin-inc.cn/@types/d3-dispatch/download/@types/d3-dispatch-3.0.7.tgz", {}, "sha1-7wBNihKARs/OQ00XGC+DTkTvlbI="],
+
+    "@types/d3-drag": ["@types/d3-drag@3.0.7", "https://registry.npm.qianxin-inc.cn/@types/d3-drag/download/@types/d3-drag-3.0.7.tgz", { "dependencies": { "@types/d3-selection": "*" } }, "sha1-sTq6iyRCtAaMmp5tHYL4vOp3/AI="],
+
+    "@types/d3-dsv": ["@types/d3-dsv@3.0.7", "https://registry.npm.qianxin-inc.cn/@types/d3-dsv/download/@types/d3-dsv-3.0.7.tgz", {}, "sha1-CjUfmW3Jmzf0+li0ksLRwE49rBc="],
+
+    "@types/d3-ease": ["@types/d3-ease@3.0.2", "https://registry.npm.qianxin-inc.cn/@types/d3-ease/download/@types/d3-ease-3.0.2.tgz", {}, "sha1-4o2xv7+mFwdvd3DdHZpI6qO2xRs="],
+
+    "@types/d3-fetch": ["@types/d3-fetch@3.0.7", "https://registry.npm.qianxin-inc.cn/@types/d3-fetch/download/@types/d3-fetch-3.0.7.tgz", { "dependencies": { "@types/d3-dsv": "*" } }, "sha1-wEorTyMYGqN28wrwKD28eztWmYA="],
+
+    "@types/d3-force": ["@types/d3-force@3.0.10", "https://registry.npm.qianxin-inc.cn/@types/d3-force/download/@types/d3-force-3.0.10.tgz", {}, "sha1-bcj8bh81cE87BXCQvu63rGdL/xo="],
+
+    "@types/d3-format": ["@types/d3-format@3.0.4", "https://registry.npm.qianxin-inc.cn/@types/d3-format/download/@types/d3-format-3.0.4.tgz", {}, "sha1-seRGVkTds/3zomP+uyQKbNYW3pA="],
+
+    "@types/d3-geo": ["@types/d3-geo@3.1.0", "https://registry.npm.qianxin-inc.cn/@types/d3-geo/download/@types/d3-geo-3.1.0.tgz", { "dependencies": { "@types/geojson": "*" } }, "sha1-ueVqB5RJF08KLIaEqaTfP2BSJEA="],
+
+    "@types/d3-hierarchy": ["@types/d3-hierarchy@3.1.7", "https://registry.npm.qianxin-inc.cn/@types/d3-hierarchy/download/@types/d3-hierarchy-3.1.7.tgz", {}, "sha1-YCP7Oy1GMiny1oD5rEtHRm9x8Xs="],
+
+    "@types/d3-interpolate": ["@types/d3-interpolate@3.0.4", "https://registry.npm.qianxin-inc.cn/@types/d3-interpolate/download/@types/d3-interpolate-3.0.4.tgz", { "dependencies": { "@types/d3-color": "*" } }, "sha1-QSuQ6EhwKF8v+KhGxutgNE8SpBw="],
+
+    "@types/d3-path": ["@types/d3-path@3.1.1", "https://registry.npm.qianxin-inc.cn/@types/d3-path/download/@types/d3-path-3.1.1.tgz", {}, "sha1-9jKzgMOsoduo40qgSbzWpK8j34o="],
+
+    "@types/d3-polygon": ["@types/d3-polygon@3.0.2", "https://registry.npm.qianxin-inc.cn/@types/d3-polygon/download/@types/d3-polygon-3.0.2.tgz", {}, "sha1-365UptNdGedqyVZbyzKo5UaTGJw="],
+
+    "@types/d3-quadtree": ["@types/d3-quadtree@3.0.6", "https://registry.npm.qianxin-inc.cn/@types/d3-quadtree/download/@types/d3-quadtree-3.0.6.tgz", {}, "sha1-1HQLD+NbHFi2bhSI9OftApUvVw8="],
+
+    "@types/d3-random": ["@types/d3-random@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/d3-random/download/@types/d3-random-3.0.3.tgz", {}, "sha1-7ZlcceyxXgzTHiLZ1dI5QuMwDPs="],
+
+    "@types/d3-scale": ["@types/d3-scale@4.0.9", "https://registry.npm.qianxin-inc.cn/@types/d3-scale/download/@types/d3-scale-4.0.9.tgz", { "dependencies": { "@types/d3-time": "*" } }, "sha1-V6L3ByQub+Hega17/Myq9gYXmvs="],
+
+    "@types/d3-scale-chromatic": ["@types/d3-scale-chromatic@3.1.0", "https://registry.npm.qianxin-inc.cn/@types/d3-scale-chromatic/download/@types/d3-scale-chromatic-3.1.0.tgz", {}, "sha1-3G1Pmpg3bxjqULrWw5U38bVGPDk="],
+
+    "@types/d3-selection": ["@types/d3-selection@3.0.11", "https://registry.npm.qianxin-inc.cn/@types/d3-selection/download/@types/d3-selection-3.0.11.tgz", {}, "sha1-vXpF/AqMMWemMWdeYbwsorBY1KM="],
+
+    "@types/d3-shape": ["@types/d3-shape@3.1.8", "https://registry.npm.qianxin-inc.cn/@types/d3-shape/download/@types/d3-shape-3.1.8.tgz", { "dependencies": { "@types/d3-path": "*" } }, "sha1-0VFsxQh1O+BoUs0GdY47tUoisOM="],
+
+    "@types/d3-time": ["@types/d3-time@3.0.4", "https://registry.npm.qianxin-inc.cn/@types/d3-time/download/@types/d3-time-3.0.4.tgz", {}, "sha1-hHL+7NY5aRRQ3YAA6zPt1EThMj8="],
+
+    "@types/d3-time-format": ["@types/d3-time-format@4.0.3", "https://registry.npm.qianxin-inc.cn/@types/d3-time-format/download/@types/d3-time-format-4.0.3.tgz", {}, "sha1-1rwea2p9tpzM+73Uw0twYy2enbI="],
+
+    "@types/d3-timer": ["@types/d3-timer@3.0.2", "https://registry.npm.qianxin-inc.cn/@types/d3-timer/download/@types/d3-timer-3.0.2.tgz", {}, "sha1-cLvad9wjqnJ0E+IuIUr6Pw6FL3A="],
+
+    "@types/d3-transition": ["@types/d3-transition@3.0.9", "https://registry.npm.qianxin-inc.cn/@types/d3-transition/download/@types/d3-transition-3.0.9.tgz", { "dependencies": { "@types/d3-selection": "*" } }, "sha1-ETa8V+nds8OQ3MybX/O30rjZRwY="],
+
+    "@types/d3-zoom": ["@types/d3-zoom@3.0.8", "https://registry.npm.qianxin-inc.cn/@types/d3-zoom/download/@types/d3-zoom-3.0.8.tgz", { "dependencies": { "@types/d3-interpolate": "*", "@types/d3-selection": "*" } }, "sha1-3Msy0cVrHhxuDxGA2ZSJbwOLxAs="],
+
+    "@types/debug": ["@types/debug@4.1.13", "https://registry.npm.qianxin-inc.cn/@types/debug/download/@types/debug-4.1.13.tgz", { "dependencies": { "@types/ms": "*" } }, "sha1-ItHMnVQtNZPK6nZPl0MGqzYobuc="],
+
+    "@types/estree": ["@types/estree@1.0.8", "https://registry.npm.qianxin-inc.cn/@types/estree/download/@types/estree-1.0.8.tgz", {}, "sha1-lYuRyZGxhnztMYvt6g4hXuBQcm4="],
+
+    "@types/estree-jsx": ["@types/estree-jsx@1.0.5", "https://registry.npm.qianxin-inc.cn/@types/estree-jsx/download/@types/estree-jsx-1.0.5.tgz", { "dependencies": { "@types/estree": "*" } }, "sha1-hYqI6iDzT+ZREfAFpon6Hr9w3Bg="],
+
+    "@types/geojson": ["@types/geojson@7946.0.16", "https://registry.npm.qianxin-inc.cn/@types/geojson/download/@types/geojson-7946.0.16.tgz", {}, "sha1-jr5T1p762nBERU4zBcGQF9l87So="],
+
+    "@types/hast": ["@types/hast@3.0.4", "https://registry.npm.qianxin-inc.cn/@types/hast/download/@types/hast-3.0.4.tgz", { "dependencies": { "@types/unist": "*" } }, "sha1-HWs5mTuCzqateDlFsFCMJZA+Fao="],
+
+    "@types/mdast": ["@types/mdast@4.0.4", "https://registry.npm.qianxin-inc.cn/@types/mdast/download/@types/mdast-4.0.4.tgz", { "dependencies": { "@types/unist": "*" } }, "sha1-fM9y7dLxqn3TQ34YDGQ3NYWATdY="],
+
+    "@types/ms": ["@types/ms@2.1.0", "https://registry.npm.qianxin-inc.cn/@types/ms/download/@types/ms-2.1.0.tgz", {}, "sha1-BSqmekjszEMJ1/AZG35BQ0uQu3g="],
+
+    "@types/prismjs": ["@types/prismjs@1.26.6", "https://registry.npm.qianxin-inc.cn/@types/prismjs/download/@types/prismjs-1.26.6.tgz", {}, "sha1-bqJ8Em1kUxmuT3BV7aY6noNcAYc="],
+
+    "@types/prop-types": ["@types/prop-types@15.7.15", "https://registry.npm.qianxin-inc.cn/@types/prop-types/download/@types/prop-types-15.7.15.tgz", {}, "sha1-5uWobWAr6spxzlFj+t9fldcJMcc="],
+
+    "@types/react": ["@types/react@18.3.29", "https://registry.npm.qianxin-inc.cn/@types/react/download/@types/react-18.3.29.tgz", { "dependencies": { "@types/prop-types": "*", "csstype": "^3.2.2" } }, "sha1-fztuFRVJnU/RmcyP1HEBFL42waI="],
+
+    "@types/react-dom": ["@types/react-dom@18.3.7", "https://registry.npm.qianxin-inc.cn/@types/react-dom/download/@types/react-dom-18.3.7.tgz", { "peerDependencies": { "@types/react": "^18.0.0" } }, "sha1-uJ3fLNg7T+r8xOLqQa/fuVoNGU8="],
+
+    "@types/trusted-types": ["@types/trusted-types@2.0.7", "https://registry.npm.qianxin-inc.cn/@types/trusted-types/download/@types/trusted-types-2.0.7.tgz", {}, "sha1-usywepcLkXB986PoumiWxX6tLRE="],
+
+    "@types/unist": ["@types/unist@2.0.11", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-2.0.11.tgz", {}, "sha1-Ea9XsSfjJId3SEH3pOVOqxZtA8Q="],
+
+    "@ungap/structured-clone": ["@ungap/structured-clone@1.3.1", "https://registry.npm.qianxin-inc.cn/@ungap/structured-clone/download/@ungap/structured-clone-1.3.1.tgz", {}, "sha1-Do80hU33lmsJMEoY6AiyOZe7n8E="],
+
+    "@upsetjs/venn.js": ["@upsetjs/venn.js@2.0.0", "https://registry.npm.qianxin-inc.cn/@upsetjs/venn.js/download/@upsetjs/venn.js-2.0.0.tgz", { "optionalDependencies": { "d3-selection": "^3.0.0", "d3-transition": "^3.0.1" } }, "sha1-O+GSA4zdqSeqT4siq1Gvgqv0fzQ="],
+
+    "@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "https://registry.npm.qianxin-inc.cn/@vitejs/plugin-react/download/@vitejs/plugin-react-4.7.0.tgz", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha1-ZHr057t1rTrdV452KtmEuQ9KJLk="],
+
+    "antd": ["antd@5.29.3", "https://registry.npm.qianxin-inc.cn/antd/download/antd-5.29.3.tgz", { "dependencies": { "@ant-design/colors": "^7.2.1", "@ant-design/cssinjs": "^1.23.0", "@ant-design/cssinjs-utils": "^1.1.3", "@ant-design/fast-color": "^2.0.6", "@ant-design/icons": "^5.6.1", "@ant-design/react-slick": "~1.1.2", "@babel/runtime": "^7.26.0", "@rc-component/color-picker": "~2.0.1", "@rc-component/mutate-observer": "^1.1.0", "@rc-component/qrcode": "~1.1.0", "@rc-component/tour": "~1.15.1", "@rc-component/trigger": "^2.3.0", "classnames": "^2.5.1", "copy-to-clipboard": "^3.3.3", "dayjs": "^1.11.11", "rc-cascader": "~3.34.0", "rc-checkbox": "~3.5.0", "rc-collapse": "~3.9.0", "rc-dialog": "~9.6.0", "rc-drawer": "~7.3.0", "rc-dropdown": "~4.2.1", "rc-field-form": "~2.7.1", "rc-image": "~7.12.0", "rc-input": "~1.8.0", "rc-input-number": "~9.5.0", "rc-mentions": "~2.20.0", "rc-menu": "~9.16.1", "rc-motion": "^2.9.5", "rc-notification": "~5.6.4", "rc-pagination": "~5.1.0", "rc-picker": "~4.11.3", "rc-progress": "~4.0.0", "rc-rate": "~2.13.1", "rc-resize-observer": "^1.4.3", "rc-segmented": "~2.7.0", "rc-select": "~14.16.8", "rc-slider": "~11.1.9", "rc-steps": "~6.0.1", "rc-switch": "~4.1.0", "rc-table": "~7.54.0", "rc-tabs": "~15.7.0", "rc-textarea": "~1.10.2", "rc-tooltip": "~6.4.0", "rc-tree": "~5.13.1", "rc-tree-select": "~5.27.0", "rc-upload": "~4.11.0", "rc-util": "^5.44.4", "scroll-into-view-if-needed": "^3.1.0", "throttle-debounce": "^5.0.2" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-QE7an5cWsv+bBiUd/stwKNfE3kA="],
+
+    "bail": ["bail@2.0.2", "https://registry.npm.qianxin-inc.cn/bail/download/bail-2.0.2.tgz", {}, "sha1-0m9c2P5db4MqMVF7n3w1YEC6bV0="],
+
+    "baseline-browser-mapping": ["baseline-browser-mapping@2.10.27", "https://registry.npm.qianxin-inc.cn/baseline-browser-mapping/download/baseline-browser-mapping-2.10.27.tgz", { "bin": { "baseline-browser-mapping": "dist/cli.cjs" } }, "sha1-/ulBwqC0LN+DxkJ+TIMLHQvassM="],
+
+    "browserslist": ["browserslist@4.28.2", "https://registry.npm.qianxin-inc.cn/browserslist/download/browserslist-4.28.2.tgz", { "dependencies": { "baseline-browser-mapping": "^2.10.12", "caniuse-lite": "^1.0.30001782", "electron-to-chromium": "^1.5.328", "node-releases": "^2.0.36", "update-browserslist-db": "^1.2.3" }, "bin": { "browserslist": "cli.js" } }, "sha1-9QtlNi70iXTKn1CzaAVm14a4EdI="],
+
+    "caniuse-lite": ["caniuse-lite@1.0.30001791", "https://registry.npm.qianxin-inc.cn/caniuse-lite/download/caniuse-lite-1.0.30001791.tgz", {}, "sha1-37k9hcQK04DFcSPnLhDzxXV4a1E="],
+
+    "ccount": ["ccount@2.0.1", "https://registry.npm.qianxin-inc.cn/ccount/download/ccount-2.0.1.tgz", {}, "sha1-F6O/gjAuCHDW2kOgExGovAKj7PU="],
+
+    "character-entities": ["character-entities@2.0.2", "https://registry.npm.qianxin-inc.cn/character-entities/download/character-entities-2.0.2.tgz", {}, "sha1-LQnC5yzZUjB2zLIRV9/2atQ/zCI="],
+
+    "character-entities-html4": ["character-entities-html4@2.1.0", "https://registry.npm.qianxin-inc.cn/character-entities-html4/download/character-entities-html4-2.1.0.tgz", {}, "sha1-HxrblAyXGksiujndymthjcblays="],
+
+    "character-entities-legacy": ["character-entities-legacy@3.0.0", "https://registry.npm.qianxin-inc.cn/character-entities-legacy/download/character-entities-legacy-3.0.0.tgz", {}, "sha1-dryDqQc4kB17wiOp6TdZ/dVgEls="],
+
+    "character-reference-invalid": ["character-reference-invalid@2.0.1", "https://registry.npm.qianxin-inc.cn/character-reference-invalid/download/character-reference-invalid-2.0.1.tgz", {}, "sha1-hcZrBB5DtHIQ+vQBJ4q/gIrEXLk="],
+
+    "classnames": ["classnames@2.5.1", "https://registry.npm.qianxin-inc.cn/classnames/download/classnames-2.5.1.tgz", {}, "sha1-undMYUvg8BbaEFyFjnFZ6ujnaHs="],
+
+    "clsx": ["clsx@2.1.1", "https://registry.npm.qianxin-inc.cn/clsx/download/clsx-2.1.1.tgz", {}, "sha1-7tOXyf2L2IK/sY3qtxAgSaLzKZk="],
+
+    "comma-separated-tokens": ["comma-separated-tokens@2.0.3", "https://registry.npm.qianxin-inc.cn/comma-separated-tokens/download/comma-separated-tokens-2.0.3.tgz", {}, "sha1-TonJRYrLYbyP7xn0UplzsjkoOe4="],
+
+    "commander": ["commander@8.3.0", "https://registry.npm.qianxin-inc.cn/commander/download/commander-8.3.0.tgz", {}, "sha1-SDfqGy2me5xhamevuw+v7lZ7ymY="],
+
+    "compute-scroll-into-view": ["compute-scroll-into-view@3.1.1", "https://registry.npm.qianxin-inc.cn/compute-scroll-into-view/download/compute-scroll-into-view-3.1.1.tgz", {}, "sha1-AsM4bsUx+2qYgZZziOU+hWTz6ao="],
+
+    "convert-source-map": ["convert-source-map@2.0.0", "https://registry.npm.qianxin-inc.cn/convert-source-map/download/convert-source-map-2.0.0.tgz", {}, "sha1-S1YPZJ/E6RjdCrdc9JYei8iC2Co="],
+
+    "copy-to-clipboard": ["copy-to-clipboard@3.3.3", "https://registry.npm.qianxin-inc.cn/copy-to-clipboard/download/copy-to-clipboard-3.3.3.tgz", { "dependencies": { "toggle-selection": "^1.0.6" } }, "sha1-VaxDoduK5jmkvZlRHBSM3RuDobA="],
+
+    "cose-base": ["cose-base@1.0.3", "https://registry.npm.qianxin-inc.cn/cose-base/download/cose-base-1.0.3.tgz", { "dependencies": { "layout-base": "^1.0.0" } }, "sha1-ZQM0tBuGlXilQzWLgM2n4Kvgpgo="],
+
+    "csstype": ["csstype@3.2.3", "https://registry.npm.qianxin-inc.cn/csstype/download/csstype-3.2.3.tgz", {}, "sha1-7EjA8+mT5QZIyG2lWeJhCZXPmJo="],
+
+    "cytoscape": ["cytoscape@3.33.3", "https://registry.npm.qianxin-inc.cn/cytoscape/download/cytoscape-3.33.3.tgz", {}, "sha1-bIhYI8sIjrjDEIfDXZeGYdzeXq4="],
+
+    "cytoscape-cose-bilkent": ["cytoscape-cose-bilkent@4.1.0", "https://registry.npm.qianxin-inc.cn/cytoscape-cose-bilkent/download/cytoscape-cose-bilkent-4.1.0.tgz", { "dependencies": { "cose-base": "^1.0.0" }, "peerDependencies": { "cytoscape": "^3.2.0" } }, "sha1-di+hId+ZMP/rUaSV2HkXxXCsIJs="],
+
+    "cytoscape-fcose": ["cytoscape-fcose@2.2.0", "https://registry.npm.qianxin-inc.cn/cytoscape-fcose/download/cytoscape-fcose-2.2.0.tgz", { "dependencies": { "cose-base": "^2.2.0" }, "peerDependencies": { "cytoscape": "^3.2.0" } }, "sha1-5Nb2SQ30+rWK6c6p5cOrjXRy9HE="],
+
+    "d3": ["d3@7.9.0", "https://registry.npm.qianxin-inc.cn/d3/download/d3-7.9.0.tgz", { "dependencies": { "d3-array": "3", "d3-axis": "3", "d3-brush": "3", "d3-chord": "3", "d3-color": "3", "d3-contour": "4", "d3-delaunay": "6", "d3-dispatch": "3", "d3-drag": "3", "d3-dsv": "3", "d3-ease": "3", "d3-fetch": "3", "d3-force": "3", "d3-format": "3", "d3-geo": "3", "d3-hierarchy": "3", "d3-interpolate": "3", "d3-path": "3", "d3-polygon": "3", "d3-quadtree": "3", "d3-random": "3", "d3-scale": "4", "d3-scale-chromatic": "3", "d3-selection": "3", "d3-shape": "3", "d3-time": "3", "d3-time-format": "4", "d3-timer": "3", "d3-transition": "3", "d3-zoom": "3" } }, "sha1-V556yz10nK+IYL0XQa6NNxBwzV0="],
+
+    "d3-array": ["d3-array@3.2.4", "https://registry.npm.qianxin-inc.cn/d3-array/download/d3-array-3.2.4.tgz", { "dependencies": { "internmap": "1 - 2" } }, "sha1-Ff7DOyN/l6xdfJhtx32ic6jtC7U="],
+
+    "d3-axis": ["d3-axis@3.0.0", "https://registry.npm.qianxin-inc.cn/d3-axis/download/d3-axis-3.0.0.tgz", {}, "sha1-xCpKE+gTHWN7dF/Clzgkz+r5MyI="],
+
+    "d3-brush": ["d3-brush@3.0.0", "https://registry.npm.qianxin-inc.cn/d3-brush/download/d3-brush-3.0.0.tgz", { "dependencies": { "d3-dispatch": "1 - 3", "d3-drag": "2 - 3", "d3-interpolate": "1 - 3", "d3-selection": "3", "d3-transition": "3" } }, "sha1-b3Z8Ttjct53n7ePhwPieY+9k0xw="],
+
+    "d3-chord": ["d3-chord@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-chord/download/d3-chord-3.0.1.tgz", { "dependencies": { "d3-path": "1 - 3" } }, "sha1-0VbWH0hfzoMn5qvzOctB2Mu6aWY="],
+
+    "d3-color": ["d3-color@3.1.0", "https://registry.npm.qianxin-inc.cn/d3-color/download/d3-color-3.1.0.tgz", {}, "sha1-OVsoM9+scVB/EqwvevI7+BneJOI="],
+
+    "d3-contour": ["d3-contour@4.0.2", "https://registry.npm.qianxin-inc.cn/d3-contour/download/d3-contour-4.0.2.tgz", { "dependencies": { "d3-array": "^3.2.0" } }, "sha1-u5IGO8jFZjrLJCL5nHPLtsauO8w="],
+
+    "d3-delaunay": ["d3-delaunay@6.0.4", "https://registry.npm.qianxin-inc.cn/d3-delaunay/download/d3-delaunay-6.0.4.tgz", { "dependencies": { "delaunator": "5" } }, "sha1-mBaQOHM6ClurvtpVBU95W7nkpYs="],
+
+    "d3-dispatch": ["d3-dispatch@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-dispatch/download/d3-dispatch-3.0.1.tgz", {}, "sha1-X8dShOnCN1w2yDlBGgz1UMv8TV4="],
+
+    "d3-drag": ["d3-drag@3.0.0", "https://registry.npm.qianxin-inc.cn/d3-drag/download/d3-drag-3.0.0.tgz", { "dependencies": { "d3-dispatch": "1 - 3", "d3-selection": "3" } }, "sha1-mUqunNI8cZ9TteEOOgphCMaWB7o="],
+
+    "d3-dsv": ["d3-dsv@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-dsv/download/d3-dsv-3.0.1.tgz", { "dependencies": { "commander": "7", "iconv-lite": "0.6", "rw": "1" }, "bin": { "csv2json": "bin/dsv2json.js", "csv2tsv": "bin/dsv2dsv.js", "dsv2dsv": "bin/dsv2dsv.js", "dsv2json": "bin/dsv2json.js", "json2csv": "bin/json2dsv.js", "json2dsv": "bin/json2dsv.js", "json2tsv": "bin/json2dsv.js", "tsv2csv": "bin/dsv2dsv.js", "tsv2json": "bin/dsv2json.js" } }, "sha1-xjr5ePTWoNCEpSpnOSK+IWB4m3M="],
+
+    "d3-ease": ["d3-ease@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-ease/download/d3-ease-3.0.1.tgz", {}, "sha1-llisOKIUDVnTRhYPH2ww/aC9EvQ="],
+
+    "d3-fetch": ["d3-fetch@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-fetch/download/d3-fetch-3.0.1.tgz", { "dependencies": { "d3-dsv": "1 - 3" } }, "sha1-gxQb/5hWoO21443onNz+Y9CmCiI="],
+
+    "d3-force": ["d3-force@3.0.0", "https://registry.npm.qianxin-inc.cn/d3-force/download/d3-force-3.0.0.tgz", { "dependencies": { "d3-dispatch": "1 - 3", "d3-quadtree": "1 - 3", "d3-timer": "1 - 3" } }, "sha1-Piuhph5wiI/j2RlOMNbRTuzhVcQ="],
+
+    "d3-format": ["d3-format@3.1.2", "https://registry.npm.qianxin-inc.cn/d3-format/download/d3-format-3.1.2.tgz", {}, "sha1-Af20a1i+sfVbELQq1wtuNE1esq4="],
+
+    "d3-geo": ["d3-geo@3.1.1", "https://registry.npm.qianxin-inc.cn/d3-geo/download/d3-geo-3.1.1.tgz", { "dependencies": { "d3-array": "2.5.0 - 3" } }, "sha1-YCfPUSRvmy69ZPmeAdx8M2QDOk0="],
+
+    "d3-hierarchy": ["d3-hierarchy@3.1.2", "https://registry.npm.qianxin-inc.cn/d3-hierarchy/download/d3-hierarchy-3.1.2.tgz", {}, "sha1-sBzULB7tPUbbd6WWbPcm+MCRYMY="],
+
+    "d3-interpolate": ["d3-interpolate@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-interpolate/download/d3-interpolate-3.0.1.tgz", { "dependencies": { "d3-color": "1 - 3" } }, "sha1-PEeqWzLFs9+1bvP9Q0IHimMrQA0="],
+
+    "d3-path": ["d3-path@3.1.0", "https://registry.npm.qianxin-inc.cn/d3-path/download/d3-path-3.1.0.tgz", {}, "sha1-It+TkDL7WnGuixgA1h3beFHEJSY="],
+
+    "d3-polygon": ["d3-polygon@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-polygon/download/d3-polygon-3.0.1.tgz", {}, "sha1-C0XT3RxIopyOBX5hNWk+yAvxY5g="],
+
+    "d3-quadtree": ["d3-quadtree@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-quadtree/download/d3-quadtree-3.0.1.tgz", {}, "sha1-bco+i+Kzk8mp1RTau9gKkt7vGk8="],
+
+    "d3-random": ["d3-random@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-random/download/d3-random-3.0.1.tgz", {}, "sha1-1JJjeNMz2cC/0eb6AZTTCuuqIPQ="],
+
+    "d3-sankey": ["d3-sankey@0.12.3", "https://registry.npm.qianxin-inc.cn/d3-sankey/download/d3-sankey-0.12.3.tgz", { "dependencies": { "d3-array": "1 - 2", "d3-shape": "^1.2.0" } }, "sha1-s8JoYnvXLl2AM26N5qy/7J0V0B0="],
+
+    "d3-scale": ["d3-scale@4.0.2", "https://registry.npm.qianxin-inc.cn/d3-scale/download/d3-scale-4.0.2.tgz", { "dependencies": { "d3-array": "2.10.0 - 3", "d3-format": "1 - 3", "d3-interpolate": "1.2.0 - 3", "d3-time": "2.1.1 - 3", "d3-time-format": "2 - 4" } }, "sha1-grOOjo/3CAdk+Nzsd71L45Nok5Y="],
+
+    "d3-scale-chromatic": ["d3-scale-chromatic@3.1.0", "https://registry.npm.qianxin-inc.cn/d3-scale-chromatic/download/d3-scale-chromatic-3.1.0.tgz", { "dependencies": { "d3-color": "1 - 3", "d3-interpolate": "1 - 3" } }, "sha1-NMOdopiyPCDgLxpLI5vQ8i5/ExQ="],
+
+    "d3-selection": ["d3-selection@3.0.0", "https://registry.npm.qianxin-inc.cn/d3-selection/download/d3-selection-3.0.0.tgz", {}, "sha1-wlM4IH76csxbm9FFihpBkB8eGzE="],
+
+    "d3-shape": ["d3-shape@3.2.0", "https://registry.npm.qianxin-inc.cn/d3-shape/download/d3-shape-3.2.0.tgz", { "dependencies": { "d3-path": "^3.1.0" } }, "sha1-oag5y9m6RfKGdMadf4Vbz5HfxqU="],
+
+    "d3-time": ["d3-time@3.1.0", "https://registry.npm.qianxin-inc.cn/d3-time/download/d3-time-3.1.0.tgz", { "dependencies": { "d3-array": "2 - 3" } }, "sha1-kxDbVumS48AXXh7zheVF5Iqbtcc="],
+
+    "d3-time-format": ["d3-time-format@4.1.0", "https://registry.npm.qianxin-inc.cn/d3-time-format/download/d3-time-format-4.1.0.tgz", { "dependencies": { "d3-time": "1 - 3" } }, "sha1-erUlelBB0R7LT+cKXH0WoZW7QIo="],
+
+    "d3-timer": ["d3-timer@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-timer/download/d3-timer-3.0.1.tgz", {}, "sha1-YoTSonCChbGrt+IB7aQ4CvNeY7A="],
+
+    "d3-transition": ["d3-transition@3.0.1", "https://registry.npm.qianxin-inc.cn/d3-transition/download/d3-transition-3.0.1.tgz", { "dependencies": { "d3-color": "1 - 3", "d3-dispatch": "1 - 3", "d3-ease": "1 - 3", "d3-interpolate": "1 - 3", "d3-timer": "1 - 3" }, "peerDependencies": { "d3-selection": "2 - 3" } }, "sha1-aGn93hRIhoB3/dWYkgDLYbKhZF8="],
+
+    "d3-zoom": ["d3-zoom@3.0.0", "https://registry.npm.qianxin-inc.cn/d3-zoom/download/d3-zoom-3.0.0.tgz", { "dependencies": { "d3-dispatch": "1 - 3", "d3-drag": "2 - 3", "d3-interpolate": "1 - 3", "d3-selection": "2 - 3", "d3-transition": "2 - 3" } }, "sha1-0T9BZccyF//qpUKVzWlps+eu6PM="],
+
+    "dagre-d3-es": ["dagre-d3-es@7.0.14", "https://registry.npm.qianxin-inc.cn/dagre-d3-es/download/dagre-d3-es-7.0.14.tgz", { "dependencies": { "d3": "^7.9.0", "lodash-es": "^4.17.21" } }, "sha1-EnInbiZFfPO5faxWn48FMewzw3c="],
+
+    "dayjs": ["dayjs@1.11.21", "https://registry.npm.qianxin-inc.cn/dayjs/download/dayjs-1.11.21.tgz", {}, "sha1-V/h1YuYt5288cEvSuNUi/DMGjrI="],
+
+    "debug": ["debug@4.4.3", "https://registry.npm.qianxin-inc.cn/debug/download/debug-4.4.3.tgz", { "dependencies": { "ms": "^2.1.3" } }, "sha1-xq5DLZvZZiWC/OCHCbA4xY6ePWo="],
+
+    "decode-named-character-reference": ["decode-named-character-reference@1.3.0", "https://registry.npm.qianxin-inc.cn/decode-named-character-reference/download/decode-named-character-reference-1.3.0.tgz", { "dependencies": { "character-entities": "^2.0.0" } }, "sha1-PkBgN2CHTC5YZ2kbWZ1zp9oltT8="],
+
+    "delaunator": ["delaunator@5.0.1", "https://registry.npm.qianxin-inc.cn/delaunator/download/delaunator-5.0.1.tgz", { "dependencies": { "robust-predicates": "^3.0.2" } }, "sha1-OQMrCAU5I+kk1glP4s3hqZzFEng="],
+
+    "dequal": ["dequal@2.0.3", "https://registry.npm.qianxin-inc.cn/dequal/download/dequal-2.0.3.tgz", {}, "sha1-JkQhTxmX057Q7g7OcjNUkKesZ74="],
+
+    "devlop": ["devlop@1.1.0", "https://registry.npm.qianxin-inc.cn/devlop/download/devlop-1.1.0.tgz", { "dependencies": { "dequal": "^2.0.0" } }, "sha1-TbfCyk3G4Og0wwvnDJS7yXbccBg="],
+
+    "dompurify": ["dompurify@3.4.6", "https://registry.npm.qianxin-inc.cn/dompurify/download/dompurify-3.4.6.tgz", { "optionalDependencies": { "@types/trusted-types": "^2.0.7" } }, "sha1-j3MBDRSkbNl4G702MPO87wJaIRE="],
+
+    "electron-to-chromium": ["electron-to-chromium@1.5.351", "https://registry.npm.qianxin-inc.cn/electron-to-chromium/download/electron-to-chromium-1.5.351.tgz", {}, "sha1-cxT7tbSDWhhp/q7AlmVUG2qEzTc="],
+
+    "es-toolkit": ["es-toolkit@1.47.0", "https://registry.npm.qianxin-inc.cn/es-toolkit/download/es-toolkit-1.47.0.tgz", {}, "sha1-hGd42sR6+VH5kXNj7Fo7lL7rjdw="],
+
+    "esbuild": ["esbuild@0.25.12", "https://registry.npm.qianxin-inc.cn/esbuild/download/esbuild-0.25.12.tgz", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.25.12", "@esbuild/android-arm": "0.25.12", "@esbuild/android-arm64": "0.25.12", "@esbuild/android-x64": "0.25.12", "@esbuild/darwin-arm64": "0.25.12", "@esbuild/darwin-x64": "0.25.12", "@esbuild/freebsd-arm64": "0.25.12", "@esbuild/freebsd-x64": "0.25.12", "@esbuild/linux-arm": "0.25.12", "@esbuild/linux-arm64": "0.25.12", "@esbuild/linux-ia32": "0.25.12", "@esbuild/linux-loong64": "0.25.12", "@esbuild/linux-mips64el": "0.25.12", "@esbuild/linux-ppc64": "0.25.12", "@esbuild/linux-riscv64": "0.25.12", "@esbuild/linux-s390x": "0.25.12", "@esbuild/linux-x64": "0.25.12", "@esbuild/netbsd-arm64": "0.25.12", "@esbuild/netbsd-x64": "0.25.12", "@esbuild/openbsd-arm64": "0.25.12", "@esbuild/openbsd-x64": "0.25.12", "@esbuild/openharmony-arm64": "0.25.12", "@esbuild/sunos-x64": "0.25.12", "@esbuild/win32-arm64": "0.25.12", "@esbuild/win32-ia32": "0.25.12", "@esbuild/win32-x64": "0.25.12" }, "bin": { "esbuild": "bin/esbuild" } }, "sha1-l6HQQfSrAML84vg40rmWmi0ql6U="],
+
+    "escalade": ["escalade@3.2.0", "https://registry.npm.qianxin-inc.cn/escalade/download/escalade-3.2.0.tgz", {}, "sha1-ARo/aYVroYnf+n3I/M6Z0qh5A+U="],
+
+    "escape-string-regexp": ["escape-string-regexp@5.0.0", "https://registry.npm.qianxin-inc.cn/escape-string-regexp/download/escape-string-regexp-5.0.0.tgz", {}, "sha1-RoMSa1ALYXYvLb66zhgG6L4xscg="],
+
+    "estree-util-is-identifier-name": ["estree-util-is-identifier-name@3.0.0", "https://registry.npm.qianxin-inc.cn/estree-util-is-identifier-name/download/estree-util-is-identifier-name-3.0.0.tgz", {}, "sha1-C170xP8TUIs03NAez6lF9h/OXb0="],
+
+    "extend": ["extend@3.0.2", "https://registry.npm.qianxin-inc.cn/extend/download/extend-3.0.2.tgz", {}, "sha1-+LETa0Bx+9jrFAr/hYsQGewpFfo="],
+
+    "fault": ["fault@1.0.4", "https://registry.npm.qianxin-inc.cn/fault/download/fault-1.0.4.tgz", { "dependencies": { "format": "^0.2.0" } }, "sha1-6vz8Cm0hT8lGAeFw3ymVSk+ELxM="],
+
+    "fdir": ["fdir@6.5.0", "https://registry.npm.qianxin-inc.cn/fdir/download/fdir-6.5.0.tgz", { "peerDependencies": { "picomatch": "^3 || ^4" }, "optionalPeers": ["picomatch"] }, "sha1-7Sq5Z6MxreYvGNB32uGSaE1Q01A="],
+
+    "format": ["format@0.2.2", "https://registry.npm.qianxin-inc.cn/format/download/format-0.2.2.tgz", {}, "sha1-1hcBB+nv3E7TDJ3DkBbflCtctYs="],
+
+    "fsevents": ["fsevents@2.3.3", "https://registry.npm.qianxin-inc.cn/fsevents/download/fsevents-2.3.3.tgz", { "os": "darwin" }, "sha1-ysZAd4XQNnWipeGlMFxpezR9kNY="],
+
+    "gensync": ["gensync@1.0.0-beta.2", "https://registry.npm.qianxin-inc.cn/gensync/download/gensync-1.0.0-beta.2.tgz", {}, "sha1-MqbudsPX9S1GsrGuXZP+qFgKJeA="],
+
+    "hachure-fill": ["hachure-fill@0.5.2", "https://registry.npm.qianxin-inc.cn/hachure-fill/download/hachure-fill-0.5.2.tgz", {}, "sha1-0ZvEzIdQpZYrR/sTAFV6hfz5NMw="],
+
+    "hast-util-parse-selector": ["hast-util-parse-selector@4.0.0", "https://registry.npm.qianxin-inc.cn/hast-util-parse-selector/download/hast-util-parse-selector-4.0.0.tgz", { "dependencies": { "@types/hast": "^3.0.0" } }, "sha1-NSh5+obiVhYDYDfdiTH7XzTLSic="],
+
+    "hast-util-to-jsx-runtime": ["hast-util-to-jsx-runtime@2.3.6", "https://registry.npm.qianxin-inc.cn/hast-util-to-jsx-runtime/download/hast-util-to-jsx-runtime-2.3.6.tgz", { "dependencies": { "@types/estree": "^1.0.0", "@types/hast": "^3.0.0", "@types/unist": "^3.0.0", "comma-separated-tokens": "^2.0.0", "devlop": "^1.0.0", "estree-util-is-identifier-name": "^3.0.0", "hast-util-whitespace": "^3.0.0", "mdast-util-mdx-expression": "^2.0.0", "mdast-util-mdx-jsx": "^3.0.0", "mdast-util-mdxjs-esm": "^2.0.0", "property-information": "^7.0.0", "space-separated-tokens": "^2.0.0", "style-to-js": "^1.0.0", "unist-util-position": "^5.0.0", "vfile-message": "^4.0.0" } }, "sha1-/zGJeq5Z9iIy4hWU6sfva2MzPpg="],
+
+    "hast-util-whitespace": ["hast-util-whitespace@3.0.0", "https://registry.npm.qianxin-inc.cn/hast-util-whitespace/download/hast-util-whitespace-3.0.0.tgz", { "dependencies": { "@types/hast": "^3.0.0" } }, "sha1-d3jtnTyS3Z6MXI9kiknCH8UctiE="],
+
+    "hastscript": ["hastscript@9.0.1", "https://registry.npm.qianxin-inc.cn/hastscript/download/hastscript-9.0.1.tgz", { "dependencies": { "@types/hast": "^3.0.0", "comma-separated-tokens": "^2.0.0", "hast-util-parse-selector": "^4.0.0", "property-information": "^7.0.0", "space-separated-tokens": "^2.0.0" } }, "sha1-28hL72BR1ACENCwinEUc2dxWff8="],
+
+    "highlight.js": ["highlight.js@10.7.3", "https://registry.npm.qianxin-inc.cn/highlight.js/download/highlight.js-10.7.3.tgz", {}, "sha1-aXJy45kTVuQMPKxWanTu9oF1ZTE="],
+
+    "highlightjs-vue": ["highlightjs-vue@1.0.0", "https://registry.npm.qianxin-inc.cn/highlightjs-vue/download/highlightjs-vue-1.0.0.tgz", {}, "sha1-/f6X++pjVOcO5E46lVh14RTbCG0="],
+
+    "html-url-attributes": ["html-url-attributes@3.0.1", "https://registry.npm.qianxin-inc.cn/html-url-attributes/download/html-url-attributes-3.0.1.tgz", {}, "sha1-g7BSzV5DcHG3Vs10rnD3CIcMLYc="],
+
+    "iconv-lite": ["iconv-lite@0.6.3", "https://registry.npm.qianxin-inc.cn/iconv-lite/download/iconv-lite-0.6.3.tgz", { "dependencies": { "safer-buffer": ">= 2.1.2 < 3.0.0" } }, "sha1-pS+AvzjaGVLrXGgXkHGYcaGnJQE="],
+
+    "import-meta-resolve": ["import-meta-resolve@4.2.0", "https://registry.npm.qianxin-inc.cn/import-meta-resolve/download/import-meta-resolve-4.2.0.tgz", {}, "sha1-CMuFtb037MjrHg9nDcJ2cALUNzQ="],
+
+    "inline-style-parser": ["inline-style-parser@0.2.7", "https://registry.npm.qianxin-inc.cn/inline-style-parser/download/inline-style-parser-0.2.7.tgz", {}, "sha1-sfxov8AxO4aFdF5EZON/k3a5yQk="],
+
+    "internmap": ["internmap@1.0.1", "https://registry.npm.qianxin-inc.cn/internmap/download/internmap-1.0.1.tgz", {}, "sha1-ABfMijuZYF8DAvKxmNJy4BXl35U="],
+
+    "is-alphabetical": ["is-alphabetical@2.0.1", "https://registry.npm.qianxin-inc.cn/is-alphabetical/download/is-alphabetical-2.0.1.tgz", {}, "sha1-AQcgU+p8EDbfPH0Zptqux/GeeJs="],
+
+    "is-alphanumerical": ["is-alphanumerical@2.0.1", "https://registry.npm.qianxin-inc.cn/is-alphanumerical/download/is-alphanumerical-2.0.1.tgz", { "dependencies": { "is-alphabetical": "^2.0.0", "is-decimal": "^2.0.0" } }, "sha1-fAP76W4+kxET5X+WSwo2jMLf2HU="],
+
+    "is-decimal": ["is-decimal@2.0.1", "https://registry.npm.qianxin-inc.cn/is-decimal/download/is-decimal-2.0.1.tgz", {}, "sha1-lGnS3BkNAhT9h9eLeMrswMwU7vc="],
+
+    "is-hexadecimal": ["is-hexadecimal@2.0.1", "https://registry.npm.qianxin-inc.cn/is-hexadecimal/download/is-hexadecimal-2.0.1.tgz", {}, "sha1-hrW/Zo/KMHSY0xnfwDKJ14GpACc="],
+
+    "is-mobile": ["is-mobile@5.0.0", "https://registry.npm.qianxin-inc.cn/is-mobile/download/is-mobile-5.0.0.tgz", {}, "sha1-Hgig7yw4pnv/hKUq9o1nvO9EUzM="],
+
+    "is-plain-obj": ["is-plain-obj@4.1.0", "https://registry.npm.qianxin-inc.cn/is-plain-obj/download/is-plain-obj-4.1.0.tgz", {}, "sha1-1lAl7ew2V84DL9fbY8l4g+rtcfA="],
+
+    "js-tokens": ["js-tokens@4.0.0", "https://registry.npm.qianxin-inc.cn/js-tokens/download/js-tokens-4.0.0.tgz", {}, "sha1-GSA/tZmR35jjoocFDUZHzerzJJk="],
+
+    "jsesc": ["jsesc@3.1.0", "https://registry.npm.qianxin-inc.cn/jsesc/download/jsesc-3.1.0.tgz", { "bin": { "jsesc": "bin/jsesc" } }, "sha1-dNM1ojT2ftGZB/2t+sfM+dQJgl0="],
+
+    "json2mq": ["json2mq@0.2.0", "https://registry.npm.qianxin-inc.cn/json2mq/download/json2mq-0.2.0.tgz", { "dependencies": { "string-convert": "^0.2.0" } }, "sha1-tje9O6nqvhIsg+lyBIOusQ0skEo="],
+
+    "json5": ["json5@2.2.3", "https://registry.npm.qianxin-inc.cn/json5/download/json5-2.2.3.tgz", { "bin": { "json5": "lib/cli.js" } }, "sha1-eM1vGhm9wStz21rQxh79ZsHikoM="],
+
+    "katex": ["katex@0.16.47", "https://registry.npm.qianxin-inc.cn/katex/download/katex-0.16.47.tgz", { "dependencies": { "commander": "^8.3.0" }, "bin": { "katex": "cli.js" } }, "sha1-ChOkLC3rT3TmHxYtRAuRZaVIAw8="],
+
+    "khroma": ["khroma@2.1.0", "https://registry.npm.qianxin-inc.cn/khroma/download/khroma-2.1.0.tgz", {}, "sha1-RfLOlM4jGkN89bY8LohubrQru7E="],
+
+    "layout-base": ["layout-base@1.0.2", "https://registry.npm.qianxin-inc.cn/layout-base/download/layout-base-1.0.2.tgz", {}, "sha1-EpHilog8Miqd1MXdggY3IbU+JuI="],
+
+    "lodash-es": ["lodash-es@4.18.1", "https://registry.npm.qianxin-inc.cn/lodash-es/download/lodash-es-4.18.1.tgz", {}, "sha1-uWLuuA2dmDqQC/NClh+3QYyhCx0="],
+
+    "lodash.throttle": ["lodash.throttle@4.1.1", "https://registry.npm.qianxin-inc.cn/lodash.throttle/download/lodash.throttle-4.1.1.tgz", {}, "sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ="],
+
+    "longest-streak": ["longest-streak@3.1.0", "https://registry.npm.qianxin-inc.cn/longest-streak/download/longest-streak-3.1.0.tgz", {}, "sha1-YvpnzZWHQqFXSvnzmGY2QQLZDNQ="],
+
+    "loose-envify": ["loose-envify@1.4.0", "https://registry.npm.qianxin-inc.cn/loose-envify/download/loose-envify-1.4.0.tgz", { "dependencies": { "js-tokens": "^3.0.0 || ^4.0.0" }, "bin": { "loose-envify": "cli.js" } }, "sha1-ce5R+nvkyuwaY4OffmgtgTLTDK8="],
+
+    "lowlight": ["lowlight@1.20.0", "https://registry.npm.qianxin-inc.cn/lowlight/download/lowlight-1.20.0.tgz", { "dependencies": { "fault": "^1.0.0", "highlight.js": "~10.7.0" } }, "sha1-3bGX0zRirQ2TvxnRe2wwGqOUGIg="],
+
+    "lru-cache": ["lru-cache@5.1.1", "https://registry.npm.qianxin-inc.cn/lru-cache/download/lru-cache-5.1.1.tgz", { "dependencies": { "yallist": "^3.0.2" } }, "sha1-HaJ+ZxAnGUdpXa9oSOhH8B2EuSA="],
+
+    "markdown-table": ["markdown-table@3.0.4", "https://registry.npm.qianxin-inc.cn/markdown-table/download/markdown-table-3.0.4.tgz", {}, "sha1-/kTW1BD/nW8uoXl6P2CqTStjHCo="],
+
+    "marked": ["marked@16.4.2", "https://registry.npm.qianxin-inc.cn/marked/download/marked-16.4.2.tgz", { "bin": { "marked": "bin/marked.js" } }, "sha1-SVmmS+bEhvDbdGfq184ojeVCkKM="],
+
+    "mdast-util-find-and-replace": ["mdast-util-find-and-replace@3.0.2", "https://registry.npm.qianxin-inc.cn/mdast-util-find-and-replace/download/mdast-util-find-and-replace-3.0.2.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "escape-string-regexp": "^5.0.0", "unist-util-is": "^6.0.0", "unist-util-visit-parents": "^6.0.0" } }, "sha1-cKMXTIlOFN9yKr9DvCUMuuRLEd8="],
+
+    "mdast-util-from-markdown": ["mdast-util-from-markdown@2.0.3", "https://registry.npm.qianxin-inc.cn/mdast-util-from-markdown/download/mdast-util-from-markdown-2.0.3.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "@types/unist": "^3.0.0", "decode-named-character-reference": "^1.0.0", "devlop": "^1.0.0", "mdast-util-to-string": "^4.0.0", "micromark": "^4.0.0", "micromark-util-decode-numeric-character-reference": "^2.0.0", "micromark-util-decode-string": "^2.0.0", "micromark-util-normalize-identifier": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0", "unist-util-stringify-position": "^4.0.0" } }, "sha1-yVgiuRqrdfGKTL6LL1G4c+0s8Mc="],
+
+    "mdast-util-gfm": ["mdast-util-gfm@3.1.0", "https://registry.npm.qianxin-inc.cn/mdast-util-gfm/download/mdast-util-gfm-3.1.0.tgz", { "dependencies": { "mdast-util-from-markdown": "^2.0.0", "mdast-util-gfm-autolink-literal": "^2.0.0", "mdast-util-gfm-footnote": "^2.0.0", "mdast-util-gfm-strikethrough": "^2.0.0", "mdast-util-gfm-table": "^2.0.0", "mdast-util-gfm-task-list-item": "^2.0.0", "mdast-util-to-markdown": "^2.0.0" } }, "sha1-LN9juSwqMxQGsPsNtMB3wbAzF1E="],
+
+    "mdast-util-gfm-autolink-literal": ["mdast-util-gfm-autolink-literal@2.0.1", "https://registry.npm.qianxin-inc.cn/mdast-util-gfm-autolink-literal/download/mdast-util-gfm-autolink-literal-2.0.1.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "ccount": "^2.0.0", "devlop": "^1.0.0", "mdast-util-find-and-replace": "^3.0.0", "micromark-util-character": "^2.0.0" } }, "sha1-q9VXYwM3vTCm1aS9glLhwtwIddU="],
+
+    "mdast-util-gfm-footnote": ["mdast-util-gfm-footnote@2.1.0", "https://registry.npm.qianxin-inc.cn/mdast-util-gfm-footnote/download/mdast-util-gfm-footnote-2.1.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "devlop": "^1.1.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0", "micromark-util-normalize-identifier": "^2.0.0" } }, "sha1-d3jp2co99yOMwr0/orG/amWxlAM="],
+
+    "mdast-util-gfm-strikethrough": ["mdast-util-gfm-strikethrough@2.0.0", "https://registry.npm.qianxin-inc.cn/mdast-util-gfm-strikethrough/download/mdast-util-gfm-strikethrough-2.0.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0" } }, "sha1-1E756O0oOsjBFlqw0N/QWMJ2TBY="],
+
+    "mdast-util-gfm-table": ["mdast-util-gfm-table@2.0.0", "https://registry.npm.qianxin-inc.cn/mdast-util-gfm-table/download/mdast-util-gfm-table-2.0.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "markdown-table": "^3.0.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0" } }, "sha1-ekNftiI6crCGKzOvvXErba6HjTg="],
+
+    "mdast-util-gfm-task-list-item": ["mdast-util-gfm-task-list-item@2.0.0", "https://registry.npm.qianxin-inc.cn/mdast-util-gfm-task-list-item/download/mdast-util-gfm-task-list-item-2.0.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0" } }, "sha1-5oCV0vikMD7yQJSrZC4QR7mRqTY="],
+
+    "mdast-util-mdx-expression": ["mdast-util-mdx-expression@2.0.1", "https://registry.npm.qianxin-inc.cn/mdast-util-mdx-expression/download/mdast-util-mdx-expression-2.0.1.tgz", { "dependencies": { "@types/estree-jsx": "^1.0.0", "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0" } }, "sha1-Q/CrrJrcdW4ghvY4IqOMjTw6UJY="],
+
+    "mdast-util-mdx-jsx": ["mdast-util-mdx-jsx@3.2.0", "https://registry.npm.qianxin-inc.cn/mdast-util-mdx-jsx/download/mdast-util-mdx-jsx-3.2.0.tgz", { "dependencies": { "@types/estree-jsx": "^1.0.0", "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "@types/unist": "^3.0.0", "ccount": "^2.0.0", "devlop": "^1.1.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0", "parse-entities": "^4.0.0", "stringify-entities": "^4.0.0", "unist-util-stringify-position": "^4.0.0", "vfile-message": "^4.0.0" } }, "sha1-/QTGeip0me+5BailxXjd3J/a2g0="],
+
+    "mdast-util-mdxjs-esm": ["mdast-util-mdxjs-esm@2.0.1", "https://registry.npm.qianxin-inc.cn/mdast-util-mdxjs-esm/download/mdast-util-mdxjs-esm-2.0.1.tgz", { "dependencies": { "@types/estree-jsx": "^1.0.0", "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "mdast-util-from-markdown": "^2.0.0", "mdast-util-to-markdown": "^2.0.0" } }, "sha1-AZz751etYt1VfbNaaV5zFLzJ+pc="],
+
+    "mdast-util-phrasing": ["mdast-util-phrasing@4.1.0", "https://registry.npm.qianxin-inc.cn/mdast-util-phrasing/download/mdast-util-phrasing-4.1.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "unist-util-is": "^6.0.0" } }, "sha1-fMCo3sMOrwS3salmGpKtszgqpuM="],
+
+    "mdast-util-to-hast": ["mdast-util-to-hast@13.2.1", "https://registry.npm.qianxin-inc.cn/mdast-util-to-hast/download/mdast-util-to-hast-13.2.1.tgz", { "dependencies": { "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "@ungap/structured-clone": "^1.0.0", "devlop": "^1.0.0", "micromark-util-sanitize-uri": "^2.0.0", "trim-lines": "^3.0.0", "unist-util-position": "^5.0.0", "unist-util-visit": "^5.0.0", "vfile": "^6.0.0" } }, "sha1-1/+EykmaV+LAYK5nVIrZUOaJoFM="],
+
+    "mdast-util-to-markdown": ["mdast-util-to-markdown@2.1.2", "https://registry.npm.qianxin-inc.cn/mdast-util-to-markdown/download/mdast-util-to-markdown-2.1.2.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "@types/unist": "^3.0.0", "longest-streak": "^3.0.0", "mdast-util-phrasing": "^4.0.0", "mdast-util-to-string": "^4.0.0", "micromark-util-classify-character": "^2.0.0", "micromark-util-decode-string": "^2.0.0", "unist-util-visit": "^5.0.0", "zwitch": "^2.0.0" } }, "sha1-+RD/5giX8Eu0t+fuQ0SG92KINhs="],
+
+    "mdast-util-to-string": ["mdast-util-to-string@4.0.0", "https://registry.npm.qianxin-inc.cn/mdast-util-to-string/download/mdast-util-to-string-4.0.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0" } }, "sha1-elEhR1VWoE5+3etnsmSq550xKBQ="],
+
+    "mermaid": ["mermaid@11.15.0", "https://registry.npm.qianxin-inc.cn/mermaid/download/mermaid-11.15.0.tgz", { "dependencies": { "@braintree/sanitize-url": "^7.1.1", "@iconify/utils": "^3.0.2", "@mermaid-js/parser": "^1.1.1", "@types/d3": "^7.4.3", "@upsetjs/venn.js": "^2.0.0", "cytoscape": "^3.33.1", "cytoscape-cose-bilkent": "^4.1.0", "cytoscape-fcose": "^2.2.0", "d3": "^7.9.0", "d3-sankey": "^0.12.3", "dagre-d3-es": "7.0.14", "dayjs": "^1.11.19", "dompurify": "^3.3.1", "es-toolkit": "^1.45.1", "katex": "^0.16.25", "khroma": "^2.1.0", "marked": "^16.3.0", "roughjs": "^4.6.6", "stylis": "^4.3.6", "ts-dedent": "^2.2.0", "uuid": "^11.1.0 || ^12 || ^13 || ^14.0.0" } }, "sha1-tIXBPqXh508zKMS7AEJ72of6HB4="],
+
+    "micromark": ["micromark@4.0.2", "https://registry.npm.qianxin-inc.cn/micromark/download/micromark-4.0.2.tgz", { "dependencies": { "@types/debug": "^4.0.0", "debug": "^4.0.0", "decode-named-character-reference": "^1.0.0", "devlop": "^1.0.0", "micromark-core-commonmark": "^2.0.0", "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-chunked": "^2.0.0", "micromark-util-combine-extensions": "^2.0.0", "micromark-util-decode-numeric-character-reference": "^2.0.0", "micromark-util-encode": "^2.0.0", "micromark-util-normalize-identifier": "^2.0.0", "micromark-util-resolve-all": "^2.0.0", "micromark-util-sanitize-uri": "^2.0.0", "micromark-util-subtokenize": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-kTlaPhiEoZjmIRbjPJxWjjmTb9s="],
+
+    "micromark-core-commonmark": ["micromark-core-commonmark@2.0.3", "https://registry.npm.qianxin-inc.cn/micromark-core-commonmark/download/micromark-core-commonmark-2.0.3.tgz", { "dependencies": { "decode-named-character-reference": "^1.0.0", "devlop": "^1.0.0", "micromark-factory-destination": "^2.0.0", "micromark-factory-label": "^2.0.0", "micromark-factory-space": "^2.0.0", "micromark-factory-title": "^2.0.0", "micromark-factory-whitespace": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-chunked": "^2.0.0", "micromark-util-classify-character": "^2.0.0", "micromark-util-html-tag-name": "^2.0.0", "micromark-util-normalize-identifier": "^2.0.0", "micromark-util-resolve-all": "^2.0.0", "micromark-util-subtokenize": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-xpFjDkhQIaaM8o28Kyyifr9njNQ="],
+
+    "micromark-extension-gfm": ["micromark-extension-gfm@3.0.0", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm/download/micromark-extension-gfm-3.0.0.tgz", { "dependencies": { "micromark-extension-gfm-autolink-literal": "^2.0.0", "micromark-extension-gfm-footnote": "^2.0.0", "micromark-extension-gfm-strikethrough": "^2.0.0", "micromark-extension-gfm-table": "^2.0.0", "micromark-extension-gfm-tagfilter": "^2.0.0", "micromark-extension-gfm-task-list-item": "^2.0.0", "micromark-util-combine-extensions": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-PhM3arld16XP0OKVYN/pmWV7PFs="],
+
+    "micromark-extension-gfm-autolink-literal": ["micromark-extension-gfm-autolink-literal@2.1.0", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm-autolink-literal/download/micromark-extension-gfm-autolink-literal-2.1.0.tgz", { "dependencies": { "micromark-util-character": "^2.0.0", "micromark-util-sanitize-uri": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-Yoau6WhsRGLB41UqnVBf7dzuuTU="],
+
+    "micromark-extension-gfm-footnote": ["micromark-extension-gfm-footnote@2.1.0", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm-footnote/download/micromark-extension-gfm-footnote-2.1.0.tgz", { "dependencies": { "devlop": "^1.0.0", "micromark-core-commonmark": "^2.0.0", "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-normalize-identifier": "^2.0.0", "micromark-util-sanitize-uri": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-TatW1OOYuYU/b+TvrE/JNh8+B1A="],
+
+    "micromark-extension-gfm-strikethrough": ["micromark-extension-gfm-strikethrough@2.1.0", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm-strikethrough/download/micromark-extension-gfm-strikethrough-2.1.0.tgz", { "dependencies": { "devlop": "^1.0.0", "micromark-util-chunked": "^2.0.0", "micromark-util-classify-character": "^2.0.0", "micromark-util-resolve-all": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-hhBt+LOmkrX2qSKA04eb5r5G2SM="],
+
+    "micromark-extension-gfm-table": ["micromark-extension-gfm-table@2.1.1", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm-table/download/micromark-extension-gfm-table-2.1.1.tgz", { "dependencies": { "devlop": "^1.0.0", "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-+scLy/Uf5l9fRAMxGNOb6Km1lAs="],
+
+    "micromark-extension-gfm-tagfilter": ["micromark-extension-gfm-tagfilter@2.0.0", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm-tagfilter/download/micromark-extension-gfm-tagfilter-2.0.0.tgz", { "dependencies": { "micromark-util-types": "^2.0.0" } }, "sha1-8m2KeAe1mF+6E89hRltYyl/33Fc="],
+
+    "micromark-extension-gfm-task-list-item": ["micromark-extension-gfm-task-list-item@2.1.0", "https://registry.npm.qianxin-inc.cn/micromark-extension-gfm-task-list-item/download/micromark-extension-gfm-task-list-item-2.1.0.tgz", { "dependencies": { "devlop": "^1.0.0", "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-vMNNgFY5gpmQ7BdcPuoSu1t4Hyw="],
+
+    "micromark-factory-destination": ["micromark-factory-destination@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-factory-destination/download/micromark-factory-destination-2.0.1.tgz", { "dependencies": { "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-j++OD3CB8EdPvdkt61DJkKAmRjk="],
+
+    "micromark-factory-label": ["micromark-factory-label@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-factory-label/download/micromark-factory-label-2.0.1.tgz", { "dependencies": { "devlop": "^1.0.0", "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-UmfvqX8eUlTvx/ILRZo4yyEFi6E="],
+
+    "micromark-factory-space": ["micromark-factory-space@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-factory-space/download/micromark-factory-space-2.0.1.tgz", { "dependencies": { "micromark-util-character": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-NtAhLpYrKzEh+FJfx6PHwCnzNPw="],
+
+    "micromark-factory-title": ["micromark-factory-title@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-factory-title/download/micromark-factory-title-2.0.1.tgz", { "dependencies": { "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-I35KpdWKlYY/AQMtnumwkPHebpQ="],
+
+    "micromark-factory-whitespace": ["micromark-factory-whitespace@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-factory-whitespace/download/micromark-factory-whitespace-2.0.1.tgz", { "dependencies": { "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-BrJrKYPE0nv8xlezPiUTTUhosLE="],
+
+    "micromark-util-character": ["micromark-util-character@2.1.1", "https://registry.npm.qianxin-inc.cn/micromark-util-character/download/micromark-util-character-2.1.1.tgz", { "dependencies": { "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-L5h4MaQNTFEKwmHomFLE6XA8zaY="],
+
+    "micromark-util-chunked": ["micromark-util-chunked@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-chunked/download/micromark-util-chunked-2.0.1.tgz", { "dependencies": { "micromark-util-symbol": "^2.0.0" } }, "sha1-R/vNk0caP8yrhs/wOEf8NVLbEFE="],
+
+    "micromark-util-classify-character": ["micromark-util-classify-character@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-classify-character/download/micromark-util-classify-character-2.0.1.tgz", { "dependencies": { "micromark-util-character": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-05n6+cRcoUyLS+mLHqSBvO2Htik="],
+
+    "micromark-util-combine-extensions": ["micromark-util-combine-extensions@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-combine-extensions/download/micromark-util-combine-extensions-2.0.1.tgz", { "dependencies": { "micromark-util-chunked": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-Kg9JCrCL/1zC/V7sbdDKBPibMKk="],
+
+    "micromark-util-decode-numeric-character-reference": ["micromark-util-decode-numeric-character-reference@2.0.2", "https://registry.npm.qianxin-inc.cn/micromark-util-decode-numeric-character-reference/download/micromark-util-decode-numeric-character-reference-2.0.2.tgz", { "dependencies": { "micromark-util-symbol": "^2.0.0" } }, "sha1-/PFbZgl5OI5vEYzba/fXnXPSb+U="],
+
+    "micromark-util-decode-string": ["micromark-util-decode-string@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-decode-string/download/micromark-util-decode-string-2.0.1.tgz", { "dependencies": { "decode-named-character-reference": "^1.0.0", "micromark-util-character": "^2.0.0", "micromark-util-decode-numeric-character-reference": "^2.0.0", "micromark-util-symbol": "^2.0.0" } }, "sha1-bLmVguXScehO/KjmGoB5lNcWHrI="],
+
+    "micromark-util-encode": ["micromark-util-encode@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-encode/download/micromark-util-encode-2.0.1.tgz", {}, "sha1-DVHRwJVVHPqsNoMmljz1XxX1QLg="],
+
+    "micromark-util-html-tag-name": ["micromark-util-html-tag-name@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-html-tag-name/download/micromark-util-html-tag-name-2.0.1.tgz", {}, "sha1-5AQDCWSBmGtBwQZif5j3LU0QuCU="],
+
+    "micromark-util-normalize-identifier": ["micromark-util-normalize-identifier@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-normalize-identifier/download/micromark-util-normalize-identifier-2.0.1.tgz", { "dependencies": { "micromark-util-symbol": "^2.0.0" } }, "sha1-ww13sugyrPZSb4vxqke8nJQ4wW0="],
+
+    "micromark-util-resolve-all": ["micromark-util-resolve-all@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-resolve-all/download/micromark-util-resolve-all-2.0.1.tgz", { "dependencies": { "micromark-util-types": "^2.0.0" } }, "sha1-4aLWLN0jcjCirhGDkCexk4HjHos="],
+
+    "micromark-util-sanitize-uri": ["micromark-util-sanitize-uri@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-sanitize-uri/download/micromark-util-sanitize-uri-2.0.1.tgz", { "dependencies": { "micromark-util-character": "^2.0.0", "micromark-util-encode": "^2.0.0", "micromark-util-symbol": "^2.0.0" } }, "sha1-q4l4m4GKWHUrc9a1UjhiG3+qj9c="],
+
+    "micromark-util-subtokenize": ["micromark-util-subtokenize@2.1.0", "https://registry.npm.qianxin-inc.cn/micromark-util-subtokenize/download/micromark-util-subtokenize-2.1.0.tgz", { "dependencies": { "devlop": "^1.0.0", "micromark-util-chunked": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha1-2K3lug8xl6HPaimZ+7/mNXoaGe4="],
+
+    "micromark-util-symbol": ["micromark-util-symbol@2.0.1", "https://registry.npm.qianxin-inc.cn/micromark-util-symbol/download/micromark-util-symbol-2.0.1.tgz", {}, "sha1-5dpJTo6ysHGg0I+zT2zv7GwKGbg="],
+
+    "micromark-util-types": ["micromark-util-types@2.0.2", "https://registry.npm.qianxin-inc.cn/micromark-util-types/download/micromark-util-types-2.0.2.tgz", {}, "sha1-8AIl9fWg68MlT5bDa2YFxLOTkI4="],
+
+    "ms": ["ms@2.1.3", "https://registry.npm.qianxin-inc.cn/ms/download/ms-2.1.3.tgz", {}, "sha1-V0yBOM4dK1hh8LRFedut1gxmFbI="],
+
+    "nanoid": ["nanoid@3.3.12", "https://registry.npm.qianxin-inc.cn/nanoid/download/nanoid-3.3.12.tgz", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha1-qz2RLiF6bQpRTwCnKhZUOiiYLAU="],
+
+    "node-releases": ["node-releases@2.0.38", "https://registry.npm.qianxin-inc.cn/node-releases/download/node-releases-2.0.38.tgz", {}, "sha1-eRVpueRCSgROEsOr+tQY7YPOmUc="],
+
+    "package-manager-detector": ["package-manager-detector@1.6.0", "https://registry.npm.qianxin-inc.cn/package-manager-detector/download/package-manager-detector-1.6.0.tgz", {}, "sha1-cNDPCqAsh37q9mxNmE7eC+kTBzQ="],
+
+    "parse-entities": ["parse-entities@4.0.2", "https://registry.npm.qianxin-inc.cn/parse-entities/download/parse-entities-4.0.2.tgz", { "dependencies": { "@types/unist": "^2.0.0", "character-entities-legacy": "^3.0.0", "character-reference-invalid": "^2.0.0", "decode-named-character-reference": "^1.0.0", "is-alphanumerical": "^2.0.0", "is-decimal": "^2.0.0", "is-hexadecimal": "^2.0.0" } }, "sha1-YdRvXtKOTuYundxD1rAQGIRD8Vk="],
+
+    "path-data-parser": ["path-data-parser@0.1.0", "https://registry.npm.qianxin-inc.cn/path-data-parser/download/path-data-parser-0.1.0.tgz", {}, "sha1-j1ulzHD8e+yz3O+uoI4mWaumC4w="],
+
+    "picocolors": ["picocolors@1.1.1", "https://registry.npm.qianxin-inc.cn/picocolors/download/picocolors-1.1.1.tgz", {}, "sha1-PTIa8+q5ObCDyPkpodEs2oHCa2s="],
+
+    "picomatch": ["picomatch@4.0.4", "https://registry.npm.qianxin-inc.cn/picomatch/download/picomatch-4.0.4.tgz", {}, "sha1-/W9eAKFDCG4HTf/kySS4+yk7BYk="],
+
+    "points-on-curve": ["points-on-curve@0.2.0", "https://registry.npm.qianxin-inc.cn/points-on-curve/download/points-on-curve-0.2.0.tgz", {}, "sha1-fbuYxDeRhZQ0KEdhMw+ok8uBtNE="],
+
+    "points-on-path": ["points-on-path@0.2.1", "https://registry.npm.qianxin-inc.cn/points-on-path/download/points-on-path-0.2.1.tgz", { "dependencies": { "path-data-parser": "0.1.0", "points-on-curve": "0.2.0" } }, "sha1-VTICtUJMU77TcTWzGIWOrP+F3VI="],
+
+    "postcss": ["postcss@8.5.15", "https://registry.npm.qianxin-inc.cn/postcss/download/postcss-8.5.15.tgz", { "dependencies": { "nanoid": "^3.3.12", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha1-0er2d6Mk6ewCGW2i0/7PSguac1w="],
+
+    "prismjs": ["prismjs@1.30.0", "https://registry.npm.qianxin-inc.cn/prismjs/download/prismjs-1.30.0.tgz", {}, "sha1-2XCZadnU4WQD9vNIxjVTsZ8Jdak="],
+
+    "property-information": ["property-information@7.1.0", "https://registry.npm.qianxin-inc.cn/property-information/download/property-information-7.1.0.tgz", {}, "sha1-tiLoZG4CtYAgVBVYa0CATT6L/V0="],
+
+    "rc-cascader": ["rc-cascader@3.34.0", "https://registry.npm.qianxin-inc.cn/rc-cascader/download/rc-cascader-3.34.0.tgz", { "dependencies": { "@babel/runtime": "^7.25.7", "classnames": "^2.3.1", "rc-select": "~14.16.2", "rc-tree": "~5.13.0", "rc-util": "^5.43.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-Vvk2q2sSKbq31VhwHOm56WU2WCw="],
+
+    "rc-checkbox": ["rc-checkbox@3.5.0", "https://registry.npm.qianxin-inc.cn/rc-checkbox/download/rc-checkbox-3.5.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "^2.3.2", "rc-util": "^5.25.2" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-OuJEHjoyF3TTkPdlOecGhk/PX/A="],
+
+    "rc-collapse": ["rc-collapse@3.9.0", "https://registry.npm.qianxin-inc.cn/rc-collapse/download/rc-collapse-3.9.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "2.x", "rc-motion": "^2.3.4", "rc-util": "^5.27.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-lyQEznck4cnR0kdlQ+EXVASjaAY="],
+
+    "rc-dialog": ["rc-dialog@9.6.0", "https://registry.npm.qianxin-inc.cn/rc-dialog/download/rc-dialog-9.6.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "@rc-component/portal": "^1.0.0-8", "classnames": "^2.2.6", "rc-motion": "^2.3.0", "rc-util": "^5.21.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-3HolXGrRy1YCHDphx96G7ojHw3E="],
+
+    "rc-drawer": ["rc-drawer@7.3.0", "https://registry.npm.qianxin-inc.cn/rc-drawer/download/rc-drawer-7.3.0.tgz", { "dependencies": { "@babel/runtime": "^7.23.9", "@rc-component/portal": "^1.1.1", "classnames": "^2.2.6", "rc-motion": "^2.6.1", "rc-util": "^5.38.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-G7X+X52ji2orKn3/yfy2RyUqMo8="],
+
+    "rc-dropdown": ["rc-dropdown@4.2.1", "https://registry.npm.qianxin-inc.cn/rc-dropdown/download/rc-dropdown-4.2.1.tgz", { "dependencies": { "@babel/runtime": "^7.18.3", "@rc-component/trigger": "^2.0.0", "classnames": "^2.2.6", "rc-util": "^5.44.1" }, "peerDependencies": { "react": ">=16.11.0", "react-dom": ">=16.11.0" } }, "sha1-RHKesqQnLgNT0xrAYNoh5gasyxw="],
+
+    "rc-field-form": ["rc-field-form@2.7.1", "https://registry.npm.qianxin-inc.cn/rc-field-form/download/rc-field-form-2.7.1.tgz", { "dependencies": { "@babel/runtime": "^7.18.0", "@rc-component/async-validator": "^5.0.3", "rc-util": "^5.32.2" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-i7HXxr9A4rmbSUgWlyJSwyfZtaA="],
+
+    "rc-image": ["rc-image@7.12.0", "https://registry.npm.qianxin-inc.cn/rc-image/download/rc-image-7.12.0.tgz", { "dependencies": { "@babel/runtime": "^7.11.2", "@rc-component/portal": "^1.0.2", "classnames": "^2.2.6", "rc-dialog": "~9.6.0", "rc-motion": "^2.6.2", "rc-util": "^5.34.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-lekxRwHmaCF9ETwfKbTwGsAlyv4="],
+
+    "rc-input": ["rc-input@1.8.0", "https://registry.npm.qianxin-inc.cn/rc-input/download/rc-input-1.8.0.tgz", { "dependencies": { "@babel/runtime": "^7.11.1", "classnames": "^2.2.1", "rc-util": "^5.18.1" }, "peerDependencies": { "react": ">=16.0.0", "react-dom": ">=16.0.0" } }, "sha1-0vRAS+/r8vvcKDkNVJTDAvdK6XQ="],
+
+    "rc-input-number": ["rc-input-number@9.5.0", "https://registry.npm.qianxin-inc.cn/rc-input-number/download/rc-input-number-9.5.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "@rc-component/mini-decimal": "^1.0.1", "classnames": "^2.2.5", "rc-input": "~1.8.0", "rc-util": "^5.40.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-tHlj0PLL2Fqy8brf3AiakEwHPzg="],
+
+    "rc-mentions": ["rc-mentions@2.20.0", "https://registry.npm.qianxin-inc.cn/rc-mentions/download/rc-mentions-2.20.0.tgz", { "dependencies": { "@babel/runtime": "^7.22.5", "@rc-component/trigger": "^2.0.0", "classnames": "^2.2.6", "rc-input": "~1.8.0", "rc-menu": "~9.16.0", "rc-textarea": "~1.10.0", "rc-util": "^5.34.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-O76sA1KwLgzj4SRK20hwG7aQO/c="],
+
+    "rc-menu": ["rc-menu@9.16.1", "https://registry.npm.qianxin-inc.cn/rc-menu/download/rc-menu-9.16.1.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "@rc-component/trigger": "^2.0.0", "classnames": "2.x", "rc-motion": "^2.4.3", "rc-overflow": "^1.3.1", "rc-util": "^5.27.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-nfEWjkHYfccWTFghc+Gh0yARiZ8="],
+
+    "rc-motion": ["rc-motion@2.9.5", "https://registry.npm.qianxin-inc.cn/rc-motion/download/rc-motion-2.9.5.tgz", { "dependencies": { "@babel/runtime": "^7.11.1", "classnames": "^2.2.1", "rc-util": "^5.44.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-Esbq1P01X5TwDem7TxXfV21nfgw="],
+
+    "rc-notification": ["rc-notification@5.6.4", "https://registry.npm.qianxin-inc.cn/rc-notification/download/rc-notification-5.6.4.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "2.x", "rc-motion": "^2.9.0", "rc-util": "^5.20.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-6onDnBPNUX/f2X/mPwM3b6u3hUQ="],
+
+    "rc-overflow": ["rc-overflow@1.5.0", "https://registry.npm.qianxin-inc.cn/rc-overflow/download/rc-overflow-1.5.0.tgz", { "dependencies": { "@babel/runtime": "^7.11.1", "classnames": "^2.2.1", "rc-resize-observer": "^1.0.0", "rc-util": "^5.37.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-AuWKFRmeOSrfzIfg1unnyOV/J3E="],
+
+    "rc-pagination": ["rc-pagination@5.1.0", "https://registry.npm.qianxin-inc.cn/rc-pagination/download/rc-pagination-5.1.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "^2.3.2", "rc-util": "^5.38.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-puY6LF2ynmL5kSgusYotPucluos="],
+
+    "rc-picker": ["rc-picker@4.11.3", "https://registry.npm.qianxin-inc.cn/rc-picker/download/rc-picker-4.11.3.tgz", { "dependencies": { "@babel/runtime": "^7.24.7", "@rc-component/trigger": "^2.0.0", "classnames": "^2.2.1", "rc-overflow": "^1.3.2", "rc-resize-observer": "^1.4.0", "rc-util": "^5.43.0" }, "peerDependencies": { "date-fns": ">= 2.x", "dayjs": ">= 1.x", "luxon": ">= 3.x", "moment": ">= 2.x", "react": ">=16.9.0", "react-dom": ">=16.9.0" }, "optionalPeers": ["date-fns", "dayjs", "luxon", "moment"] }, "sha1-fn462DqkYcKEuDkcaXSS0cNNLLg="],
+
+    "rc-progress": ["rc-progress@4.0.0", "https://registry.npm.qianxin-inc.cn/rc-progress/download/rc-progress-4.0.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "^2.2.6", "rc-util": "^5.16.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-U4IUfZrdM9Ol+9JkABNz32RA4SY="],
+
+    "rc-rate": ["rc-rate@2.13.1", "https://registry.npm.qianxin-inc.cn/rc-rate/download/rc-rate-2.13.1.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "^2.2.5", "rc-util": "^5.0.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-Ka96PUdoNi6dQ4j5Vai2OJUmt/0="],
+
+    "rc-resize-observer": ["rc-resize-observer@1.4.3", "https://registry.npm.qianxin-inc.cn/rc-resize-observer/download/rc-resize-observer-1.4.3.tgz", { "dependencies": { "@babel/runtime": "^7.20.7", "classnames": "^2.2.1", "rc-util": "^5.44.1", "resize-observer-polyfill": "^1.5.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-T9QfpWG6UTYrUVWgfDXXyJoepWk="],
+
+    "rc-segmented": ["rc-segmented@2.7.1", "https://registry.npm.qianxin-inc.cn/rc-segmented/download/rc-segmented-2.7.1.tgz", { "dependencies": { "@babel/runtime": "^7.11.1", "classnames": "^2.2.1", "rc-motion": "^2.4.4", "rc-util": "^5.17.0" }, "peerDependencies": { "react": ">=16.0.0", "react-dom": ">=16.0.0" } }, "sha1-CKWYsU51URfFs30jiVXC1Q6qXTM="],
+
+    "rc-select": ["rc-select@14.16.8", "https://registry.npm.qianxin-inc.cn/rc-select/download/rc-select-14.16.8.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "@rc-component/trigger": "^2.1.1", "classnames": "2.x", "rc-motion": "^2.0.1", "rc-overflow": "^1.3.1", "rc-util": "^5.16.1", "rc-virtual-list": "^3.5.2" }, "peerDependencies": { "react": "*", "react-dom": "*" } }, "sha1-eOZ4LxzMHwPZADvD7/pO1gnSmpc="],
+
+    "rc-slider": ["rc-slider@11.1.9", "https://registry.npm.qianxin-inc.cn/rc-slider/download/rc-slider-11.1.9.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "^2.2.5", "rc-util": "^5.36.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-2HITD79OxR8oVD1i6QRRCR1vUgg="],
+
+    "rc-steps": ["rc-steps@6.0.1", "https://registry.npm.qianxin-inc.cn/rc-steps/download/rc-steps-6.0.1.tgz", { "dependencies": { "@babel/runtime": "^7.16.7", "classnames": "^2.2.3", "rc-util": "^5.16.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-whNs0Ah3M/bVCSCahKXIDcKaJ00="],
+
+    "rc-switch": ["rc-switch@4.1.0", "https://registry.npm.qianxin-inc.cn/rc-switch/download/rc-switch-4.1.0.tgz", { "dependencies": { "@babel/runtime": "^7.21.0", "classnames": "^2.2.1", "rc-util": "^5.30.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-832BtODFr9EnT9hTZ7FzBr8l59c="],
+
+    "rc-table": ["rc-table@7.54.0", "https://registry.npm.qianxin-inc.cn/rc-table/download/rc-table-7.54.0.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "@rc-component/context": "^1.4.0", "classnames": "^2.2.5", "rc-resize-observer": "^1.1.0", "rc-util": "^5.44.3", "rc-virtual-list": "^3.14.2" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-3t1OoY0RifKs35CoDwTYygER4Wo="],
+
+    "rc-tabs": ["rc-tabs@15.7.0", "https://registry.npm.qianxin-inc.cn/rc-tabs/download/rc-tabs-15.7.0.tgz", { "dependencies": { "@babel/runtime": "^7.11.2", "classnames": "2.x", "rc-dropdown": "~4.2.0", "rc-menu": "~9.16.0", "rc-motion": "^2.6.2", "rc-resize-observer": "^1.0.0", "rc-util": "^5.34.1" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-FMou5iE9AEkai2euJuLTXCVr8Zo="],
+
+    "rc-textarea": ["rc-textarea@1.10.2", "https://registry.npm.qianxin-inc.cn/rc-textarea/download/rc-textarea-1.10.2.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "^2.2.1", "rc-input": "~1.8.0", "rc-resize-observer": "^1.0.0", "rc-util": "^5.27.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-RZ41dKlcMpOcZ5MEWh5NsEy1FMw="],
+
+    "rc-tooltip": ["rc-tooltip@6.4.0", "https://registry.npm.qianxin-inc.cn/rc-tooltip/download/rc-tooltip-6.4.0.tgz", { "dependencies": { "@babel/runtime": "^7.11.2", "@rc-component/trigger": "^2.0.0", "classnames": "^2.3.1", "rc-util": "^5.44.3" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-6DLtA5KHICXlmSjPwa2QRWVkZ/0="],
+
+    "rc-tree": ["rc-tree@5.13.1", "https://registry.npm.qianxin-inc.cn/rc-tree/download/rc-tree-5.13.1.tgz", { "dependencies": { "@babel/runtime": "^7.10.1", "classnames": "2.x", "rc-motion": "^2.0.1", "rc-util": "^5.16.1", "rc-virtual-list": "^3.5.1" }, "peerDependencies": { "react": "*", "react-dom": "*" } }, "sha1-82ozqUoSgvSwloUhbAFIcIl0iRA="],
+
+    "rc-tree-select": ["rc-tree-select@5.27.0", "https://registry.npm.qianxin-inc.cn/rc-tree-select/download/rc-tree-select-5.27.0.tgz", { "dependencies": { "@babel/runtime": "^7.25.7", "classnames": "2.x", "rc-select": "~14.16.2", "rc-tree": "~5.13.0", "rc-util": "^5.43.0" }, "peerDependencies": { "react": "*", "react-dom": "*" } }, "sha1-PapilyroCEbayWv0d20ancnHxMY="],
+
+    "rc-upload": ["rc-upload@4.11.0", "https://registry.npm.qianxin-inc.cn/rc-upload/download/rc-upload-4.11.0.tgz", { "dependencies": { "@babel/runtime": "^7.18.3", "classnames": "^2.2.5", "rc-util": "^5.2.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-ws7ZBaiziz5cSEk9OIyg6Dc94Ys="],
+
+    "rc-util": ["rc-util@5.44.4", "https://registry.npm.qianxin-inc.cn/rc-util/download/rc-util-5.44.4.tgz", { "dependencies": { "@babel/runtime": "^7.18.3", "react-is": "^18.2.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-ie6QN2g8ygHNYPGmu9p2FFfda6U="],
+
+    "rc-virtual-list": ["rc-virtual-list@3.19.2", "https://registry.npm.qianxin-inc.cn/rc-virtual-list/download/rc-virtual-list-3.19.2.tgz", { "dependencies": { "@babel/runtime": "^7.20.0", "classnames": "^2.2.6", "rc-resize-observer": "^1.0.0", "rc-util": "^5.36.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-HdLXgsmjzL5Te7hzRH1z+Dr43g8="],
+
+    "react": ["react@18.3.1", "https://registry.npm.qianxin-inc.cn/react/download/react-18.3.1.tgz", { "dependencies": { "loose-envify": "^1.1.0" } }, "sha1-SauJIAnFOTNiW9FrJTP8dUyrKJE="],
+
+    "react-dom": ["react-dom@18.3.1", "https://registry.npm.qianxin-inc.cn/react-dom/download/react-dom-18.3.1.tgz", { "dependencies": { "loose-envify": "^1.1.0", "scheduler": "^0.23.2" }, "peerDependencies": { "react": "^18.3.1" } }, "sha1-wiZdeVEbV9R5s90/36UVNklMXLQ="],
+
+    "react-is": ["react-is@18.3.1", "https://registry.npm.qianxin-inc.cn/react-is/download/react-is-18.3.1.tgz", {}, "sha1-6DVX3BLq5jqZ4AOkY4ix3LtE234="],
+
+    "react-markdown": ["react-markdown@10.1.0", "https://registry.npm.qianxin-inc.cn/react-markdown/download/react-markdown-10.1.0.tgz", { "dependencies": { "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "devlop": "^1.0.0", "hast-util-to-jsx-runtime": "^2.0.0", "html-url-attributes": "^3.0.0", "mdast-util-to-hast": "^13.0.0", "remark-parse": "^11.0.0", "remark-rehype": "^11.0.0", "unified": "^11.0.0", "unist-util-visit": "^5.0.0", "vfile": "^6.0.0" }, "peerDependencies": { "@types/react": ">=18", "react": ">=18" } }, "sha1-4ivCD63bwHYFwVKEJVZTwPO61co="],
+
+    "react-refresh": ["react-refresh@0.17.0", "https://registry.npm.qianxin-inc.cn/react-refresh/download/react-refresh-0.17.0.tgz", {}, "sha1-t+V5w2V/I9BOzL5K0uWKjtUeflM="],
+
+    "react-syntax-highlighter": ["react-syntax-highlighter@16.1.1", "https://registry.npm.qianxin-inc.cn/react-syntax-highlighter/download/react-syntax-highlighter-16.1.1.tgz", { "dependencies": { "@babel/runtime": "^7.28.4", "highlight.js": "^10.4.1", "highlightjs-vue": "^1.0.0", "lowlight": "^1.17.0", "prismjs": "^1.30.0", "refractor": "^5.0.0" }, "peerDependencies": { "react": ">= 0.14.0" } }, "sha1-koRZhV03X1z8jmRgceINVBzry1I="],
+
+    "refractor": ["refractor@5.0.0", "https://registry.npm.qianxin-inc.cn/refractor/download/refractor-5.0.0.tgz", { "dependencies": { "@types/hast": "^3.0.0", "@types/prismjs": "^1.0.0", "hastscript": "^9.0.0", "parse-entities": "^4.0.0" } }, "sha1-hdrwRIptlH9TYXlusiwxcz1h2QQ="],
+
+    "remark-gfm": ["remark-gfm@4.0.1", "https://registry.npm.qianxin-inc.cn/remark-gfm/download/remark-gfm-4.0.1.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-gfm": "^3.0.0", "micromark-extension-gfm": "^3.0.0", "remark-parse": "^11.0.0", "remark-stringify": "^11.0.0", "unified": "^11.0.0" } }, "sha1-MyJ7KnQ5dnDTV78FwJjq+FE/DWs="],
+
+    "remark-parse": ["remark-parse@11.0.0", "https://registry.npm.qianxin-inc.cn/remark-parse/download/remark-parse-11.0.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-from-markdown": "^2.0.0", "micromark-util-types": "^2.0.0", "unified": "^11.0.0" } }, "sha1-qmB0P8s36/awaSBOtNowTkDbRaE="],
+
+    "remark-rehype": ["remark-rehype@11.1.2", "https://registry.npm.qianxin-inc.cn/remark-rehype/download/remark-rehype-11.1.2.tgz", { "dependencies": { "@types/hast": "^3.0.0", "@types/mdast": "^4.0.0", "mdast-util-to-hast": "^13.0.0", "unified": "^11.0.0", "vfile": "^6.0.0" } }, "sha1-Kt2q3agMqb2aoNp2PnTRYydoOzc="],
+
+    "remark-stringify": ["remark-stringify@11.0.0", "https://registry.npm.qianxin-inc.cn/remark-stringify/download/remark-stringify-11.0.0.tgz", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-to-markdown": "^2.0.0", "unified": "^11.0.0" } }, "sha1-TFsB3XEcJp3xqq4RdD634udjb9M="],
+
+    "resize-observer-polyfill": ["resize-observer-polyfill@1.5.1", "https://registry.npm.qianxin-inc.cn/resize-observer-polyfill/download/resize-observer-polyfill-1.5.1.tgz", {}, "sha1-DpAg3T0hAkRY1OvSfiPkAmmBBGQ="],
+
+    "robust-predicates": ["robust-predicates@3.0.2", "https://registry.npm.qianxin-inc.cn/robust-predicates/download/robust-predicates-3.0.2.tgz", {}, "sha1-1bKFKMSCTSD8SN8ZKNQdnvoa13E="],
+
+    "rollup": ["rollup@4.60.4", "https://registry.npm.qianxin-inc.cn/rollup/download/rollup-4.60.4.tgz", { "dependencies": { "@types/estree": "1.0.8" }, "optionalDependencies": { "@rollup/rollup-android-arm-eabi": "4.60.4", "@rollup/rollup-android-arm64": "4.60.4", "@rollup/rollup-darwin-arm64": "4.60.4", "@rollup/rollup-darwin-x64": "4.60.4", "@rollup/rollup-freebsd-arm64": "4.60.4", "@rollup/rollup-freebsd-x64": "4.60.4", "@rollup/rollup-linux-arm-gnueabihf": "4.60.4", "@rollup/rollup-linux-arm-musleabihf": "4.60.4", "@rollup/rollup-linux-arm64-gnu": "4.60.4", "@rollup/rollup-linux-arm64-musl": "4.60.4", "@rollup/rollup-linux-loong64-gnu": "4.60.4", "@rollup/rollup-linux-loong64-musl": "4.60.4", "@rollup/rollup-linux-ppc64-gnu": "4.60.4", "@rollup/rollup-linux-ppc64-musl": "4.60.4", "@rollup/rollup-linux-riscv64-gnu": "4.60.4", "@rollup/rollup-linux-riscv64-musl": "4.60.4", "@rollup/rollup-linux-s390x-gnu": "4.60.4", "@rollup/rollup-linux-x64-gnu": "4.60.4", "@rollup/rollup-linux-x64-musl": "4.60.4", "@rollup/rollup-openbsd-x64": "4.60.4", "@rollup/rollup-openharmony-arm64": "4.60.4", "@rollup/rollup-win32-arm64-msvc": "4.60.4", "@rollup/rollup-win32-ia32-msvc": "4.60.4", "@rollup/rollup-win32-x64-gnu": "4.60.4", "@rollup/rollup-win32-x64-msvc": "4.60.4", "fsevents": "~2.3.2" }, "bin": { "rollup": "dist/bin/rollup" } }, "sha1-yjgU9ZANo6w5gdLgxhlEt+bgywk="],
+
+    "roughjs": ["roughjs@4.6.6", "https://registry.npm.qianxin-inc.cn/roughjs/download/roughjs-4.6.6.tgz", { "dependencies": { "hachure-fill": "^0.5.2", "path-data-parser": "^0.1.0", "points-on-curve": "^0.2.0", "points-on-path": "^0.2.1" } }, "sha1-EFn0ml4MgN7lQaAFsgzDIrIiFYs="],
+
+    "rw": ["rw@1.3.3", "https://registry.npm.qianxin-inc.cn/rw/download/rw-1.3.3.tgz", {}, "sha1-P4Yt+pGrdmsUiF700BEkv9oHT7Q="],
+
+    "safer-buffer": ["safer-buffer@2.1.2", "https://registry.npm.qianxin-inc.cn/safer-buffer/download/safer-buffer-2.1.2.tgz", {}, "sha1-RPoWGwGHuVSd2Eu5GAL5vYOFzWo="],
+
+    "scheduler": ["scheduler@0.23.2", "https://registry.npm.qianxin-inc.cn/scheduler/download/scheduler-0.23.2.tgz", { "dependencies": { "loose-envify": "^1.1.0" } }, "sha1-QUumSjsoKJLpRM8hCOzAeNEVzcM="],
+
+    "scroll-into-view-if-needed": ["scroll-into-view-if-needed@3.1.0", "https://registry.npm.qianxin-inc.cn/scroll-into-view-if-needed/download/scroll-into-view-if-needed-3.1.0.tgz", { "dependencies": { "compute-scroll-into-view": "^3.0.2" } }, "sha1-+pUkUYx5m0Wi72u/+5K8rQKW0B8="],
+
+    "semver": ["semver@6.3.1", "https://registry.npm.qianxin-inc.cn/semver/download/semver-6.3.1.tgz", { "bin": { "semver": "bin/semver.js" } }, "sha1-VW0u+GiRRuRtzqS/3QlfNDTf/LQ="],
+
+    "source-map-js": ["source-map-js@1.2.1", "https://registry.npm.qianxin-inc.cn/source-map-js/download/source-map-js-1.2.1.tgz", {}, "sha1-HOVlD93YerwJnto33P8CTCZnrkY="],
+
+    "space-separated-tokens": ["space-separated-tokens@2.0.2", "https://registry.npm.qianxin-inc.cn/space-separated-tokens/download/space-separated-tokens-2.0.2.tgz", {}, "sha1-Hs2dI1CjhEVyw/SjErzrAYNIhZ8="],
+
+    "string-convert": ["string-convert@0.2.1", "https://registry.npm.qianxin-inc.cn/string-convert/download/string-convert-0.2.1.tgz", {}, "sha1-aYLMMEn7tM2F+LJFaLnZvznu/5c="],
+
+    "stringify-entities": ["stringify-entities@4.0.4", "https://registry.npm.qianxin-inc.cn/stringify-entities/download/stringify-entities-4.0.4.tgz", { "dependencies": { "character-entities-html4": "^2.0.0", "character-entities-legacy": "^3.0.0" } }, "sha1-s7ee9fJ3zErHPK6wI2xbqTmzpPM="],
+
+    "style-to-js": ["style-to-js@1.1.21", "https://registry.npm.qianxin-inc.cn/style-to-js/download/style-to-js-1.1.21.tgz", { "dependencies": { "style-to-object": "1.0.14" } }, "sha1-KQiUEYf4V+eeKOnNeACLmgs+Do0="],
+
+    "style-to-object": ["style-to-object@1.0.14", "https://registry.npm.qianxin-inc.cn/style-to-object/download/style-to-object-1.0.14.tgz", { "dependencies": { "inline-style-parser": "0.2.7" } }, "sha1-HSLw5yZruMbYyuXK9OxPAF4I9hE="],
+
+    "stylis": ["stylis@4.4.0", "https://registry.npm.qianxin-inc.cn/stylis/download/stylis-4.4.0.tgz", {}, "sha1-xYRsk0X0v8Ub0MvXyjWgdE9IWl0="],
+
+    "throttle-debounce": ["throttle-debounce@5.0.2", "https://registry.npm.qianxin-inc.cn/throttle-debounce/download/throttle-debounce-5.0.2.tgz", {}, "sha1-7FVJ2E4FPwQ8n9Dypt2JL/hEVrE="],
+
+    "tinyexec": ["tinyexec@1.2.2", "https://registry.npm.qianxin-inc.cn/tinyexec/download/tinyexec-1.2.2.tgz", {}, "sha1-tm7fNi3K1hF0vJzk8+4nniRIpyE="],
+
+    "tinyglobby": ["tinyglobby@0.2.16", "https://registry.npm.qianxin-inc.cn/tinyglobby/download/tinyglobby-0.2.16.tgz", { "dependencies": { "fdir": "^6.5.0", "picomatch": "^4.0.4" } }, "sha1-HDt+uVP85Csia8Wh7gZCgoGv89Y="],
+
+    "toggle-selection": ["toggle-selection@1.0.6", "https://registry.npm.qianxin-inc.cn/toggle-selection/download/toggle-selection-1.0.6.tgz", {}, "sha1-bkWxJj8gF/oKzH2J14sVuL932jI="],
+
+    "trim-lines": ["trim-lines@3.0.1", "https://registry.npm.qianxin-inc.cn/trim-lines/download/trim-lines-3.0.1.tgz", {}, "sha1-2ALjMqB9+GHEiALAQyEBexvYczg="],
+
+    "trough": ["trough@2.2.0", "https://registry.npm.qianxin-inc.cn/trough/download/trough-2.2.0.tgz", {}, "sha1-lKYL1r03XBUsHfkRpLEdWwJW9Q8="],
+
+    "ts-dedent": ["ts-dedent@2.2.0", "https://registry.npm.qianxin-inc.cn/ts-dedent/download/ts-dedent-2.2.0.tgz", {}, "sha1-OeS9KXzQNikq4jlOs0Er5j9WO7U="],
+
+    "typescript": ["typescript@5.9.3", "https://registry.npm.qianxin-inc.cn/typescript/download/typescript-5.9.3.tgz", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha1-W09Z4VMQqxeiFvXWz1PuR27eZw8="],
+
+    "unified": ["unified@11.0.5", "https://registry.npm.qianxin-inc.cn/unified/download/unified-11.0.5.tgz", { "dependencies": { "@types/unist": "^3.0.0", "bail": "^2.0.0", "devlop": "^1.0.0", "extend": "^3.0.0", "is-plain-obj": "^4.0.0", "trough": "^2.0.0", "vfile": "^6.0.0" } }, "sha1-9mZ3YQpcCp7pDKsrjU1mA3Am2eE="],
+
+    "unist-util-is": ["unist-util-is@6.0.1", "https://registry.npm.qianxin-inc.cn/unist-util-is/download/unist-util-is-6.0.1.tgz", { "dependencies": { "@types/unist": "^3.0.0" } }, "sha1-0KP4by3Q23rNfYwkeAgLXGf5xqk="],
+
+    "unist-util-position": ["unist-util-position@5.0.0", "https://registry.npm.qianxin-inc.cn/unist-util-position/download/unist-util-position-5.0.0.tgz", { "dependencies": { "@types/unist": "^3.0.0" } }, "sha1-Z48gq1yhIHqX1+qKOINzyc+Ja+Q="],
+
+    "unist-util-stringify-position": ["unist-util-stringify-position@4.0.0", "https://registry.npm.qianxin-inc.cn/unist-util-stringify-position/download/unist-util-stringify-position-4.0.0.tgz", { "dependencies": { "@types/unist": "^3.0.0" } }, "sha1-RJxuIaiA4IVb9aq63rOnQDFKusI="],
+
+    "unist-util-visit": ["unist-util-visit@5.1.0", "https://registry.npm.qianxin-inc.cn/unist-util-visit/download/unist-util-visit-5.1.0.tgz", { "dependencies": { "@types/unist": "^3.0.0", "unist-util-is": "^6.0.0", "unist-util-visit-parents": "^6.0.0" } }, "sha1-mioosKp2oV4NpwoIpYY6LwYOJGg="],
+
+    "unist-util-visit-parents": ["unist-util-visit-parents@6.0.2", "https://registry.npm.qianxin-inc.cn/unist-util-visit-parents/download/unist-util-visit-parents-6.0.2.tgz", { "dependencies": { "@types/unist": "^3.0.0", "unist-util-is": "^6.0.0" } }, "sha1-d333+5hlLOFrS3zZmdChpA76OgI="],
+
+    "update-browserslist-db": ["update-browserslist-db@1.2.3", "https://registry.npm.qianxin-inc.cn/update-browserslist-db/download/update-browserslist-db-1.2.3.tgz", { "dependencies": { "escalade": "^3.2.0", "picocolors": "^1.1.1" }, "peerDependencies": { "browserslist": ">= 4.21.0" }, "bin": { "update-browserslist-db": "cli.js" } }, "sha1-ZNdttYcTE2rL60xJEUNmzGzC6A0="],
+
+    "uuid": ["uuid@14.0.0", "https://registry.npm.qianxin-inc.cn/uuid/download/uuid-14.0.0.tgz", { "bin": { "uuid": "dist-node/bin/uuid" } }, "sha1-CviDIgFj0mT/4MCE9riom5Zmlm0="],
+
+    "vfile": ["vfile@6.0.3", "https://registry.npm.qianxin-inc.cn/vfile/download/vfile-6.0.3.tgz", { "dependencies": { "@types/unist": "^3.0.0", "vfile-message": "^4.0.0" } }, "sha1-NlKrHEllMYUr9VprrFevmB68OKs="],
+
+    "vfile-message": ["vfile-message@4.0.3", "https://registry.npm.qianxin-inc.cn/vfile-message/download/vfile-message-4.0.3.tgz", { "dependencies": { "@types/unist": "^3.0.0", "unist-util-stringify-position": "^4.0.0" } }, "sha1-h7RN3de3DwZBwuPtCGS6c+LqjfQ="],
+
+    "vite": ["vite@6.4.2", "https://registry.npm.qianxin-inc.cn/vite/download/vite-6.4.2.tgz", { "dependencies": { "esbuild": "^0.25.0", "fdir": "^6.4.4", "picomatch": "^4.0.2", "postcss": "^8.5.3", "rollup": "^4.34.9", "tinyglobby": "^0.2.13" }, "optionalDependencies": { "fsevents": "~2.3.3" }, "peerDependencies": { "@types/node": "^18.0.0 || ^20.0.0 || >=22.0.0", "jiti": ">=1.21.0", "less": "*", "lightningcss": "^1.21.0", "sass": "*", "sass-embedded": "*", "stylus": "*", "sugarss": "*", "terser": "^5.16.0", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["@types/node", "jiti", "less", "lightningcss", "sass", "sass-embedded", "stylus", "sugarss", "terser", "tsx", "yaml"], "bin": { "vite": "bin/vite.js" } }, "sha1-pOVIyjqQyp83JFgsqzXhuhXvxvI="],
+
+    "yallist": ["yallist@3.1.1", "https://registry.npm.qianxin-inc.cn/yallist/download/yallist-3.1.1.tgz", {}, "sha1-27fa+b/YusmrRev2ArjLrQ1dCP0="],
+
+    "zustand": ["zustand@5.0.13", "https://registry.npm.qianxin-inc.cn/zustand/download/zustand-5.0.13.tgz", { "peerDependencies": { "@types/react": ">=18.0.0", "immer": ">=9.0.6", "react": ">=18.0.0", "use-sync-external-store": ">=1.2.0" }, "optionalPeers": ["@types/react", "immer", "react", "use-sync-external-store"] }, "sha1-BplcEm6JA80nEArwTakcNq4wUe0="],
+
+    "zwitch": ["zwitch@2.0.4", "https://registry.npm.qianxin-inc.cn/zwitch/download/zwitch-2.0.4.tgz", {}, "sha1-yCfUsKy3b8PmhaTG7CkC1RBw6dc="],
+
+    "@rc-component/color-picker/@ant-design/fast-color": ["@ant-design/fast-color@2.0.6", "https://registry.npm.qianxin-inc.cn/@ant-design/fast-color/download/@ant-design/fast-color-2.0.6.tgz", { "dependencies": { "@babel/runtime": "^7.24.7" } }, "sha1-q01EVcFULJAX02fC+oyj5CFdC6I="],
+
+    "antd/@ant-design/colors": ["@ant-design/colors@7.2.1", "https://registry.npm.qianxin-inc.cn/@ant-design/colors/download/@ant-design/colors-7.2.1.tgz", { "dependencies": { "@ant-design/fast-color": "^2.0.6" } }, "sha1-O7wcbBhVACDRYioAZ/8DSSMY35g="],
+
+    "antd/@ant-design/cssinjs": ["@ant-design/cssinjs@1.24.0", "https://registry.npm.qianxin-inc.cn/@ant-design/cssinjs/download/@ant-design/cssinjs-1.24.0.tgz", { "dependencies": { "@babel/runtime": "^7.11.1", "@emotion/hash": "^0.8.0", "@emotion/unitless": "^0.7.5", "classnames": "^2.3.1", "csstype": "^3.1.3", "rc-util": "^5.35.0", "stylis": "^4.3.4" }, "peerDependencies": { "react": ">=16.0.0", "react-dom": ">=16.0.0" } }, "sha1-fbCR8D8Ymrx3oTy9J6IpOALNcoU="],
+
+    "antd/@ant-design/cssinjs-utils": ["@ant-design/cssinjs-utils@1.1.3", "https://registry.npm.qianxin-inc.cn/@ant-design/cssinjs-utils/download/@ant-design/cssinjs-utils-1.1.3.tgz", { "dependencies": { "@ant-design/cssinjs": "^1.21.0", "@babel/runtime": "^7.23.2", "rc-util": "^5.38.0" }, "peerDependencies": { "react": ">=16.9.0", "react-dom": ">=16.9.0" } }, "sha1-XdeRJgV5IKaZLVezjdhOLAtweXc="],
+
+    "antd/@ant-design/fast-color": ["@ant-design/fast-color@2.0.6", "https://registry.npm.qianxin-inc.cn/@ant-design/fast-color/download/@ant-design/fast-color-2.0.6.tgz", { "dependencies": { "@babel/runtime": "^7.24.7" } }, "sha1-q01EVcFULJAX02fC+oyj5CFdC6I="],
+
+    "antd/@ant-design/icons": ["@ant-design/icons@5.6.1", "https://registry.npm.qianxin-inc.cn/@ant-design/icons/download/@ant-design/icons-5.6.1.tgz", { "dependencies": { "@ant-design/colors": "^7.0.0", "@ant-design/icons-svg": "^4.4.0", "@babel/runtime": "^7.24.8", "classnames": "^2.2.6", "rc-util": "^5.31.1" }, "peerDependencies": { "react": ">=16.0.0", "react-dom": ">=16.0.0" } }, "sha1-cpD83D2W/z/KeT7TmQU80prV29M="],
+
+    "cytoscape-fcose/cose-base": ["cose-base@2.2.0", "https://registry.npm.qianxin-inc.cn/cose-base/download/cose-base-2.2.0.tgz", { "dependencies": { "layout-base": "^2.0.0" } }, "sha1-HDlcNbbhC7g/l2nKi4F9YUrdXAE="],
+
+    "d3-dsv/commander": ["commander@7.2.0", "https://registry.npm.qianxin-inc.cn/commander/download/commander-7.2.0.tgz", {}, "sha1-o2y1fQtQHOEI5NIFWaFQo5HZerc="],
+
+    "d3-sankey/d3-array": ["d3-array@2.12.1", "https://registry.npm.qianxin-inc.cn/d3-array/download/d3-array-2.12.1.tgz", { "dependencies": { "internmap": "^1.0.0" } }, "sha1-4gtBqvzf/fXVCSgATs7PgVpGXoE="],
+
+    "d3-sankey/d3-shape": ["d3-shape@1.3.7", "https://registry.npm.qianxin-inc.cn/d3-shape/download/d3-shape-1.3.7.tgz", { "dependencies": { "d3-path": "1" } }, "sha1-32OAG+B7yYa8VPY3ibT+UCmStdc="],
+
+    "hast-util-to-jsx-runtime/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "mdast-util-from-markdown/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "mdast-util-mdx-jsx/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "mdast-util-to-markdown/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "unified/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "unist-util-is/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "unist-util-position/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "unist-util-stringify-position/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "unist-util-visit/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "unist-util-visit-parents/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "vfile/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "vfile-message/@types/unist": ["@types/unist@3.0.3", "https://registry.npm.qianxin-inc.cn/@types/unist/download/@types/unist-3.0.3.tgz", {}, "sha1-rKqw+RnOaczmKcLU7S60rcG2wgw="],
+
+    "cytoscape-fcose/cose-base/layout-base": ["layout-base@2.0.1", "https://registry.npm.qianxin-inc.cn/layout-base/download/layout-base-2.0.1.tgz", {}, "sha1-0DN5E1hskPnCwHUpIGn1wtpd0oU="],
+
+    "d3-sankey/d3-shape/d3-path": ["d3-path@1.0.9", "https://registry.npm.qianxin-inc.cn/d3-path/download/d3-path-1.0.9.tgz", {}, "sha1-SMBQux/owmJJOoyvVSTj6VkXAc8="],
+  }
+}

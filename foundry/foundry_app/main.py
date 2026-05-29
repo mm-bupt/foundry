@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -42,3 +43,14 @@ app.include_router(sse_router)
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "version": settings.app_version}
+
+
+_webui_dist = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "webui",
+    "dist",
+)
+if os.path.isdir(_webui_dist):
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/", StaticFiles(directory=_webui_dist, html=True), name="webui")
