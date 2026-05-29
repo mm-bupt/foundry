@@ -45,6 +45,11 @@ async def health():
     return {"status": "ok", "version": settings.app_version}
 
 
+@app.get("/api/config")
+async def get_config():
+    return {"work_dir": str(settings.work_dir)}
+
+
 _webui_dist = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
     "webui",

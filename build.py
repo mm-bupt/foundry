@@ -214,7 +214,7 @@ if not exist "%BUN%" (
 )
 
 echo Starting backend...
-start "" /B "%SERVER%" --host 127.0.0.1 --port 8000
+start "" /B "%SERVER%" --host 127.0.0.1 --port 8000 %*
 set SERVER_PID=
 
 :wait_server
@@ -259,7 +259,7 @@ if [ ! -f "$BUN" ]; then
 fi
 
 echo "Starting backend..."
-"$SERVER" --host 127.0.0.1 --port 8000 &
+"$SERVER" --host 127.0.0.1 --port 8000 "$@" &
 SERVER_PID=$!
 
 for i in $(seq 1 30); do

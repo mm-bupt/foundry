@@ -39,6 +39,10 @@ to check for relevant user preferences and past context. Use `store_memory` \
 when the user shares important information worth remembering (preferences, \
 project details, decisions made).
 
+You have file operation tools. Use `read_file`, `write_file`, `list_files`, \
+and `run_command` to work with files in the user's project. All relative \
+paths are resolved against the working directory.
+
 Be concise, direct, and helpful. Format code with markdown code blocks.
 Respond in the same language the user uses."""
 
@@ -47,12 +51,16 @@ Respond in the same language the user uses."""
 class AgentDeps:
     session_id: str
     model_id: str
+    work_dir: str = ""
     send_event: Callable[[dict], Awaitable[None]] | None = None
 
 
 def create_agent(model_id: str, system_prompt: str = "") -> Agent:
     model_info = get_model_info(model_id)
     model_string = get_provider_prefix(model_id)
+
+    instructions = system_prompt or SYSTEM_PROMPT
+    instructions += f"\n\nYour working directory is: {settings.work_dir}"
 
     if model_info and model_info.api_base:
         api_key = model_info.api_key or _resolve_api_key(model_info.provider)
@@ -61,14 +69,14 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
         )
         agent = Agent(
             model_obj,
-            instructions=system_prompt or SYSTEM_PROMPT,
+            instructions=instructions,
             deps_type=AgentDeps,
             history_processors=[trim_and_summarize],
         )
     else:
         agent = Agent(
             model_string,
-            instructions=system_prompt or SYSTEM_PROMPT,
+            instructions=instructions,
             deps_type=AgentDeps,
             history_processors=[trim_and_summarize],
         )
@@ -111,9 +119,10 @@ def _create_model_client(model_string: str, provider: str, api_key: str, base_ur
 
 
 def _register_tools(agent: Agent):
-    from foundry_app.agent.tools import register_memory_tools
+    from foundry_app.agent.tools import register_memory_tools, register_file_tools
 
     register_memory_tools(agent)
+    register_file_tools(agent)
 
 
 async def stream_chat(
@@ -155,7 +164,12 @@ async def stream_chat(
     history = _load_history(messages[:-1])
 
     agent = create_agent(model_id, session.get("system_prompt", ""))
-    deps = AgentDeps(session_id=session_id, model_id=model_id, send_event=send_event)
+    deps = AgentDeps(
+        session_id=session_id,
+        model_id=model_id,
+        work_dir=str(settings.work_dir),
+        send_event=send_event,
+    )
 
     start_time = time.monotonic()
     assistant_id = None

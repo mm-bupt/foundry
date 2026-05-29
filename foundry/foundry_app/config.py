@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     port: int = 8000
 
     db_path: Path = Path.home() / ".dream-foundry" / "dream-foundry.db"
+    work_dir: Path = Path.cwd()
 
     openai_api_key: str = ""
     anthropic_api_key: str = ""
@@ -36,6 +37,10 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+settings.work_dir = settings.work_dir.resolve()
+
+if foundry_config.work_dir:
+    settings.work_dir = Path(foundry_config.work_dir).resolve()
 
 if foundry_config.providers:
     if foundry_config.default_model_id:

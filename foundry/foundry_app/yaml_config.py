@@ -26,6 +26,7 @@ class FoundryConfig:
     default_model: str = ""
     default_provider_name: str = ""
     default_model_id: str = ""
+    work_dir: str = ""
 
     def get_default_model(self) -> str:
         if self.default_model_id:
@@ -105,11 +106,14 @@ def load_yaml_config(config_path: str | Path | None = None) -> FoundryConfig:
         default_provider_name = parts[0]
         default_model_id = parts[1]
 
+    work_dir = str(data.get("workDir", ""))
+
     return FoundryConfig(
         providers=providers,
         default_model=default_model,
         default_provider_name=default_provider_name,
         default_model_id=default_model_id,
+        work_dir=work_dir,
     )
 
 

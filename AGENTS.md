@@ -99,6 +99,7 @@ python build.py bun      # Bundle Bun runtime only
 | GET | /api/memory/{session_id} | List session memories |
 | POST | /api/memory/{session_id}/search | Search memories by similarity |
 | DELETE | /api/memory/{memory_id} | Delete memory |
+| GET | /api/config | Get runtime config (work_dir, etc.) |
 | WS | /ws/{session_id} | WebSocket chat (default) |
 | GET | /api/chat/{session_id}/stream | SSE chat fallback |
 
@@ -123,8 +124,11 @@ All env vars use prefix `DREAM_FOUNDRY_`:
 - `DREAM_FOUNDRY_OPENAI_API_KEY` — OpenAI API key
 - `DREAM_FOUNDRY_ANTHROPIC_API_KEY` — Anthropic API key
 - `DREAM_FOUNDRY_DB_PATH` — SQLite database path (default: ~/.dream-foundry/dream-foundry.db)
+- `DREAM_FOUNDRY_WORK_DIR` — Agent working directory for file operations (default: cwd)
 - `DREAM_FOUNDRY_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
 - `DREAM_FOUNDRY_DEBUG` — Enable debug mode
+
+Work dir priority: `--work-dir` CLI arg > `DREAM_FOUNDRY_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
 
 ## Available Models
 
