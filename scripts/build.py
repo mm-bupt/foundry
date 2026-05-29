@@ -19,7 +19,7 @@ import sys
 import platform
 from pathlib import Path
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent
 DIST = ROOT / "dist" / "dream-foundry"
 FOUNDRY = ROOT / "foundry"
 TUI = ROOT / "tui"

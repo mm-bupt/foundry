@@ -6,7 +6,7 @@
 
 set -e
 
-ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BACKEND_CMD="python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload"
 TUI_CMD="bun run src/index.tsx"
 

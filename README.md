@@ -54,8 +54,9 @@ The `type` field determines which provider protocol to use (`openai` or `anthrop
 
 ```bash
 # Dev mode (backend + TUI together)
-dev.bat          # Windows
-./dev.sh         # Linux/macOS
+scripts\dev.bat          # Windows CMD
+scripts\dev.ps1          # Windows PowerShell
+./scripts/dev.sh         # Linux/macOS
 
 # Or run individually
 pip install -e foundry
@@ -67,9 +68,9 @@ cd tui && bun install && bun run src/index.tsx
 ### Production Build
 
 ```bash
-python build.py          # Build all
-python build.py backend  # Backend only (PyInstaller)
-python build.py tui      # TUI only
+python scripts/build.py          # Build all
+python scripts/build.py backend  # Backend only (PyInstaller)
+python scripts/build.py tui      # TUI only
 ```
 
 Output goes to `dist/dream-foundry/` with a launcher script.
@@ -94,7 +95,11 @@ dream-foundry/
 │       ├── commands.ts               # Slash commands
 │       └── components/               # UI components
 ├── docs/                             # Design documents
-└── build.py                          # Production build script
+└── scripts/                          # Build & dev scripts
+    ├── build.py                      # Production build
+    ├── dev.bat                       # Windows CMD dev launcher
+    ├── dev.ps1                       # PowerShell dev launcher
+    └── dev.sh                        # Linux/macOS dev launcher
 ```
 
 ## API Endpoints

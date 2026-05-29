@@ -60,11 +60,14 @@ dream-foundry/
 
 ```bash
 # === Dev Mode (backend + TUI together) ===
-# Windows:
-dev.bat
+# Windows CMD:
+scripts\dev.bat
+
+# Windows PowerShell:
+scripts\dev.ps1
 
 # Linux/macOS:
-./dev.sh
+./scripts/dev.sh
 
 # Individual components:
 pip install -e foundry                  # Install backend
@@ -72,10 +75,10 @@ python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload  # Ba
 cd tui && bun install && bun run src/index.tsx  # TUI only
 
 # === Production Build ===
-python build.py          # Build all (self-contained folder)
-python build.py backend  # Backend only (PyInstaller onefile)
-python build.py tui      # TUI only (sources + node_modules)
-python build.py bun      # Bundle Bun runtime only
+python scripts/build.py          # Build all (self-contained folder)
+python scripts/build.py backend  # Backend only (PyInstaller onefile)
+python scripts/build.py tui      # TUI only (sources + node_modules)
+python scripts/build.py bun      # Bundle Bun runtime only
 
 # Output: dist/dream-foundry/
 #   dream-foundry.bat (or .sh)  ← double-click to run
@@ -163,8 +166,11 @@ All phases P1-P8 complete. Future work:
 
 ```
 dream-foundry/
-├── build.py                         # Build script (PyInstaller + Bun compile)
-├── dev.sh / dev.bat                 # Dev launcher (backend + TUI)
+├── scripts/                        # Build & dev scripts
+│   ├── build.py                    # Production build (PyInstaller + Bun compile)
+│   ├── dev.bat                     # Windows CMD dev launcher
+│   ├── dev.ps1                     # PowerShell dev launcher
+│   └── dev.sh                      # Linux/macOS dev launcher
 ├── foundry/                         # Backend (Python/FastAPI/Pydantic AI)
 │   └── foundry_app/
 │       ├── main.py, config.py
