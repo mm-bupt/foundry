@@ -5,27 +5,21 @@
 .DESCRIPTION
     Starts backend and/or UI for development.
 .EXAMPLE
-    ./scripts/dev.ps1          # Starts both backend and WebUI
-    ./scripts/dev.ps1 backend  # Backend only
-    ./scripts/dev.ps1 webui    # WebUI only
-    ./scripts/dev.ps1 tui      # TUI only
+    ./scripts/dev-web.ps1         # Starts both backend and WebUI
+    ./scripts/dev-web.ps1 backend # Backend only
+    ./scripts/dev-web.ps1 webui   # WebUI only
 #>
 
 param(
-    [ValidateSet("all", "backend", "webui", "tui")]
+    [ValidateSet("all", "backend", "webui")]
     [string]$Target = "all"
 )
 
 $RootDir = Resolve-Path (Join-Path $PSScriptRoot "..")
 $BackendPid = $null
 $WebUiPid = $null
-$TuiPid = $null
 
 function Cleanup {
-    if ($TuiPid) {
-        Write-Host "Stopping TUI (PID $TuiPid)..." -ForegroundColor Yellow
-        Stop-Process -Id $TuiPid -Force -ErrorAction SilentlyContinue
-    }
     if ($WebUiPid) {
         Write-Host "Stopping WebUI (PID $WebUiPid)..." -ForegroundColor Yellow
         Stop-Process -Id $WebUiPid -Force -ErrorAction SilentlyContinue
@@ -38,7 +32,7 @@ function Cleanup {
 
 trap { Cleanup; break }
 
-Write-Host "Dream Foundry Dev" -ForegroundColor Cyan
+Write-Host "Dream Foundry Dev (WebUI)" -ForegroundColor Cyan
 Write-Host ""
 
 if ($Target -in "all", "backend") {
@@ -75,6 +69,7 @@ if ($Target -in "all", "webui") {
     Write-Host "Starting WebUI..." -ForegroundColor Green
     Push-Location (Join-Path $RootDir "webui")
     if (!(Test-Path "node_modules")) {
+        Write-Host "Installing WebUI dependencies..." -ForegroundColor Yellow
         npm install
     }
     $webUiProc = Start-Process -FilePath "npm" `
@@ -83,18 +78,15 @@ if ($Target -in "all", "webui") {
     $WebUiPid = $webUiProc.Id
     Write-Host "WebUI running at http://localhost:5173" -ForegroundColor Cyan
     Pop-Location
-    
-    # Keep script running to manage both processes
+
     Write-Host "Press Ctrl+C to stop all services..." -ForegroundColor Yellow
     try {
         while ($true) {
-            # Check if backend is still running
             $backendRunning = Get-Process -Id $BackendPid -ErrorAction SilentlyContinue
             if (-not $backendRunning) {
                 Write-Host "Backend stopped, exiting..." -ForegroundColor Red
                 break
             }
-            # Check if webui is still running
             $webUiRunning = Get-Process -Id $WebUiPid -ErrorAction SilentlyContinue
             if (-not $webUiRunning) {
                 Write-Host "WebUI stopped, exiting..." -ForegroundColor Red
@@ -105,14 +97,6 @@ if ($Target -in "all", "webui") {
     } catch {
         # Ctrl+C pressed
     }
-}
-
-if ($Target -eq "tui") {
-    Write-Host "Starting TUI..." -ForegroundColor Green
-    Push-Location (Join-Path $RootDir "tui")
-    bun install
-    bun run src/index.tsx
-    Pop-Location
 }
 
 Cleanup

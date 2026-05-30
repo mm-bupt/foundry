@@ -156,6 +156,7 @@ async def update_message(
     for k, v in kwargs.items():
         if k in (
             "content",
+            "thinking_content",
             "model_id",
             "duration_ms",
             "input_tokens",

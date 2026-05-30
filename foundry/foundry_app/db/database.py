@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS messages (
     session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
     role TEXT NOT NULL CHECK(role IN ('user', 'assistant', 'system')),
     content TEXT NOT NULL,
+    thinking_content TEXT NOT NULL DEFAULT '',
     model_id TEXT,
     duration_ms INTEGER NOT NULL DEFAULT 0,
     input_tokens INTEGER NOT NULL DEFAULT 0,
@@ -88,8 +89,19 @@ async def _connect() -> aiosqlite.Connection:
     return db
 
 
+_MIGRATIONS = [
+    "ALTER TABLE messages ADD COLUMN thinking_content TEXT NOT NULL DEFAULT ''",
+]
+
+
 async def init_db(db: aiosqlite.Connection):
     await db.executescript(_SCHEMA)
+    for migration in _MIGRATIONS:
+        try:
+            await db.execute(migration)
+            await db.commit()
+        except Exception:
+            await db.rollback()
     await db.commit()
 
 

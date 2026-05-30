@@ -19,14 +19,12 @@ export default function App() {
   const removeSession = useAppStore((s) => s.removeSession)
   const setConnected = useAppStore((s) => s.setConnected)
   const appendStreamText = useAppStore((s) => s.appendStreamText)
-  const finalizeStream = useAppStore((s) => s.finalizeStream)
-  const reloadMessages = useAppStore((s) => s.reloadMessages)
+  const finalizeStreamWithMessage = useAppStore((s) => s.finalizeStreamWithMessage)
   const setError = useAppStore((s) => s.setError)
   const updateSessionTitle = useAppStore((s) => s.updateSessionTitle)
   const startThinking = useAppStore((s) => s.startThinking)
   const appendThinkingText = useAppStore((s) => s.appendThinkingText)
   const endThinking = useAppStore((s) => s.endThinking)
-
   const ws = useMemo(() => createWSClient(), [])
 
   useEffect(() => {
@@ -51,8 +49,7 @@ export default function App() {
           endThinking()
           break
         case "stream.done":
-          finalizeStream()
-          reloadMessages()
+          finalizeStreamWithMessage()
           break
         case "stream.error": {
           const msg =

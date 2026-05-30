@@ -31,6 +31,7 @@ class Message(SQLModel, table=True):
     session_id: str = Field(foreign_key="sessions.id")
     role: str
     content: str
+    thinking_content: str = Field(default="")
     model_id: Optional[str] = Field(default=None)
     duration_ms: int = Field(default=0)
     input_tokens: int = Field(default=0)

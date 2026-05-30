@@ -16,6 +16,7 @@ export interface Message {
   session_id: string
   role: "user" | "assistant"
   content: string
+  thinking_content: string
   model_id: string | null
   tokens_in: number | null
   tokens_out: number | null

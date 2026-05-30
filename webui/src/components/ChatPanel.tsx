@@ -26,6 +26,8 @@ function messagesToItems(
     key: m.id,
     role: m.role === "assistant" ? ("ai" as const) : ("user" as const),
     content: m.content,
+    thinkingText: m.thinking_content || undefined,
+    isThinking: false,
   }))
 
   if (streamingMessageId && (streamingText || isThinking)) {

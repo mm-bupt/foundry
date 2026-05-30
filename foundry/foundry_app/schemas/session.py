@@ -30,6 +30,7 @@ class MessageResponse(BaseModel):
     session_id: str
     role: str
     content: str
+    thinking_content: str = ""
     model_id: str | None = None
     duration_ms: int = 0
     tokens_in: int = 0
@@ -43,6 +44,7 @@ def map_message(msg: dict) -> MessageResponse:
         session_id=msg["session_id"],
         role=msg["role"],
         content=msg["content"],
+        thinking_content=msg.get("thinking_content", ""),
         model_id=msg.get("model_id"),
         duration_ms=msg.get("duration_ms", 0),
         tokens_in=msg.get("input_tokens", 0),

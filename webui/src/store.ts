@@ -27,6 +27,7 @@ interface AppState {
   startStreaming: (messageId: string) => void
   appendStreamText: (text: string) => void
   finalizeStream: () => void
+  finalizeStreamWithMessage: () => void
   startThinking: (messageId: string) => void
   appendThinkingText: (text: string) => void
   endThinking: () => void
@@ -126,6 +127,31 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   finalizeStream: () =>
     set({ status: "idle", streamingText: "", streamingMessageId: "" }),
+
+  finalizeStreamWithMessage: () => {
+    const s = get()
+    const assistantMsg: Message = {
+      id: s.streamingMessageId || crypto.randomUUID(),
+      session_id: s.currentSessionId,
+      role: "assistant",
+      content: s.streamingText,
+      thinking_content: s.thinkingText,
+      model_id: null,
+      tokens_in: null,
+      tokens_out: null,
+      duration_ms: null,
+      created_at: new Date().toISOString(),
+    }
+    set({
+      status: "idle",
+      streamingText: "",
+      streamingMessageId: "",
+      isThinking: false,
+      thinkingText: "",
+      thinkingMessageId: "",
+      messages: [...s.messages, assistantMsg],
+    })
+  },
 
   startThinking: (messageId) =>
     set({ isThinking: true, thinkingText: "", thinkingMessageId: messageId }),

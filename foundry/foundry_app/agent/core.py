@@ -19,7 +19,6 @@ from pydantic_ai.messages import (
     ThinkingPartDelta,
     PartStartEvent,
     PartDeltaEvent,
-    PartEndEvent,
     FunctionToolCallEvent,
     FunctionToolResultEvent,
 )
@@ -212,6 +211,29 @@ async def stream_chat(
                                                 "message_id": user_msg["id"],
                                             }
                                         )
+                                elif isinstance(part, ToolCallPart):
+                                    tc_id = part.tool_call_id or ""
+                                    tool_name = part.tool_name
+                                    args = (
+                                        part.args_as_dict()
+                                        if hasattr(part, "args_as_dict")
+                                        else (
+                                            part.args
+                                            if isinstance(part.args, dict)
+                                            else {}
+                                        )
+                                    )
+                                    pending_tool_calls[tc_id] = {
+                                        "tool_name": tool_name
+                                    }
+                                    await send_event(
+                                        {
+                                            "type": "tool.call",
+                                            "tool_call_id": tc_id,
+                                            "tool_name": tool_name,
+                                            "args": args,
+                                        }
+                                    )
                             elif isinstance(event, PartDeltaEvent):
                                 delta = event.delta
                                 if isinstance(delta, TextPartDelta):
@@ -234,32 +256,6 @@ async def stream_chat(
                                                 "text": delta.content_delta,
                                             }
                                         )
-
-                        model_response = agent_stream.response
-                        for part in model_response.parts:
-                            if isinstance(part, ToolCallPart):
-                                tc_id = part.tool_call_id or ""
-                                tool_name = part.tool_name
-                                args = (
-                                    part.args_as_dict()
-                                    if hasattr(part, "args_as_dict")
-                                    else (
-                                        part.args
-                                        if isinstance(part.args, dict)
-                                        else {}
-                                    )
-                                )
-                                pending_tool_calls[tc_id] = {
-                                    "tool_name": tool_name
-                                }
-                                await send_event(
-                                    {
-                                        "type": "tool.call",
-                                        "tool_call_id": tc_id,
-                                        "tool_name": tool_name,
-                                        "args": args,
-                                    }
-                                )
 
                 elif isinstance(node, CallToolsNode):
                     async with node.stream(run.ctx) as stream:
@@ -308,6 +304,7 @@ async def stream_chat(
                     db,
                     assistant_id,
                     content=full_text,
+                    thinking_content=thinking_text,
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
                     duration_ms=int((time.monotonic() - start_time) * 1000),

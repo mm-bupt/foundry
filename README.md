@@ -60,7 +60,11 @@ scripts\dev.ps1          # Windows PowerShell
 
 # Or run individually
 pip install -e foundry
+$env:DREAM_FOUNDRY_WORK_DIR="D:\1-Project\playground"
 python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# default or web debug
+cd webui && bun install && bun run dev 
 
 cd tui && bun install && bun run src/index.tsx
 ```

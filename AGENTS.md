@@ -1,10 +1,13 @@
 # AGENTS.md — Dream Foundry Project Guide
 
+## 使用中文交互
+
 ## Project Overview
 
 Dream Foundry is a full-stack AI Agent application:
 - **Backend (foundry/)**: Python/FastAPI + Pydantic AI + SQLite
 - **TUI Frontend (tui/)**: Python/Textual terminal UI (opencode-style)
+- **WebUI (webui/)**: React + Vite + Ant Design web interface
 - **Communication**: WebSocket (default) + SSE (fallback)
 
 ## Current Status
@@ -59,19 +62,20 @@ dream-foundry/
 ## Key Commands
 
 ```bash
-# === Dev Mode (backend + TUI together) ===
-# Windows CMD:
-scripts\dev.bat
+# === Dev Mode ===
+# Backend + WebUI (recommended):
+scripts\dev-web.ps1
 
-# Windows PowerShell:
+# Backend + TUI:
 scripts\dev.ps1
 
-# Linux/macOS:
-./scripts/dev.sh
+# Windows CMD:
+scripts\dev.bat
 
 # Individual components:
 pip install -e foundry                  # Install backend
 python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
+cd webui && npm install && npm run dev   # WebUI only
 cd tui && bun install && bun run src/index.tsx  # TUI only
 
 # === Production Build ===
