@@ -69,6 +69,14 @@ cd webui && bun install && bun run dev
 cd tui && bun install && bun run src/index.tsx
 ```
 
+```bash
+
+# debug
+$env:HTTP_PROXY="http://127.0.0.1:8080"
+$env:HTTPS_PROXY="http://127.0.0.1:8080"
+# 代理
+mitmweb --listen-port 8080 --web-port 8081
+
 ### Production Build
 
 ```bash
