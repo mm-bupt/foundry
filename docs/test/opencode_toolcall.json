@@ -1,0 +1,42 @@
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"工作"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"区"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"是"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"空的"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"，"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"这是一个"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"全新"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"项目"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"。"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"让我"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"先"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"通过"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"头脑"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"风暴"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"来"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"明确"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"需求"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"role":"assistant","content":"。"}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"delta":{"tool_calls":[{"id":"call_5f3ba59ae7754047a9b3ed4c","index":0,"type":"function","function":{"name":"skill","arguments":"{\"name\":\"brainstorming\"}"}}]}}]}
+
+data: {"id":"202605311916536495dbeb9b864ba0","created":1780226213,"object":"chat.completion.chunk","model":"glm-5.1","choices":[{"index":0,"finish_reason":"tool_calls","delta":{"role":"assistant","content":""}}],"usage":{"prompt_tokens":15738,"completion_tokens":31,"total_tokens":15769,"prompt_tokens_details":{"cached_tokens":15552},"completion_tokens_details":{"reasoning_tokens":0}}}
+
+data: [DONE]
+

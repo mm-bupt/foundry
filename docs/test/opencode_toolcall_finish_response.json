@@ -1,0 +1,1350 @@
+{
+    "model": "glm-5.1",
+    "max_tokens": 32000,
+    "thinking": {
+        "type": "enabled",
+        "clear_thinking": false
+    },
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are opencode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user.\n\nIMPORTANT: You must NEVER generate or guess URLs for the user unless you are confident that the URLs are for helping the user with programming. You may use URLs provided by the user in their messages or local files.\n\nIf the user asks for help or wants to give feedback inform them of the following:\n- /help: Get help with using opencode\n- To give feedback, users should report the issue at https://github.com/anomalyco/opencode/issues\n\nWhen the user directly asks about opencode (eg 'can opencode do...', 'does opencode have...') or asks in second person (eg 'are you able...', 'can you do...'), first use the WebFetch tool to gather information to answer the question from opencode docs at https://opencode.ai\n\n# Tone and style\nYou should be concise, direct, and to the point. When you run a non-trivial bash command, you should explain what the command does and why you are running it, to make sure the user understands what you are doing (this is especially important when you are running a command that will make changes to the user's system).\nRemember that your output will be displayed on a command line interface. Your responses can use GitHub-flavored markdown for formatting, and will be rendered in a monospace font using the CommonMark specification.\nOutput text to communicate with the user; all text you output outside of tool use is displayed to the user. Only use tools to complete tasks. Never use tools like Bash or code comments as means to communicate with the user during the session.\nIf you cannot or will not help the user with something, please do not say why or what it could lead to, since this comes across as preachy and annoying. Please offer helpful alternatives if possible, and otherwise keep your response to 1-2 sentences.\nOnly use emojis if the user explicitly requests it. Avoid using emojis in all communication unless asked.\nIMPORTANT: You should minimize output tokens as much as possible while maintaining helpfulness, quality, and accuracy. Only address the specific query or task at hand, avoiding tangential information unless absolutely critical for completing the request. If you can answer in 1-3 sentences or a short paragraph, please do.\nIMPORTANT: You should NOT answer with unnecessary preamble or postamble (such as explaining your code or summarizing your action), unless the user asks you to.\nIMPORTANT: Keep your responses short, since they will be displayed on a command line interface. You MUST answer concisely with fewer than 4 lines (not including tool use or code generation), unless user asks for detail. Answer the user's question directly, without elaboration, explanation, or details. One word answers are best. Avoid introductions, conclusions, and explanations. You MUST avoid text before/after your response, such as \"The answer is <answer>.\", \"Here is the content of the file...\" or \"Based on the information provided, the answer is...\" or \"Here is what I will do next...\". Here are some examples to demonstrate appropriate verbosity:\n<example>\nuser: what is 2+2?\nassistant: 4\n</example>\n\n<example>\nuser: is 11 a prime number?\nassistant: Yes\n</example>\n\n<example>\nuser: what command should I run to list files in the current directory?\nassistant: ls\n</example>\n\n<example>\nuser: what command should I run to watch files in the current directory?\nassistant: [use the ls tool to list the files in the current directory, then read docs/commands in the relevant file to find out how to watch files]\nnpm run dev\n</example>\n\n<example>\nuser: what files are in the directory src/?\nassistant: [runs ls and sees foo.c, bar.c, baz.c]\nuser: which file contains the implementation of foo?\nassistant: src/foo.c\n</example>\n\n<example>\nuser: write tests for new feature\nassistant: [uses grep and glob search tools to find where similar tests are defined, uses concurrent read file tool use blocks in one tool call to read relevant files at the same time, uses edit file tool to write new tests]\n</example>\n\n# Proactiveness\nYou are allowed to be proactive, but only when the user asks you to do something. You should strive to strike a balance between:\n1. Doing the right thing when asked, including taking actions and follow-up actions\n2. Not surprising the user with actions you take without asking\nFor example, if the user asks you how to approach something, you should do your best to answer their question first, and not immediately jump into taking actions.\n3. Do not add additional code explanation summary unless requested by the user. After working on a file, just stop, rather than providing an explanation of what you did.\n\n# Following conventions\nWhen making changes to files, first understand the file's code conventions. Mimic code style, use existing libraries and utilities, and follow existing patterns.\n- NEVER assume that a given library is available, even if it is well known. Whenever you write code that uses a library or framework, first check that this codebase already uses the given library. For example, you might look at neighboring files, or check the package.json (or cargo.toml, and so on depending on the language).\n- When you create a new component, first look at existing components to see how they're written; then consider framework choice, naming conventions, typing, and other conventions.\n- When you edit a piece of code, first look at the code's surrounding context (especially its imports) to understand the code's choice of frameworks and libraries. Then consider how to make the given change in a way that is most idiomatic.\n- Always follow security best practices. Never introduce code that exposes or logs secrets and keys. Never commit secrets or keys to the repository.\n\n# Code style\n- IMPORTANT: DO NOT ADD ***ANY*** COMMENTS unless asked\n\n# Doing tasks\nThe user will primarily request you perform software engineering tasks. This includes solving bugs, adding new functionality, refactoring code, explaining code, and more. For these tasks the following steps are recommended:\n- Use the available search tools to understand the codebase and the user's query. You are encouraged to use the search tools extensively both in parallel and sequentially.\n- Implement the solution using all tools available to you\n- Verify the solution if possible with tests. NEVER assume specific test framework or test script. Check the README or search codebase to determine the testing approach.\n- VERY IMPORTANT: When you have completed a task, you MUST run the lint and typecheck commands (e.g. npm run lint, npm run typecheck, ruff, etc.) with Bash if they were provided to you to ensure your code is correct. If you are unable to find the correct command, ask the user for the command to run and if they supply it, proactively suggest writing it to AGENTS.md so that you will know to run it next time.\nNEVER commit changes unless the user explicitly asks you to. It is VERY IMPORTANT to only commit when explicitly asked, otherwise the user will feel that you are being too proactive.\n\n- Tool results and user messages may include <system-reminder> tags. <system-reminder> tags contain useful information and reminders. They are NOT part of the user's provided input or the tool result.\n\n# Tool usage policy\n- When doing file search, prefer to use the Task tool in order to reduce context usage.\n- You have the capability to call multiple tools in a single response. When multiple independent pieces of information are requested, batch your tool calls together for optimal performance. When making multiple bash tool calls, you MUST send a single message with multiple tools calls to run the calls in parallel. For example, if you need to run \"git status\" and \"git diff\", send a single message with two tool calls to run the calls in parallel.\n\nYou MUST answer concisely with fewer than 4 lines of text (not including tool use or code generation), unless user asks for detail.\n\nIMPORTANT: Before you begin work, think about what the code you're editing is supposed to do based on the filenames directory structure.\n\n# Code References\n\nWhen referencing specific functions or pieces of code include the pattern `file_path:line_number` to allow the user to easily navigate to the source code location.\n\n<example>\nuser: Where are errors from the client handled?\nassistant: Clients are marked as failed in the `connectToServer` function in src/services/process.ts:712.\n</example>\n\nYou are powered by the model named glm-5.1. The exact model ID is zhipuai-coding-plan/glm-5.1\nHere is some useful information about the environment you are running in:\n<env>\n  Working directory: D:\\1-Project\\mmeory\n  Workspace root folder: /\n  Is directory a git repo: no\n  Platform: win32\n  Today's date: Sun May 31 2026\n</env>\nSkills provide specialized instructions and workflows for specific tasks.\nUse the skill tool to load a skill when a task matches its description.\n<available_skills>\n  <skill>\n    <name>brainstorming</name>\n    <description>You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/brainstorming/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>customize-opencode</name>\n    <description>Use ONLY when the user is editing or creating opencode's own configuration: opencode.json, opencode.jsonc, files under .opencode/, or files under ~/.config/opencode/. Also use when creating or fixing opencode agents, subagents, skills, plugins, MCP servers, or permission rules. Do not use for the user's own application code, or for any project that is not configuring opencode itself.</description>\n    <location>file:///D:/1-Project/mmeory/%3Cbuilt-in%3E</location>\n  </skill>\n  <skill>\n    <name>dispatching-parallel-agents</name>\n    <description>Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/dispatching-parallel-agents/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>executing-plans</name>\n    <description>Use when you have a written implementation plan to execute in a separate session with review checkpoints</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/executing-plans/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>finishing-a-development-branch</name>\n    <description>Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/finishing-a-development-branch/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>opentui</name>\n    <description>Comprehensive OpenTUI skill for building terminal user interfaces. Covers the core imperative API, React reconciler, and Solid reconciler. Use for any TUI development task including components, layout, keyboard handling, animations, and testing.</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.opencode/skill/opentui/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>playwright-cli</name>\n    <description>Automate browser interactions, test web pages and work with Playwright tests.</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.claude/skills/playwright-cli/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>receiving-code-review</name>\n    <description>Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/receiving-code-review/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>requesting-code-review</name>\n    <description>Use when completing tasks, implementing major features, or before merging to verify work meets requirements</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/requesting-code-review/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>subagent-driven-development</name>\n    <description>Use when executing implementation plans with independent tasks in the current session</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/subagent-driven-development/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>systematic-debugging</name>\n    <description>Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/systematic-debugging/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>test-driven-development</name>\n    <description>Use when implementing any feature or bugfix, before writing implementation code</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/test-driven-development/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.opencode/skills/ui-ux-pro-max/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>using-git-worktrees</name>\n    <description>Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/using-git-worktrees/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>using-superpowers</name>\n    <description>Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/using-superpowers/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>verification-before-completion</name>\n    <description>Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/verification-before-completion/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>writing-plans</name>\n    <description>Use when you have a spec or requirements for a multi-step task, before touching code</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/writing-plans/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>writing-skills</name>\n    <description>Use when creating new skills, editing existing skills, or verifying skills work before deployment</description>\n    <location>file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/writing-skills/SKILL.md</location>\n  </skill>\n</available_skills>"
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "计划开发一个ai agent使用的记忆模块工具，用于长时间记忆"
+                },
+                {
+                    "type": "text",
+                    "text": "<system-reminder>\n# Plan Mode - System Reminder\n\nCRITICAL: Plan mode ACTIVE - you are in READ-ONLY phase. STRICTLY FORBIDDEN:\nANY file edits, modifications, or system changes. Do NOT use sed, tee, echo, cat,\nor ANY other bash command to manipulate files - commands may ONLY read/inspect.\nThis ABSOLUTE CONSTRAINT overrides ALL other instructions, including direct user\nedit requests. You may ONLY observe, analyze, and plan. Any modification attempt\nis a critical violation. ZERO exceptions.\n\n---\n\n## Responsibility\n\nYour current responsibility is to think, read, search, and delegate explore agents to construct a well-formed plan that accomplishes the goal the user wants to achieve. Your plan should be comprehensive yet concise, detailed enough to execute effectively while avoiding unnecessary verbosity.\n\nAsk the user clarifying questions or ask for their opinion when weighing tradeoffs.\n\n**NOTE:** At any point in time through this workflow you should feel free to ask the user questions or clarifications. Don't make large assumptions about user intent. The goal is to present a well researched plan to the user, and tie any loose ends before implementation begins.\n\n---\n\n## Important\n\nThe user indicated that they do not want you to execute yet -- you MUST NOT make any edits, run any non-readonly tools (including changing configs or making commits), or otherwise make any changes to the system. This supersedes any other instructions you have received.\n</system-reminder>\n"
+                }
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": "我先探索一下当前工作区，然后通过头脑风暴来理解你的需求。",
+            "tool_calls": [
+                {
+                    "id": "call_3143bfffa9634a22b0e23ebf",
+                    "type": "function",
+                    "function": {
+                        "name": "read",
+                        "arguments": "{\"filePath\":\"D:\\\\1-Project\\\\mmeory\"}"
+                    }
+                },
+                {
+                    "id": "call_86f596d8c6424914baaf8e59",
+                    "type": "function",
+                    "function": {
+                        "name": "glob",
+                        "arguments": "{\"pattern\":\"**/*\",\"path\":\"D:\\\\1-Project\\\\mmeory\"}"
+                    }
+                }
+            ],
+            "reasoning_content": "The user wants to develop a memory module tool for AI agents, used for long-term memory. Let me first understand what they're working with by exploring the current workspace, then use the brainstorming skill to explore requirements before making a plan.\n\nLet me first look at the workspace to understand what's already there."
+        },
+        {
+            "role": "tool",
+            "tool_call_id": "call_3143bfffa9634a22b0e23ebf",
+            "content": "<path>D:\\1-Project\\mmeory</path>\n<type>directory</type>\n<entries>\n\n\n(0 entries)\n</entries>"
+        },
+        {
+            "role": "tool",
+            "tool_call_id": "call_86f596d8c6424914baaf8e59",
+            "content": "No files found"
+        },
+        {
+            "role": "assistant",
+            "content": "工作区是空的，这是一个全新项目。让我先通过头脑风暴来明确需求。",
+            "tool_calls": [
+                {
+                    "id": "call_5f3ba59ae7754047a9b3ed4c",
+                    "type": "function",
+                    "function": {
+                        "name": "skill",
+                        "arguments": "{\"name\":\"brainstorming\"}"
+                    }
+                }
+            ],
+            "reasoning_content": ""
+        },
+        {
+            "role": "tool",
+            "tool_call_id": "call_5f3ba59ae7754047a9b3ed4c",
+            "content": "<skill_content name=\"brainstorming\">\n# Skill: brainstorming\n\n# Brainstorming Ideas Into Designs\n\nHelp turn ideas into fully formed designs and specs through natural collaborative dialogue.\n\nStart by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.\n\n<HARD-GATE>\nDo NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.\n</HARD-GATE>\n\n## Anti-Pattern: \"This Is Too Simple To Need A Design\"\n\nEvery project goes through this process. A todo list, a single-function utility, a config change — all of them. \"Simple\" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.\n\n## Checklist\n\nYou MUST create a task for each of these items and complete them in order:\n\n1. **Explore project context** — check files, docs, recent commits\n2. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a clarifying question. See the Visual Companion section below.\n3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria\n4. **Propose 2-3 approaches** — with trade-offs and your recommendation\n5. **Present design** — in sections scaled to their complexity, get user approval after each section\n6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit\n7. **Spec review loop** — dispatch spec-document-reviewer subagent with precisely crafted review context (never your session history); fix issues and re-dispatch until approved (max 5 iterations, then surface to human)\n8. **User reviews written spec** — ask user to review the spec file before proceeding\n9. **Transition to implementation** — invoke writing-plans skill to create implementation plan\n\n## Process Flow\n\n```dot\ndigraph brainstorming {\n    \"Explore project context\" [shape=box];\n    \"Visual questions ahead?\" [shape=diamond];\n    \"Offer Visual Companion\\n(own message, no other content)\" [shape=box];\n    \"Ask clarifying questions\" [shape=box];\n    \"Propose 2-3 approaches\" [shape=box];\n    \"Present design sections\" [shape=box];\n    \"User approves design?\" [shape=diamond];\n    \"Write design doc\" [shape=box];\n    \"Spec review loop\" [shape=box];\n    \"Spec review passed?\" [shape=diamond];\n    \"User reviews spec?\" [shape=diamond];\n    \"Invoke writing-plans skill\" [shape=doublecircle];\n\n    \"Explore project context\" -> \"Visual questions ahead?\";\n    \"Visual questions ahead?\" -> \"Offer Visual Companion\\n(own message, no other content)\" [label=\"yes\"];\n    \"Visual questions ahead?\" -> \"Ask clarifying questions\" [label=\"no\"];\n    \"Offer Visual Companion\\n(own message, no other content)\" -> \"Ask clarifying questions\";\n    \"Ask clarifying questions\" -> \"Propose 2-3 approaches\";\n    \"Propose 2-3 approaches\" -> \"Present design sections\";\n    \"Present design sections\" -> \"User approves design?\";\n    \"User approves design?\" -> \"Present design sections\" [label=\"no, revise\"];\n    \"User approves design?\" -> \"Write design doc\" [label=\"yes\"];\n    \"Write design doc\" -> \"Spec review loop\";\n    \"Spec review loop\" -> \"Spec review passed?\";\n    \"Spec review passed?\" -> \"Spec review loop\" [label=\"issues found,\\nfix and re-dispatch\"];\n    \"Spec review passed?\" -> \"User reviews spec?\" [label=\"approved\"];\n    \"User reviews spec?\" -> \"Write design doc\" [label=\"changes requested\"];\n    \"User reviews spec?\" -> \"Invoke writing-plans skill\" [label=\"approved\"];\n}\n```\n\n**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.\n\n## The Process\n\n**Understanding the idea:**\n\n- Check out the current project state first (files, docs, recent commits)\n- Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., \"build a platform with chat, file storage, billing, and analytics\"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.\n- If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.\n- For appropriately-scoped projects, ask questions one at a time to refine the idea\n- Prefer multiple choice questions when possible, but open-ended is fine too\n- Only one question per message - if a topic needs more exploration, break it into multiple questions\n- Focus on understanding: purpose, constraints, success criteria\n\n**Exploring approaches:**\n\n- Propose 2-3 different approaches with trade-offs\n- Present options conversationally with your recommendation and reasoning\n- Lead with your recommended option and explain why\n\n**Presenting the design:**\n\n- Once you believe you understand what you're building, present the design\n- Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced\n- Ask after each section whether it looks right so far\n- Cover: architecture, components, data flow, error handling, testing\n- Be ready to go back and clarify if something doesn't make sense\n\n**Design for isolation and clarity:**\n\n- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently\n- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?\n- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.\n- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.\n\n**Working in existing codebases:**\n\n- Explore the current structure before proposing changes. Follow existing patterns.\n- Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.\n- Don't propose unrelated refactoring. Stay focused on what serves the current goal.\n\n## After the Design\n\n**Documentation:**\n\n- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`\n  - (User preferences for spec location override this default)\n- Use elements-of-style:writing-clearly-and-concisely skill if available\n- Commit the design document to git\n\n**Spec Review Loop:**\nAfter writing the spec document:\n\n1. Dispatch spec-document-reviewer subagent (see spec-document-reviewer-prompt.md)\n2. If Issues Found: fix, re-dispatch, repeat until Approved\n3. If loop exceeds 5 iterations, surface to human for guidance\n\n**User Review Gate:**\nAfter the spec review loop passes, ask the user to review the written spec before proceeding:\n\n> \"Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan.\"\n\nWait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.\n\n**Implementation:**\n\n- Invoke the writing-plans skill to create a detailed implementation plan\n- Do NOT invoke any other skill. writing-plans is the next step.\n\n## Key Principles\n\n- **One question at a time** - Don't overwhelm with multiple questions\n- **Multiple choice preferred** - Easier to answer than open-ended when possible\n- **YAGNI ruthlessly** - Remove unnecessary features from all designs\n- **Explore alternatives** - Always propose 2-3 approaches before settling\n- **Incremental validation** - Present design, get approval before moving on\n- **Be flexible** - Go back and clarify when something doesn't make sense\n\n## Visual Companion\n\nA browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.\n\n**Offering the companion:** When you anticipate that upcoming questions will involve visual content (mockups, layouts, diagrams), offer it once for consent:\n> \"Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. This feature is still new and can be token-intensive. Want to try it? (Requires opening a local URL)\"\n\n**This offer MUST be its own message.** Do not combine it with clarifying questions, context summaries, or any other content. The message should contain ONLY the offer above and nothing else. Wait for the user's response before continuing. If they decline, proceed with text-only brainstorming.\n\n**Per-question decision:** Even after the user accepts, decide FOR EACH QUESTION whether to use the browser or the terminal. The test: **would the user understand this better by seeing it than reading it?**\n\n- **Use the browser** for content that IS visual — mockups, wireframes, layout comparisons, architecture diagrams, side-by-side visual designs\n- **Use the terminal** for content that is text — requirements questions, conceptual choices, tradeoff lists, A/B/C/D text options, scope decisions\n\nA question about a UI topic is not automatically a visual question. \"What does personality mean in this context?\" is a conceptual question — use the terminal. \"Which wizard layout works better?\" is a visual question — use the browser.\n\nIf they agree to the companion, read the detailed guide before proceeding:\n`skills/brainstorming/visual-companion.md`\n\nBase directory for this skill: file:///C:/Users/%E9%A9%AC%E9%B8%A3/.config/opencode/skills/superpowers/brainstorming\nRelative paths in this skill (e.g., scripts/, reference/) are relative to this base directory.\nNote: file list is sampled.\n\n<skill_files>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\visual-companion.md</file>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\spec-document-reviewer-prompt.md</file>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\scripts\\stop-server.sh</file>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\scripts\\start-server.sh</file>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\scripts\\server.js</file>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\scripts\\helper.js</file>\n<file>C:\\Users\\马鸣\\.config\\opencode\\skills\\superpowers\\brainstorming\\scripts\\frame-template.html</file>\n</skill_files>\n</skill_content>"
+        }
+    ],
+    "tools": [
+        {
+            "type": "function",
+            "function": {
+                "name": "bash",
+                "description": "Executes a given PowerShell (7+) command with optional timeout, ensuring proper handling and security measures.\n\nBe aware: OS: win32, Shell: pwsh\n\nAll commands run in the current working directory by default. Use the `workdir` parameter if you need to run a command in a different directory. AVOID changing directories inside the command - use `workdir` instead.\n\nUse `C:\\Users\\马鸣\\AppData\\Local\\Temp\\opencode` for temporary work outside the workspace. This directory has already been created, already exists, and is pre-approved for external directory access.\n\nIMPORTANT: This tool is for terminal operations like git, npm, docker, etc. DO NOT use it for file operations (reading, writing, editing, searching, finding files) - use the specialized tools for this instead.\n\n# PowerShell (7+) shell notes\n- This cross-platform shell supports pipeline chain operators (`&&` and `||`).\n- Use double quotes for interpolated strings (`\"Hello $name\"`), single quotes for verbatim strings.\n- Prefer full cmdlet names like `Get-ChildItem`, `Set-Content`, `Remove-Item`, and `New-Item` over aliases.\n- Use `$(...)` for subexpressions. Use `@(...)` for array expressions.\n- To call a native executable whose path contains spaces, use the call operator: `& \"path/to/exe\" args`.\n- Escape special characters with the PowerShell backtick character.\n\nBefore executing the command, please follow these steps:\n\n1. Directory Verification:\n   - If the command will create new directories or files, first use `Test-Path -LiteralPath <parent>` to verify the parent directory exists and is the correct location\n   - For example, before creating `foo\\bar`, first use `Test-Path -LiteralPath \"foo\"` to check that `foo` exists and is the intended parent directory\n\n2. Command Execution:\n   - Always quote file paths that contain spaces with double quotes (e.g., Remove-Item -LiteralPath \"path with spaces\\file.txt\")\n   - Examples of proper quoting:\n     - New-Item -ItemType Directory -Path \"My Documents\" (correct)\n     - New-Item -ItemType Directory -Path My Documents (incorrect - path is split)\n     - & \"path with spaces\\script.ps1\" (correct)\n     - path with spaces\\script.ps1 (incorrect - path is split and not invoked)\n   - After ensuring proper quoting, execute the command.\n   - Capture the output of the command.\n\nUsage notes:\n  - The command argument is required.\n  - You can specify an optional timeout in milliseconds. If not specified, commands will time out after 120000ms.\n  - It is very helpful if you write a clear, concise description of what this command does in 5-10 words.\n  - If the output exceeds 2000 lines or 51200 bytes, it will be truncated and the full output will be written to a file. You can use Read with offset/limit to read specific sections or Grep to search the full content. Do NOT use `Select-Object -First`, `Select-Object -Last`, or other truncation commands to limit output; the full output will already be captured to a file for more precise searching.\n\n  - Avoid using Shell with PowerShell file/content cmdlets unless explicitly instructed or when these cmdlets are truly necessary for the task. Instead, always prefer using the dedicated tools for these commands:\n    - File search: Use Glob (NOT Get-ChildItem)\n    - Content search: Use Grep (NOT Select-String)\n    - Read files: Use Read (NOT Get-Content)\n    - Edit files: Use Edit (NOT Set-Content)\n    - Write files: Use Write (NOT Set-Content/Out-File or here-strings)\n    - Communication: Output text directly (NOT Write-Output/Write-Host)\n  - When issuing multiple commands:\n    - If the commands are independent and can run in parallel, make multiple bash tool calls in a single message. For example, if you need to run \"git status\" and \"git diff\", send a single message with two bash tool calls in parallel.\n    - If the commands depend on each other and must run sequentially, use a single bash tool call with '&&' to chain them together (e.g., `git add . && git commit -m \"message\" && git push`). For instance, if one operation must complete before another starts (like New-Item before Copy-Item, Write before bash for git operations, or git add before git commit), run these operations sequentially instead.\n    - Use `;` only when you need to run commands sequentially but don't care if earlier commands fail\n    - DO NOT use newlines to separate commands (newlines are ok in quoted strings)\n  - AVOID changing directories inside the command. Use the `workdir` parameter to change directories instead.\n    <good-example>\n    Use workdir=\"project\\subdir\" with command: pytest tests\n    </good-example>\n    <bad-example>\n    Set-Location -LiteralPath \"project\\subdir\" && pytest tests\n    </bad-example>\n\n# Git and GitHub\n- Only commit, amend, push, or create PRs when explicitly requested.\n- Before committing, inspect `git status`, `git diff`, and `git log --oneline -10`; stage only intended files and never commit secrets.\n- Write a concise commit message that matches the repo style.\n- Do not update git config, skip hooks, use interactive `-i`, force-push, or create empty commits unless explicitly requested.\n- If a commit fails or hooks reject it, fix the issue and create a new commit; do not amend the failed commit.\n- Before creating a PR, inspect status, diff, remote tracking, recent commits, and the diff from the base branch.\n- Review all commits included in the PR, not just the latest commit.\n- Use `gh` for GitHub tasks, including PRs, issues, checks, and releases; return the PR URL when done.\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "command": {
+                            "type": "string",
+                            "description": "The command to execute"
+                        },
+                        "timeout": {
+                            "minimum": -9007199254740991,
+                            "exclusiveMinimum": 0,
+                            "type": "integer",
+                            "maximum": 9007199254740991,
+                            "description": "Optional timeout in milliseconds"
+                        },
+                        "workdir": {
+                            "type": "string",
+                            "description": "The working directory to run the command in. Defaults to the current directory. Use this instead of 'cd' commands."
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Clear, concise description of what this command does in 5-10 words. Examples:\nInput: Get-ChildItem -LiteralPath \".\"\nOutput: Lists current directory\n\nInput: git status\nOutput: Shows working tree status\n\nInput: npm install\nOutput: Installs package dependencies\n\nInput: New-Item -ItemType Directory -Path \"tmp\"\nOutput: Creates directory tmp"
+                        }
+                    },
+                    "required": [
+                        "command",
+                        "description"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "edit",
+                "description": "Performs exact string replacements in files. \n\nUsage:\n- You must use your `Read` tool at least once in the conversation before editing. This tool will error if you attempt an edit without reading the file. \n- When editing text from Read tool output, ensure you preserve the exact indentation (tabs/spaces) as it appears AFTER the line number prefix. The line number prefix format is: line number + colon + space (e.g., `1: `). Everything after that space is the actual file content to match. Never include any part of the line number prefix in the oldString or newString.\n- ALWAYS prefer editing existing files in the codebase. NEVER write new files unless explicitly required.\n- Only use emojis if the user explicitly requests it. Avoid adding emojis to files unless asked.\n- The edit will FAIL if `oldString` is not found in the file with an error \"oldString not found in content\".\n- The edit will FAIL if `oldString` is found multiple times in the file with an error \"Found multiple matches for oldString. Provide more surrounding lines in oldString to identify the correct match.\" Either provide a larger string with more surrounding context to make it unique or use `replaceAll` to change every instance of `oldString`. \n- Use `replaceAll` for replacing and renaming strings across the file. This parameter is useful if you want to rename a variable for instance.\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "filePath": {
+                            "type": "string",
+                            "description": "The absolute path to the file to modify"
+                        },
+                        "oldString": {
+                            "type": "string",
+                            "description": "The text to replace"
+                        },
+                        "newString": {
+                            "type": "string",
+                            "description": "The text to replace it with (must be different from oldString)"
+                        },
+                        "replaceAll": {
+                            "type": "boolean",
+                            "description": "Replace all occurrences of oldString (default false)"
+                        }
+                    },
+                    "required": [
+                        "filePath",
+                        "oldString",
+                        "newString"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "glob",
+                "description": "- Fast file pattern matching tool that works with any codebase size\n- Supports glob patterns like \"**/*.js\" or \"src/**/*.ts\"\n- Returns matching file paths sorted by modification time\n- Use this tool when you need to find files by name patterns\n- When you are doing an open-ended search that may require multiple rounds of globbing and grepping, use the Task tool instead\n- You have the capability to call multiple tools in a single response. It is always better to speculatively perform multiple searches as a batch that are potentially useful.\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "pattern": {
+                            "type": "string",
+                            "description": "The glob pattern to match files against"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "The directory to search in. If not specified, the current working directory will be used. IMPORTANT: Omit this field to use the default directory. DO NOT enter \"undefined\" or \"null\" - simply omit it for the default behavior. Must be a valid directory path if provided."
+                        }
+                    },
+                    "required": [
+                        "pattern"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "grep",
+                "description": "- Fast content search tool that works with any codebase size\n- Searches file contents using regular expressions\n- Supports full regex syntax (eg. \"log.*Error\", \"function\\s+\\w+\", etc.)\n- Filter files by pattern with the include parameter (eg. \"*.js\", \"*.{ts,tsx}\")\n- Returns file paths and line numbers with at least one match sorted by modification time\n- Use this tool when you need to find files containing specific patterns\n- If you need to identify/count the number of matches within files, use the Bash tool with `rg` (ripgrep) directly. Do NOT use `grep`.\n- When you are doing an open-ended search that may require multiple rounds of globbing and grepping, use the Task tool instead\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "pattern": {
+                            "type": "string",
+                            "description": "The regex pattern to search for in file contents"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "The directory to search in. Defaults to the current working directory."
+                        },
+                        "include": {
+                            "type": "string",
+                            "description": "File pattern to include in the search (e.g. \"*.js\", \"*.{ts,tsx}\")"
+                        }
+                    },
+                    "required": [
+                        "pattern"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "question",
+                "description": "Use this tool when you need to ask the user questions during execution. This allows you to:\n1. Gather user preferences or requirements\n2. Clarify ambiguous instructions\n3. Get decisions on implementation choices as you work\n4. Offer choices to the user about what direction to take.\n\nUsage notes:\n- When `custom` is enabled (default), a \"Type your own answer\" option is added automatically; don't include \"Other\" or catch-all options\n- Answers are returned as arrays of labels; set `multiple: true` to allow selecting more than one\n- If you recommend a specific option, make that the first option in the list and add \"(Recommended)\" at the end of the label\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "questions": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "description": "Complete question"
+                                    },
+                                    "header": {
+                                        "type": "string",
+                                        "description": "Very short label (max 30 chars)"
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string",
+                                                    "description": "Display text (1-5 words, concise)"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "description": "Explanation of choice"
+                                                }
+                                            },
+                                            "required": [
+                                                "label",
+                                                "description"
+                                            ]
+                                        },
+                                        "description": "Available choices"
+                                    },
+                                    "multiple": {
+                                        "type": "boolean",
+                                        "description": "Allow selecting multiple choices"
+                                    }
+                                },
+                                "required": [
+                                    "question",
+                                    "header",
+                                    "options"
+                                ]
+                            },
+                            "description": "Questions to ask"
+                        }
+                    },
+                    "required": [
+                        "questions"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "read",
+                "description": "Read a file or directory from the local filesystem. If the path does not exist, an error is returned.\n\nUsage:\n- The filePath parameter should be an absolute path.\n- By default, this tool returns up to 2000 lines from the start of the file.\n- The offset parameter is the line number to start from (1-indexed).\n- To read later sections, call this tool again with a larger offset.\n- Use the grep tool to find specific content in large files or files with long lines.\n- If you are unsure of the correct file path, use the glob tool to look up filenames by glob pattern.\n- Contents are returned with each line prefixed by its line number as `<line>: <content>`. For example, if a file has contents \"foo\\n\", you will receive \"1: foo\\n\". For directories, entries are returned one per line (without line numbers) with a trailing `/` for subdirectories.\n- Any line longer than 2000 characters is truncated.\n- Call this tool in parallel when you know there are multiple files you want to read.\n- Avoid tiny repeated slices (30 line chunks). If you need more context, read a larger window.\n- This tool can read image files and PDFs and return them as file attachments.\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "filePath": {
+                            "type": "string",
+                            "description": "The absolute path to the file or directory to read"
+                        },
+                        "offset": {
+                            "minimum": 0,
+                            "type": "integer",
+                            "maximum": 9007199254740991,
+                            "description": "The line number to start reading from (1-indexed)"
+                        },
+                        "limit": {
+                            "minimum": 0,
+                            "type": "integer",
+                            "maximum": 9007199254740991,
+                            "description": "The maximum number of lines to read (defaults to 2000)"
+                        }
+                    },
+                    "required": [
+                        "filePath"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "skill",
+                "description": "Load a specialized skill when the task at hand matches one of the skills listed in the system prompt.\n\nUse this tool to inject the skill's instructions and resources into current conversation. The output may contain detailed workflow guidance as well as references to scripts, files, etc in the same directory as the skill.\n\nThe skill name must match one of the skills listed in your system prompt.\n\nLoad a specialized skill that provides domain-specific instructions and workflows.\n\nWhen you recognize that a task matches one of the available skills listed below, use this tool to load the full skill instructions.\n\nThe skill will inject detailed instructions, workflows, and access to bundled resources (scripts, references, templates) into the conversation context.\n\nTool output includes a `<skill_content name=\"...\">` block with the loaded content.\n\nThe following skills provide specialized sets of instructions for particular tasks\nInvoke this tool to load a skill when a task matches one of the available skills listed below:\n\n## Available Skills\n- **brainstorming**: You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.\n- **customize-opencode**: Use ONLY when the user is editing or creating opencode's own configuration: opencode.json, opencode.jsonc, files under .opencode/, or files under ~/.config/opencode/. Also use when creating or fixing opencode agents, subagents, skills, plugins, MCP servers, or permission rules. Do not use for the user's own application code, or for any project that is not configuring opencode itself.\n- **dispatching-parallel-agents**: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies\n- **executing-plans**: Use when you have a written implementation plan to execute in a separate session with review checkpoints\n- **finishing-a-development-branch**: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup\n- **opentui**: Comprehensive OpenTUI skill for building terminal user interfaces. Covers the core imperative API, React reconciler, and Solid reconciler. Use for any TUI development task including components, layout, keyboard handling, animations, and testing.\n- **playwright-cli**: Automate browser interactions, test web pages and work with Playwright tests.\n- **receiving-code-review**: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation\n- **requesting-code-review**: Use when completing tasks, implementing major features, or before merging to verify work meets requirements\n- **subagent-driven-development**: Use when executing implementation plans with independent tasks in the current session\n- **systematic-debugging**: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes\n- **test-driven-development**: Use when implementing any feature or bugfix, before writing implementation code\n- **ui-ux-pro-max**: UI/UX design intelligence with searchable database\n- **using-git-worktrees**: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification\n- **using-superpowers**: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\n- **verification-before-completion**: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always\n- **writing-plans**: Use when you have a spec or requirements for a multi-step task, before touching code\n- **writing-skills**: Use when creating new skills, editing existing skills, or verifying skills work before deployment",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the skill from available_skills"
+                        }
+                    },
+                    "required": [
+                        "name"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_abort_command",
+                "description": "Abort a running command by sending Ctrl+C.\nSession targeting: sessionId (recommended) > tabIndex > title > profileName",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "Stable session ID (recommended)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index (legacy)"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match by title"
+                        },
+                        "profileName": {
+                            "type": "string",
+                            "description": "Match by profile name"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_close_all_tabs",
+                "description": "Close all open tabs",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_close_tab",
+                "description": "Close a specific tab. If no locator provided, closes the active tab.\nTab targeting: tabId (stable, recommended) > tabIndex (legacy) > title (partial match)",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "tabId": {
+                            "type": "string",
+                            "description": "Stable tab ID (recommended)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index (legacy)"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match by title"
+                        },
+                        "force": {
+                            "type": "boolean",
+                            "description": "Force close without asking (default: false)"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_duplicate_tab",
+                "description": "Duplicate the active tab or a specific tab",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Index of the tab to duplicate (default: active tab)"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_exec_command",
+                "description": "Execute a command in a terminal session.\nSession targeting (priority order): sessionId > tabIndex > title > profileName\n- sessionId: Stable UUID (recommended, use get_session_list to get IDs)\n- tabIndex: Array index (legacy, may change if tabs are reordered)\n- title: Match by terminal title (partial, case-insensitive)\n- profileName: Match by profile name (partial, case-insensitive)\n\nFor interactive/paging commands (less, vim, top), set waitForOutput=false.\nFor long-running commands, increase timeout or use waitForOutput=false and poll with get_terminal_buffer.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "command": {
+                            "type": "string",
+                            "description": "Command to execute"
+                        },
+                        "sessionId": {
+                            "type": "string",
+                            "description": "Stable session ID (recommended, from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index (legacy, may change if tabs reorder)"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match session by title (partial, case-insensitive)"
+                        },
+                        "profileName": {
+                            "type": "string",
+                            "description": "Match session by profile name (partial, case-insensitive)"
+                        },
+                        "waitForOutput": {
+                            "type": "boolean",
+                            "description": "Wait for command completion (default: true). Set false for interactive commands."
+                        },
+                        "timeout": {
+                            "type": "number",
+                            "description": "Timeout in ms (default: 30000, max: 300000)"
+                        }
+                    },
+                    "required": [
+                        "command"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_focus_pane",
+                "description": "Focus a specific pane in a split terminal tab.\nUse sessionId to identify the exact pane to focus.\nAfter focusing, commands sent to that split tab will go to the focused pane.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "Session ID of the pane to focus (from get_session_list)"
+                        }
+                    },
+                    "required": [
+                        "sessionId"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_get_command_status",
+                "description": "Get the status of active/running commands across all terminals",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_get_session_list",
+                "description": "Get list of all terminal sessions with stable IDs and metadata.\nUse sessionId (stable UUID) for reliable session targeting.\n\nFor split panes:\n- isSplit: true if this session is inside a split tab\n- splitTabIndex: Index of parent tab (use for grouping panes)\n- paneIndex: Position within the split (0, 1, 2, ...)\n- totalPanes: Number of panes in the split\n- isFocusedPane: Whether this is the currently focused pane",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_get_terminal_buffer",
+                "description": "Get the content of a terminal buffer. Use this to check command output after using send_input or async exec_command.\nSession targeting: sessionId (recommended) > tabIndex > title > profileName",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "Stable session ID (recommended)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index (legacy)"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match by title"
+                        },
+                        "profileName": {
+                            "type": "string",
+                            "description": "Match by profile name"
+                        },
+                        "lastNLines": {
+                            "type": "number",
+                            "description": "Get only the last N lines (default: all)"
+                        },
+                        "startLine": {
+                            "type": "number",
+                            "description": "Start line (0-indexed)"
+                        },
+                        "endLine": {
+                            "type": "number",
+                            "description": "End line (exclusive)"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_list_profiles",
+                "description": "List all available terminal profiles (local shell, SSH connections, etc.).\nReturns profileId which can be used directly with open_profile().\n\nWorkflow: list_profiles() -> find desired profile -> open_profile(profileId=\"...\")",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_list_tabs",
+                "description": "List all open tabs in Tabby with stable IDs and metadata.\nUse tabId (stable) for reliable tab targeting; tabIndex may change if tabs are reordered.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_move_tab_left",
+                "description": "Move the active tab to the left",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_move_tab_right",
+                "description": "Move the active tab to the right",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_next_tab",
+                "description": "Switch to the next tab",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_open_profile",
+                "description": "Open a NEW terminal tab using a profile. Creates new connection.\n\nUsage: list_profiles() -> open_profile(profileId=\"...from list_profiles result\")\n\nParameters:\n- profileId: Use 'profileId' field from list_profiles (recommended)\n- profileName: Or match by name (partial, case-insensitive)\n- waitForReady: Wait for terminal/SSH to fully connect (default: true)\n- timeout: Timeout in ms when waiting (default: 30000)\n\nReturns sessionId for immediate use with exec_command, SFTP tools, etc.\n\nResponse state fields:\n- tabReady: Tab/frontend initialized\n- sshConnected: SSH connection established (SSH profiles only)\n- ready: OVERALL ready state (for SSH: tabReady AND sshConnected)\n\nFor SSH profiles, waits until sshSession.open=true (real connection established).\n\nNOTE: This opens a NEW tab. For existing connections, use get_session_list + exec_command.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "profileId": {
+                            "type": "string",
+                            "description": "profileId from list_profiles result"
+                        },
+                        "profileName": {
+                            "type": "string",
+                            "description": "Profile name (partial match, case-insensitive)"
+                        },
+                        "waitForReady": {
+                            "type": "boolean",
+                            "description": "Wait for connection (default: true for SSH, false for local)"
+                        },
+                        "timeout": {
+                            "type": "number",
+                            "description": "Timeout in ms when waiting (default: 30000)"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_previous_tab",
+                "description": "Switch to the previous tab",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_quick_connect",
+                "description": "Quick SSH connection - creates a NEW tab with temporary profile.\n\nIMPORTANT: This creates a NEW connection and tab, does NOT reuse existing sessions.\n- For new connections: Use this or open_profile\n- For existing sessions: Use get_session_list to find sessions, then exec_command\n\nExample: quick_connect(query=\"root@192.168.1.1\") or quick_connect(query=\"user@host:2222\")",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "SSH string: \"user@host\" or \"user@host:port\""
+                        }
+                    },
+                    "required": [
+                        "query"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_reopen_last_tab",
+                "description": "Reopen the last closed tab",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_select_tab",
+                "description": "Select/focus a specific tab.\nTab targeting: tabId (stable, recommended) > tabIndex (legacy) > title (partial match)",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "tabId": {
+                            "type": "string",
+                            "description": "Stable tab ID (recommended, from list_tabs)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index (legacy, may change)"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match by title (partial, case-insensitive)"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_send_input",
+                "description": "Send raw input to a terminal. Use this for interactive commands like vim, less, top, etc.\nSession targeting: sessionId (recommended) > tabIndex > title > profileName\nSpecial keys: \\x03 (Ctrl+C), \\x04 (Ctrl+D), \\x1b (Escape), \\r (Enter)",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "input": {
+                            "type": "string",
+                            "description": "Input to send (can include special characters like \\n, \\x03 for Ctrl+C)"
+                        },
+                        "sessionId": {
+                            "type": "string",
+                            "description": "Stable session ID (recommended)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index (legacy)"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match by title"
+                        },
+                        "profileName": {
+                            "type": "string",
+                            "description": "Match by profile name"
+                        }
+                    },
+                    "required": [
+                        "input"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_cancel_transfer",
+                "description": "Cancel an active file transfer.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "transferId": {
+                            "type": "string",
+                            "description": "Transfer task ID to cancel"
+                        }
+                    },
+                    "required": [
+                        "transferId"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_delete",
+                "description": "Delete file or empty directory via SFTP.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Path to delete"
+                        },
+                        "isDirectory": {
+                            "type": "boolean",
+                            "description": "Force treat as directory"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_download",
+                "description": "Download a remote file to local path via SFTP.\n\n⚠️ IMPORTANT: Use these exact parameter names:\n  • remotePath (required): Path to the file on the remote server\n  • localPath (required): Absolute path for local destination\n  • sync (optional): Wait for completion (default: true)\n\nExample: { \"remotePath\": \"/tmp/remote.txt\", \"localPath\": \"/home/user/downloaded.txt\" }\n\nMax download size is configurable in Tabby Settings → MCP → SFTP.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "remotePath": {
+                            "type": "string",
+                            "description": "REQUIRED: Remote file path to download (e.g., /tmp/remote.txt)"
+                        },
+                        "localPath": {
+                            "type": "string",
+                            "description": "REQUIRED: Local destination path, must be absolute (e.g., /home/user/file.txt)"
+                        },
+                        "sync": {
+                            "type": "boolean",
+                            "description": "Wait for completion, default true. Set false to get transferId for async tracking"
+                        }
+                    },
+                    "required": [
+                        "remotePath",
+                        "localPath"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_get_transfer_status",
+                "description": "Get status and progress of a file transfer task.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "transferId": {
+                            "type": "string",
+                            "description": "Transfer task ID from sftp_upload/sftp_download"
+                        }
+                    },
+                    "required": [
+                        "transferId"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_list_files",
+                "description": "List files in remote directory via SFTP.\nReturns: Array of {name, path, isDirectory, size, modifiedTime}",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Remote directory path (default: \"/\")"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_list_transfers",
+                "description": "List all active and recent file transfers.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "status": {
+                            "type": "string",
+                            "enum": [
+                                "all",
+                                "active",
+                                "completed",
+                                "failed"
+                            ],
+                            "description": "Filter by status"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_mkdir",
+                "description": "Create directory on remote server via SFTP.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Directory path to create"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_read_file",
+                "description": "Read remote file content via SFTP. For text files only.\nMax size: Configurable in Settings (default: 1MB)",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Remote file path to read"
+                        },
+                        "maxSize": {
+                            "type": "number",
+                            "description": "Max bytes (default: 1MB)"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_rename",
+                "description": "Rename or move file/directory via SFTP.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "sourcePath": {
+                            "type": "string",
+                            "description": "Current path"
+                        },
+                        "destPath": {
+                            "type": "string",
+                            "description": "New path"
+                        }
+                    },
+                    "required": [
+                        "sourcePath",
+                        "destPath"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_stat",
+                "description": "Get file/directory info (exists, size, permissions, etc).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Path to stat"
+                        }
+                    },
+                    "required": [
+                        "path"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_upload",
+                "description": "Upload a local file to a remote server via SFTP.\n\n⚠️ IMPORTANT: Use these exact parameter names:\n  • localPath (required): Absolute path to the local file to upload\n  • remotePath (required): Destination path on the remote server\n  • sync (optional): Wait for completion (default: true)\n\nExample: { \"localPath\": \"/home/user/file.txt\", \"remotePath\": \"/tmp/uploaded.txt\" }\n\nMax upload size is configurable in Tabby Settings → MCP → SFTP.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "localPath": {
+                            "type": "string",
+                            "description": "REQUIRED: Absolute path to local file (e.g., /home/user/file.txt)"
+                        },
+                        "remotePath": {
+                            "type": "string",
+                            "description": "REQUIRED: Remote destination path (e.g., /tmp/uploaded.txt)"
+                        },
+                        "sync": {
+                            "type": "boolean",
+                            "description": "Wait for completion, default true. Set false to get transferId for async tracking"
+                        }
+                    },
+                    "required": [
+                        "localPath",
+                        "remotePath"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_sftp_write_file",
+                "description": "Write string content to remote file via SFTP.\nFor text content only. Use sftp_upload for binary files.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sessionId": {
+                            "type": "string",
+                            "description": "SSH session ID (from get_session_list)"
+                        },
+                        "tabIndex": {
+                            "type": "number",
+                            "description": "Tab index of SSH session"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Match SSH session by tab title"
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Remote file path"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Text content to write"
+                        },
+                        "append": {
+                            "type": "boolean",
+                            "description": "Append instead of overwrite"
+                        }
+                    },
+                    "required": [
+                        "path",
+                        "content"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_show_profile_selector",
+                "description": "Show the profile selector dialog for the user to choose a profile.\nThis is a NON-BLOCKING operation - it immediately returns after opening the dialog.\nThe dialog will be shown to the user, but this tool does not wait for user selection.\nUse list_profiles + open_profile for programmatic profile opening instead.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "additionalProperties": false
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Tabby_MCP_split_tab",
+                "description": "Split the current terminal pane in a direction.\nCreates a new pane with a copy of the current terminal.\nDirection: 'right'/'left'/'top'/'bottom' (or shorthand 'r'/'l'/'t'/'b')\nThe active tab must be inside a SplitTabComponent, or be a terminal that can be wrapped.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "direction": {
+                            "type": "string",
+                            "enum": [
+                                "horizontal",
+                                "vertical",
+                                "right",
+                                "left",
+                                "top",
+                                "bottom",
+                                "r",
+                                "l",
+                                "t",
+                                "b"
+                            ],
+                            "description": "Split direction: right/left/top/bottom (or r/l/t/b), or horizontal/vertical"
+                        },
+                        "ratio": {
+                            "type": "number",
+                            "description": "Split ratio (0.1 to 0.9, default: 0.5) - not yet implemented"
+                        }
+                    },
+                    "required": [
+                        "direction"
+                    ],
+                    "additionalProperties": false,
+                    "$schema": "http://json-schema.org/draft-07/schema#"
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "task",
+                "description": "Launch a new agent to handle complex, multistep tasks autonomously.\n\nWhen using the Task tool, you must specify a subagent_type parameter to select which agent type to use.\n\nWhen NOT to use the Task tool:\n- If you want to read a specific file path, use the Read or Glob tool instead of the Task tool, to find the match more quickly\n- If you are searching for a specific class definition like \"class Foo\", use the Grep tool instead, to find the match more quickly\n- If you are searching for code within a specific file or set of 2-3 files, use the Read tool instead of the Task tool, to find the match more quickly\n- If no available agent is a good fit for the task, use other tools directly\n\n\nUsage notes:\n1. Launch multiple agents concurrently whenever possible, to maximize performance; to do that, use a single message with multiple tool uses\n2. When the agent is done, it will return a single message back to you. The result returned by the agent is not visible to the user. To show the user the result, you should send a text message back to the user with a concise summary of the result. The output includes a task_id you can reuse later to continue the same subagent session.\n3. Each agent invocation starts with a fresh context unless you provide task_id to resume the same subagent session (which continues with its previous messages and tool outputs). When starting fresh, your prompt should contain a highly detailed task description for the agent to perform autonomously and you should specify exactly what information the agent should return back to you in its final and only message to you.\n4. The agent's outputs should generally be trusted\n5. Clearly tell the agent whether you expect it to write code or just to do research (search, file reads, web fetches, etc.), since it is not aware of the user's intent. Tell it how to verify its work if possible (e.g., relevant test commands).\n6. If the agent description mentions that it should be used proactively, then you should try your best to use it without the user having to ask for it first. Use your judgement.\n\nAvailable agent types and the tools they have access to:\n- explore: Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. \"src/components/**/*.tsx\"), search code for keywords (eg. \"API endpoints\"), or answer questions about the codebase (eg. \"how do API endpoints work?\"). When calling this agent, specify the desired thoroughness level: \"quick\" for basic searches, \"medium\" for moderate exploration, or \"very thorough\" for comprehensive analysis across multiple locations and naming conventions.\n- general: General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string",
+                            "description": "A short (3-5 words) description of the task"
+                        },
+                        "prompt": {
+                            "type": "string",
+                            "description": "The task for the agent to perform"
+                        },
+                        "subagent_type": {
+                            "type": "string",
+                            "description": "The type of specialized agent to use for this task"
+                        },
+                        "task_id": {
+                            "type": "string",
+                            "description": "This should only be set if you mean to resume a previous task (you can pass a prior task_id and the task will continue the same subagent session as before instead of creating a fresh one)"
+                        },
+                        "command": {
+                            "type": "string",
+                            "description": "The command that triggered this task"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "prompt",
+                        "subagent_type"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "todowrite",
+                "description": "Create and maintain a structured task list for the current coding session. Tracks progress, organizes multi-step work, and surfaces status to the user.\n\n## When to use\nUse proactively when:\n- The task requires 3+ distinct steps or actions (not just 3 tool calls for a single conceptual step)\n- The work is non-trivial and benefits from planning\n- The user provides multiple tasks (numbered or comma-separated) or explicitly asks for a todo list\n- New instructions arrive - capture them as todos\n- You start a task - mark it `in_progress` (only one at a time) before working\n- You finish a task - mark it `completed` and add any follow-ups discovered during the work\n\n## When NOT to use\nSkip when:\n- The work is a single, straightforward task (or <3 trivial steps)\n- The request is purely informational or conversational\n- Tracking adds no organizational value\n\n## States\n- `pending` - not started\n- `in_progress` - actively working (exactly ONE at a time)\n- `completed` - finished successfully\n- `cancelled` - no longer needed\n\n## Rules\n- Update status in real time; don't batch completions\n- Mark `completed` only after the required work is actually done, including any required verification. Never based on intent.\n- Keep exactly one `in_progress` while work remains\n- If blocked or partial, keep it `in_progress` and add a follow-up todo describing the blocker\n- Preserve user-provided commands verbatim (flags, args, order)\n- Items should be specific and actionable; break large work into smaller steps\n\n## Examples\n\nUse it:\n- \"Add a dark mode toggle and run the tests\" -> multi-step feature + explicit verification\n- \"Rename getCwd -> getCurrentWorkingDirectory across the repo\" -> grep reveals 15 occurrences in 8 files\n- \"Implement registration, catalog, cart, checkout\" -> multiple complex features\n\nSkip it:\n- \"How do I print Hello World in Python?\" -> informational\n- \"Add a comment to calculateTotal\" -> single edit\n- \"Run npm install and tell me what happened\" -> one command\n\nWhen in doubt, use it.\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "todos": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "description": "Brief description of the task"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Current status of the task: pending, in_progress, completed, cancelled"
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "description": "Priority level of the task: high, medium, low"
+                                    }
+                                },
+                                "required": [
+                                    "content",
+                                    "status",
+                                    "priority"
+                                ]
+                            },
+                            "description": "The updated todo list"
+                        }
+                    },
+                    "required": [
+                        "todos"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "webfetch",
+                "description": "- Fetches content from a specified URL\n- Takes a URL and optional format as input\n- Fetches the URL content, converts to requested format (markdown by default)\n- Returns the content in the specified format\n- Use this tool when you need to retrieve and analyze web content\n\nUsage notes:\n  - IMPORTANT: if another tool is present that offers better web fetching capabilities, is more targeted to the task, or has fewer restrictions, prefer using that tool instead of this one.\n  - The URL must be a fully-formed valid URL\n  - HTTP URLs will be automatically upgraded to HTTPS\n  - Format options: \"markdown\" (default), \"text\", or \"html\"\n  - This tool is read-only and does not modify any files\n  - Results may be summarized if the content is very large\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "description": "The URL to fetch content from"
+                        },
+                        "format": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "enum": [
+                                        "text",
+                                        "markdown",
+                                        "html"
+                                    ],
+                                    "description": "The format to return the content in (text, markdown, or html). Defaults to markdown.",
+                                    "default": "markdown"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "timeout": {
+                            "type": "number",
+                            "description": "Optional timeout in seconds (max 120)"
+                        }
+                    },
+                    "required": [
+                        "url"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "write",
+                "description": "Writes a file to the local filesystem.\n\nUsage:\n- This tool will overwrite the existing file if there is one at the provided path.\n- If this is an existing file, you MUST use the Read tool first to read the file's contents. This tool will fail if you did not read the file first.\n- ALWAYS prefer editing existing files in the codebase. NEVER write new files unless explicitly required.\n- NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.\n- Only use emojis if the user explicitly requests it. Avoid writing emojis to files unless asked.\n",
+                "parameters": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string",
+                            "description": "The content to write to the file"
+                        },
+                        "filePath": {
+                            "type": "string",
+                            "description": "The absolute path to the file to write (must be absolute, not relative)"
+                        }
+                    },
+                    "required": [
+                        "content",
+                        "filePath"
+                    ]
+                }
+            }
+        }
+    ],
+    "tool_choice": "auto",
+    "stream": true,
+    "stream_options": {
+        "include_usage": true
+    }
+}
