@@ -193,6 +193,15 @@ async def stream_chat(
                                             "message_id": user_msg["id"],
                                         }
                                     )
+                                    if part.content:
+                                        thinking_text += part.content
+                                        await send_event(
+                                            {
+                                                "type": "thinking.delta",
+                                                "message_id": user_msg["id"],
+                                                "text": part.content,
+                                            }
+                                        )
                                 elif isinstance(part, TextPart):
                                     if not assistant_id:
                                         assistant_id = (
@@ -209,6 +218,16 @@ async def stream_chat(
                                             {
                                                 "type": "thinking.end",
                                                 "message_id": user_msg["id"],
+                                            }
+                                        )
+                                    if part.content:
+                                        full_text += part.content
+                                        await send_event(
+                                            {
+                                                "type": "stream.delta",
+                                                "message_id": user_msg["id"],
+                                                "part_id": assistant_id or "",
+                                                "text": part.content,
                                             }
                                         )
                                 elif isinstance(part, ToolCallPart):
