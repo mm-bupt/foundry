@@ -1,81 +1,9 @@
 import asyncio
+import json as _json
 from pathlib import Path
 
 from pydantic_ai import Agent, RunContext
 from foundry_app.agent.core import AgentDeps
-from foundry_app.db.database import get_db
-from foundry_app.db import crud
-import struct
-from foundry_app.config import settings
-
-
-async def _noop_embed() -> bytes:
-    dim = settings.embedding_dimensions
-    return struct.pack(f"{dim}f", *([0.0] * dim))
-
-
-def _resolve_path(work_dir: str, path: str) -> Path:
-    base = Path(work_dir).resolve()
-    target = (base / path).resolve() if not Path(path).is_absolute() else Path(path).resolve()
-    if not str(target).startswith(str(base)):
-        raise PermissionError(f"Path '{path}' is outside working directory")
-    return target
-
-
-def register_memory_tools(agent: Agent):
-    @agent.tool
-    async def store_memory(
-        ctx: RunContext[AgentDeps], content: str, category: str = "note"
-    ) -> str:
-        """Store important information to long-term memory.
-
-        Args:
-            content: The information to store.
-            category: One of "preference", "fact", "decision", "project", "note".
-        """
-        try:
-            embedding = await _noop_embed()
-            db = await get_db()
-            mem = await crud.store_memory(
-                db, ctx.deps.session_id, content, category, embedding
-            )
-            if ctx.deps.send_event:
-                await ctx.deps.send_event(
-                    {
-                        "type": "memory.stored",
-                        "memory_id": mem["id"],
-                        "content": content,
-                        "category": category,
-                    }
-                )
-            return f"Stored in memory (category: {category})."
-        except Exception as e:
-            return f"Failed to store memory: {e}"
-
-    @agent.tool
-    async def recall_memory(
-        ctx: RunContext[AgentDeps], query: str, limit: int = 5
-    ) -> str:
-        """Search long-term memory for relevant information.
-
-        Args:
-            query: The search query.
-            limit: Max results to return (default 5).
-        """
-        return "No relevant memories found."
-
-    @agent.tool
-    async def list_all_memories(ctx: RunContext[AgentDeps]) -> str:
-        """List all stored memories for the current session."""
-        try:
-            db = await get_db()
-            memories = await crud.list_memory(db, ctx.deps.session_id)
-            if not memories:
-                return "No memories stored yet."
-            lines = [f"- [{m['category']}] {m['content']}" for m in memories]
-            return "\n".join(lines)
-        except Exception as e:
-            return f"Failed to list memories: {e}"
 
 
 def register_file_tools(agent: Agent):
@@ -117,33 +45,6 @@ def register_file_tools(agent: Agent):
             return f"Error writing file: {e}"
 
     @agent.tool
-    async def list_files(ctx: RunContext[AgentDeps], path: str = ".") -> str:
-        """List files and directories in a path. Relative paths are resolved against the working directory.
-
-        Args:
-            path: Directory path (relative or absolute). Defaults to working directory.
-        """
-        try:
-            target = _resolve_path(ctx.deps.work_dir, path)
-            if not target.is_dir():
-                return f"Error: '{path}' is not a directory or does not exist."
-            entries = sorted(target.iterdir())
-            lines = []
-            for entry in entries:
-                if entry.is_dir():
-                    lines.append(f"{entry.name}/")
-                else:
-                    size = entry.stat().st_size
-                    lines.append(f"{entry.name} ({size} bytes)")
-            if not lines:
-                return "(empty directory)"
-            return "\n".join(lines)
-        except PermissionError as e:
-            return f"Error: {e}"
-        except Exception as e:
-            return f"Error listing files: {e}"
-
-    @agent.tool
     async def run_command(
         ctx: RunContext[AgentDeps], command: str, timeout: int = 120
     ) -> str:
@@ -175,3 +76,270 @@ def register_file_tools(agent: Agent):
             return f"Error: command timed out after {timeout}s."
         except Exception as e:
             return f"Error running command: {e}"
+
+
+def register_search_tools(agent: Agent):
+    """Register file search tools (glob, grep). Requires ripgrep."""
+
+    _RG_INSTALL_HINT = (
+        "Error: ripgrep (rg) is not installed.\n"
+        "Install with:\n"
+        "  Windows: winget install BurntSushi.ripgrep\n"
+        "  macOS:   brew install ripgrep\n"
+        "  Linux:   apt install ripgrep / pacman -S ripgrep\n"
+        "  Or visit: https://github.com/BurntSushi/ripgrep"
+    )
+
+    @agent.tool
+    async def glob(ctx: RunContext[AgentDeps], pattern: str, path: str = "") -> str:
+        """Fast file pattern matching tool that works with any codebase size.
+        Supports glob patterns like "**/*.py" or "src/**/*.ts".
+        Returns matching file paths sorted by modification time (newest first).
+
+        Args:
+            pattern: The glob pattern to match files against (e.g. "**/*.js").
+            path: The directory to search in. Defaults to working directory.
+        """
+        try:
+            search_dir = _resolve_path(ctx.deps.work_dir, path) if path else Path(ctx.deps.work_dir).resolve()
+            if not search_dir.is_dir():
+                return f"Error: '{path}' is not a directory."
+
+            args = [
+                "rg", "--no-config", "--files",
+                "--glob=!.git/*", f"--glob={pattern}", ".",
+            ]
+            proc = await asyncio.create_subprocess_exec(
+                *args,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=str(search_dir),
+            )
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
+
+            if proc.returncode == 2:
+                return f"Error: ripgrep failed — {stderr.decode(errors='replace')}"
+
+            raw = stdout.decode("utf-8", errors="replace").strip()
+            lines = raw.split("\n") if raw else []
+            if not lines:
+                return "No files found"
+
+            limit = 100
+            files = []
+            for line in lines:
+                full = search_dir / line
+                try:
+                    mtime = full.stat().st_mtime
+                    files.append((str(full), mtime))
+                except OSError:
+                    continue
+
+            files.sort(key=lambda x: x[1], reverse=True)
+            truncated = len(files) > limit
+            files = files[:limit]
+
+            result = "\n".join(f[0] for f in files)
+            if truncated:
+                result += "\n(Results are truncated. Consider using a more specific path or pattern.)"
+            return result
+        except FileNotFoundError:
+            return _RG_INSTALL_HINT
+        except asyncio.TimeoutError:
+            return "Error: glob search timed out."
+        except Exception as e:
+            return f"Error: {e}"
+
+    @agent.tool
+    async def grep(
+        ctx: RunContext[AgentDeps],
+        pattern: str,
+        path: str = "",
+        include: str = "",
+    ) -> str:
+        """Fast content search tool that works with any codebase size.
+        Searches file contents using regular expressions.
+        Filter files by pattern with the include parameter.
+
+        Args:
+            pattern: The regex pattern to search for in file contents.
+            path: The directory to search in. Defaults to working directory.
+            include: File pattern to include (e.g. "*.py", "*.{ts,tsx}").
+        """
+        try:
+            search_dir = _resolve_path(ctx.deps.work_dir, path) if path else Path(ctx.deps.work_dir).resolve()
+            if not search_dir.is_dir():
+                return f"Error: '{path}' is not a directory."
+
+            args = [
+                "rg", "--no-config", "--json", "--hidden",
+                "--glob=!.git/*", "--no-messages",
+            ]
+            if include:
+                args.append(f"--glob={include}")
+            args.extend(["--", pattern, "."])
+
+            proc = await asyncio.create_subprocess_exec(
+                *args,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=str(search_dir),
+            )
+            stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=30)
+
+            if not stdout.strip():
+                return "No files found"
+
+            file_matches: dict[str, list[tuple[int, str]]] = {}
+            for line in stdout.decode("utf-8", errors="replace").strip().split("\n"):
+                try:
+                    data = _json.loads(line)
+                    if data.get("type") != "match":
+                        continue
+                    d = data["data"]
+                    filepath = str(search_dir / d["path"]["text"])
+                    ln = d["line_number"]
+                    text = d["lines"]["text"].rstrip("\n")
+                    if len(text) > 2000:
+                        text = text[:2000] + "..."
+                    file_matches.setdefault(filepath, []).append((ln, text))
+                except (_json.JSONDecodeError, KeyError):
+                    continue
+
+            if not file_matches:
+                return "No files found"
+
+            sorted_files = sorted(
+                file_matches.items(),
+                key=lambda x: Path(x[0]).stat().st_mtime if Path(x[0]).exists() else 0,
+                reverse=True,
+            )
+
+            total = sum(len(v) for _, v in sorted_files)
+            limit = 100
+            truncated = total > limit
+
+            parts: list[str] = []
+            count = 0
+            for filepath, matches in sorted_files:
+                parts.append(f"\n{filepath}:")
+                for ln, text in matches:
+                    if count >= limit:
+                        break
+                    parts.append(f"  Line {ln}: {text}")
+                    count += 1
+                if count >= limit:
+                    break
+
+            if truncated:
+                parts.append(
+                    f"\n(Results are truncated: showing first {limit} matches. "
+                    "Consider using a more specific path or pattern.)"
+                )
+
+            return f"Found {total} matches\n" + "\n".join(parts)
+        except FileNotFoundError:
+            return _RG_INSTALL_HINT
+        except asyncio.TimeoutError:
+            return "Error: grep search timed out."
+        except Exception as e:
+            return f"Error: {e}"
+
+
+def register_skill_tools(agent: Agent):
+    """Register skill loading tool."""
+
+    @agent.tool
+    async def skill(ctx: RunContext[AgentDeps], name: str) -> str:
+        """Load a specialized skill when the task at hand matches one of the skills listed in the system prompt.
+        Use this tool to inject the skill's instructions and resources into current conversation.
+        The output may contain detailed workflow guidance as well as references to scripts, files, etc
+        in the same directory as the skill.
+        The skill name must match one of the skills listed in your system prompt.
+
+        Args:
+            name: The name of the skill from available_skills.
+        """
+        try:
+            from foundry_app.agent.system_prompt import _scan_skills
+
+            skills = _scan_skills(ctx.deps.work_dir)
+            matched = None
+            for s in skills:
+                if s["name"] == name:
+                    matched = s
+                    break
+
+            if matched is None:
+                available = ", ".join(s["name"] for s in skills) if skills else "none"
+                return (
+                    f'Error: Skill "{name}" not found. '
+                    f"Available skills: {available}"
+                )
+
+            location = matched["location"]
+            if location.startswith("file:///"):
+                from urllib.parse import unquote as _unquote
+                skill_path = Path(_unquote(location[7:]))
+            else:
+                skill_path = Path(location)
+
+            if not skill_path.is_file():
+                return f"Error: Skill file not found at {skill_path}"
+
+            content = skill_path.read_text(encoding="utf-8", errors="replace")
+            body = _strip_frontmatter(content)
+            skill_dir = skill_path.parent
+
+            files = _list_skill_files(skill_dir)
+
+            base_uri = skill_dir.as_uri()
+            parts = [
+                f'<skill_content name="{name}">',
+                f"# Skill: {name}",
+                "",
+                body.strip(),
+                "",
+                f"Base directory for this skill: {base_uri}",
+                "Relative paths in this skill (e.g., scripts/, reference/) are relative to this base directory.",
+                "Note: file list is sampled.",
+                "",
+                "<skill_files>",
+            ]
+            parts.extend(f"<file>{f}</file>" for f in files)
+            parts.append("</skill_files>")
+            parts.append("</skill_content>")
+
+            return "\n".join(parts)
+        except Exception as e:
+            return f"Error loading skill: {e}"
+
+
+def _strip_frontmatter(text: str) -> str:
+    if not text.startswith("---"):
+        return text
+    end = text.find("---", 3)
+    if end == -1:
+        return text
+    return text[end + 3:].strip()
+
+
+def _list_skill_files(skill_dir: Path, limit: int = 10) -> list[str]:
+    files: list[str] = []
+    try:
+        for child in sorted(skill_dir.rglob("*")):
+            if child.is_file() and child.name != "SKILL.md":
+                files.append(str(child))
+                if len(files) >= limit:
+                    break
+    except Exception:
+        pass
+    return files
+
+
+def _resolve_path(work_dir: str, path: str) -> Path:
+    base = Path(work_dir).resolve()
+    target = (base / path).resolve() if not Path(path).is_absolute() else Path(path).resolve()
+    if not str(target).startswith(str(base)):
+        raise PermissionError(f"Path '{path}' is outside working directory")
+    return target

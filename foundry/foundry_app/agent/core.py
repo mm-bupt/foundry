@@ -26,24 +26,10 @@ from pydantic_ai.agent import ModelRequestNode, CallToolsNode
 
 from foundry_app.agent.registry import get_provider_prefix, get_model_info
 from foundry_app.agent.context import trim_and_summarize
+from foundry_app.agent.system_prompt import build_system_prompt
 from foundry_app.db import crud
 from foundry_app.db.database import get_db
 from foundry_app.config import settings
-
-
-SYSTEM_PROMPT = """You are Dream Foundry AI, a helpful coding assistant.
-
-You have access to long-term memory. Use `recall_memory` before responding \
-to check for relevant user preferences and past context. Use `store_memory` \
-when the user shares important information worth remembering (preferences, \
-project details, decisions made).
-
-You have file operation tools. Use `read_file`, `write_file`, `list_files`, \
-and `run_command` to work with files in the user's project. All relative \
-paths are resolved against the working directory.
-
-Be concise, direct, and helpful. Format code with markdown code blocks.
-Respond in the same language the user uses."""
 
 
 @dataclass
@@ -58,8 +44,9 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
     model_info = get_model_info(model_id)
     model_string = get_provider_prefix(model_id)
 
-    instructions = system_prompt or SYSTEM_PROMPT
-    instructions += f"\n\nYour working directory is: {settings.work_dir}"
+    instructions = build_system_prompt(
+        model_id, str(settings.work_dir), custom_prompt=system_prompt
+    )
 
     if model_info and model_info.api_base:
         api_key = model_info.api_key or _resolve_api_key(model_info.provider)
@@ -118,10 +105,11 @@ def _create_model_client(model_string: str, provider: str, api_key: str, base_ur
 
 
 def _register_tools(agent: Agent):
-    from foundry_app.agent.tools import register_memory_tools, register_file_tools
+    from foundry_app.agent.tools import register_file_tools, register_search_tools, register_skill_tools
 
-    register_memory_tools(agent)
     register_file_tools(agent)
+    register_search_tools(agent)
+    register_skill_tools(agent)
 
 
 async def stream_chat(
