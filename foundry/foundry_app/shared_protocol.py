@@ -8,6 +8,7 @@ class ChatMessageCmd:
     type: str = "chat.message"
     message_id: str = ""
     content: str = ""
+    model_id: str = ""
 
 
 @dataclass
@@ -88,6 +89,7 @@ def parse_command(data: dict) -> ChatMessageCmd | None:
         return ChatMessageCmd(
             message_id=data.get("message_id", str(uuid.uuid4())),
             content=data.get("content", ""),
+            model_id=data.get("model_id", ""),
         )
     return None
 

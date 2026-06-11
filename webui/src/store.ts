@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment } from "./types"
-import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel } from "./api"
+import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel, updateSession } from "./api"
 
 interface AppState {
   sessions: Session[]
@@ -124,7 +124,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  setCurrentModel: (modelId) => set({ currentModel: modelId }),
+  setCurrentModel: (modelId) => {
+    set({ currentModel: modelId })
+    const sid = get().currentSessionId
+    if (sid) {
+      updateSession(sid, { model_id: modelId })
+    }
+  },
   setStatus: (status) => set({ status }),
   setConnected: (connected) => set({ connected }),
 

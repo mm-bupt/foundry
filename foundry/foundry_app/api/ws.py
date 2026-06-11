@@ -51,14 +51,15 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
 
             if msg_type == "chat.message":
                 content = data.get("content", "")
+                model_id = data.get("model_id") or None
                 if not content:
                     continue
 
                 if pending_task and not pending_task.done():
                     pending_task.cancel()
 
-                async def run_chat(content=content):
-                    await stream_chat(session_id, content, send_event)
+                async def run_chat(content=content, model_id=model_id):
+                    await stream_chat(session_id, content, send_event, model_id_override=model_id)
 
                 pending_task = asyncio.create_task(run_chat())
                 continue

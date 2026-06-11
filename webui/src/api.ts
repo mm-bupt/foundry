@@ -48,3 +48,10 @@ export async function fetchModels(): Promise<Model[]> {
 export async function fetchActiveModel(): Promise<{ model_id: string; provider: string } | null> {
   return request<{ model_id: string; provider: string }>("/models/active")
 }
+
+export async function updateSession(sessionId: string, data: { model_id?: string; title?: string }): Promise<Session | null> {
+  return request<Session>(`/sessions/${sessionId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  })
+}

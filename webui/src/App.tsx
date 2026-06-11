@@ -106,7 +106,8 @@ export default function App() {
   }, [currentSessionId, ws])
 
   function handleSend(content: string) {
-    ws.send(content)
+    const model = useAppStore.getState().currentModel
+    ws.send(content, model)
   }
 
   function handleInterrupt() {

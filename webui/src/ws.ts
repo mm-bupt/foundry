@@ -51,15 +51,17 @@ export function createWSClient() {
     }
   }
 
-  function send(content: string) {
+  function send(content: string, modelId?: string) {
     if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({
-          type: "chat.message",
-          content,
-          message_id: crypto.randomUUID(),
-        })
-      )
+      const msg: Record<string, string> = {
+        type: "chat.message",
+        content,
+        message_id: crypto.randomUUID(),
+      }
+      if (modelId) {
+        msg.model_id = modelId
+      }
+      ws.send(JSON.stringify(msg))
     }
   }
 

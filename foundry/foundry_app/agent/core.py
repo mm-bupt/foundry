@@ -27,6 +27,7 @@ from pydantic_ai.messages import (
     FunctionToolResultEvent,
 )
 from pydantic_ai.agent import ModelRequestNode, CallToolsNode
+from pydantic_ai.capabilities import ProcessHistory
 
 from foundry_app.agent.registry import get_provider_prefix, get_model_info
 from foundry_app.agent.context import trim_and_summarize
@@ -61,14 +62,14 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
             model_obj,
             instructions=instructions,
             deps_type=AgentDeps,
-            history_processors=[trim_and_summarize],
+            capabilities=[ProcessHistory(trim_and_summarize)],
         )
     else:
         agent = Agent(
             model_string,
             instructions=instructions,
             deps_type=AgentDeps,
-            history_processors=[trim_and_summarize],
+            capabilities=[ProcessHistory(trim_and_summarize)],
         )
     _register_tools(agent)
     return agent
@@ -86,10 +87,15 @@ def _create_model_client(model_string: str, provider: str, api_key: str, base_ur
     model_name = model_string.split(":", 1)[-1] if ":" in model_string else model_string
     if provider == "anthropic":
         try:
+            from anthropic import AsyncAnthropic
             from pydantic_ai.models.anthropic import AnthropicModel
             from pydantic_ai.providers.anthropic import AnthropicProvider
 
-            provider_obj = AnthropicProvider(api_key=api_key)
+            if base_url:
+                client = AsyncAnthropic(base_url=base_url, api_key=api_key)
+                provider_obj = AnthropicProvider(anthropic_client=client)
+            else:
+                provider_obj = AnthropicProvider(api_key=api_key)
             return AnthropicModel(model_name, provider=provider_obj)
         except Exception:
             import traceback
@@ -120,6 +126,7 @@ async def stream_chat(
     session_id: str,
     user_message: str,
     send_event: Callable[[dict], Awaitable[None]],
+    model_id_override: str | None = None,
 ):
     logger.debug("stream_chat start | session=%s msg_len=%d", session_id, len(user_message))
     db = await get_db()
@@ -136,7 +143,7 @@ async def stream_chat(
         )
         return
 
-    model_id = session["model_id"]
+    model_id = model_id_override or session["model_id"]
     logger.debug("resolved model: %s", model_id)
     model_info = get_model_info(model_id)
     if not model_info:
