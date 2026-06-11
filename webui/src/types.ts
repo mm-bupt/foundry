@@ -11,12 +11,34 @@ export interface SessionDetail extends Session {
   messages: Message[]
 }
 
+export interface ToolCall {
+  toolCallId: string
+  toolName: string
+  args: Record<string, unknown>
+  result?: string
+  status: "running" | "done"
+}
+
+export interface TextSegment {
+  type: "text"
+  content: string
+}
+
+export interface ToolCallSegment {
+  type: "tool_call"
+  toolCall: ToolCall
+}
+
+export type StreamSegment = TextSegment | ToolCallSegment
+
 export interface Message {
   id: string
   session_id: string
   role: "user" | "assistant"
   content: string
-  thinking_content: string
+  thinking_content: string | null
+  tool_calls: ToolCall[]
+  segments?: StreamSegment[]
   model_id: string | null
   tokens_in: number | null
   tokens_out: number | null

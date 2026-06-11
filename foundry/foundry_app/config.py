@@ -5,14 +5,14 @@ from foundry_app.yaml_config import foundry_config
 
 
 class Settings(BaseSettings):
-    app_name: str = "Dream Foundry"
+    app_name: str = "Foundry"
     app_version: str = "0.1.0"
     debug: bool = False
 
     host: str = "0.0.0.0"
     port: int = 8000
 
-    db_path: Path = Path.home() / ".dream-foundry" / "dream-foundry.db"
+    db_path: Path = Path.home() / ".foundry" / "foundry.db"
     work_dir: Path = Path.cwd()
 
     openai_api_key: str = ""
@@ -30,9 +30,10 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["*"]
 
     model_config = {
-        "env_prefix": "DREAM_FOUNDRY_",
+        "env_prefix": "FOUNDRY_",
         "env_file": ".env",
         "env_file_encoding": "utf-8",
+        "extra": "ignore",
     }
 
 

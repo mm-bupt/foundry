@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    Dream Foundry Dev Launcher (PowerShell)
+    Foundry Dev Launcher (PowerShell)
 .DESCRIPTION
     Starts backend and/or UI for development.
 .EXAMPLE
@@ -16,6 +16,11 @@ param(
 )
 
 $RootDir = Resolve-Path (Join-Path $PSScriptRoot "..")
+$VenvPython = if (Test-Path (Join-Path $RootDir ".venv\Scripts\python.exe")) {
+    Join-Path $RootDir ".venv\Scripts\python.exe"
+} else {
+    "python"
+}
 $BackendPid = $null
 $WebUiPid = $null
 
@@ -32,17 +37,16 @@ function Cleanup {
 
 trap { Cleanup; break }
 
-Write-Host "Dream Foundry Dev (WebUI)" -ForegroundColor Cyan
+Write-Host "Foundry Dev (WebUI)" -ForegroundColor Cyan
 Write-Host ""
 
 if ($Target -in "all", "backend") {
     Write-Host "Starting backend..." -ForegroundColor Green
-    Push-Location (Join-Path $RootDir "foundry")
-    $backendProc = Start-Process -FilePath "python" `
-        -ArgumentList "-m", "uvicorn", "foundry_app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" `
+    $backendProc = Start-Process -FilePath $VenvPython `
+        -ArgumentList "-m", "uvicorn", "foundry_app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", (Join-Path $RootDir "foundry" "foundry_app") `
+        -WorkingDirectory $RootDir `
         -PassThru -NoNewWindow
     $BackendPid = $backendProc.Id
-    Pop-Location
 }
 
 if ($Target -eq "all") {

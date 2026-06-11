@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { Session, Message, Model, AppStatus } from "./types"
+import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment } from "./types"
 import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel } from "./api"
 
 interface AppState {
@@ -9,7 +9,7 @@ interface AppState {
   models: Model[]
   currentModel: string
   status: AppStatus
-  streamingText: string
+  streamSegments: StreamSegment[]
   streamingMessageId: string
   thinkingText: string
   isThinking: boolean
@@ -24,6 +24,8 @@ interface AppState {
   setCurrentModel: (modelId: string) => void
   setStatus: (status: AppStatus) => void
   setConnected: (connected: boolean) => void
+  addToolCall: (tc: ToolCall) => void
+  updateToolResult: (toolCallId: string, result: string) => void
   startStreaming: (messageId: string) => void
   appendStreamText: (text: string) => void
   finalizeStream: () => void
@@ -40,6 +42,13 @@ interface AppState {
   setSessions: (sessions: Session[]) => void
 }
 
+function getStreamingText(segments: StreamSegment[]): string {
+  return segments
+    .filter((seg): seg is TextSegment => seg.type === "text")
+    .map((seg) => seg.content)
+    .join("")
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   sessions: [],
   currentSessionId: "",
@@ -47,7 +56,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   models: [],
   currentModel: "",
   status: "idle",
-  streamingText: "",
+  streamSegments: [],
   streamingMessageId: "",
   thinkingText: "",
   isThinking: false,
@@ -73,7 +82,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentSessionId: id,
       messages: [],
       status: "idle",
-      streamingText: "",
+      streamSegments: [],
       streamingMessageId: "",
       thinkingText: "",
       isThinking: false,
@@ -96,7 +105,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentSessionId: session.id,
       messages: [],
       status: "idle",
-      streamingText: "",
+      streamSegments: [],
       streamingMessageId: "",
     }))
   },
@@ -119,23 +128,53 @@ export const useAppStore = create<AppState>((set, get) => ({
   setStatus: (status) => set({ status }),
   setConnected: (connected) => set({ connected }),
 
+  addToolCall: (tc) =>
+    set((s) => ({
+      streamSegments: [...s.streamSegments, { type: "tool_call", toolCall: tc }],
+    })),
+
+  updateToolResult: (toolCallId, result) =>
+    set((s) => ({
+      streamSegments: s.streamSegments.map((seg) =>
+        seg.type === "tool_call" && seg.toolCall.toolCallId === toolCallId
+          ? { ...seg, toolCall: { ...seg.toolCall, result, status: "done" as const } }
+          : seg
+      ),
+    })),
+
   startStreaming: (messageId) =>
-    set({ status: "streaming", streamingText: "", streamingMessageId: messageId }),
+    set({ status: "streaming", streamSegments: [], streamingMessageId: messageId }),
 
   appendStreamText: (text) =>
-    set((s) => ({ streamingText: s.streamingText + text })),
+    set((s) => {
+      const segs = [...s.streamSegments]
+      const last = segs[segs.length - 1]
+      if (last && last.type === "text") {
+        segs[segs.length - 1] = { type: "text", content: last.content + text }
+      } else {
+        segs.push({ type: "text", content: text })
+      }
+      return { streamSegments: segs }
+    }),
 
   finalizeStream: () =>
-    set({ status: "idle", streamingText: "", streamingMessageId: "" }),
+    set({ status: "idle", streamSegments: [], streamingMessageId: "" }),
 
   finalizeStreamWithMessage: () => {
     const s = get()
+    if (s.status === "idle") return
+    const fullText = getStreamingText(s.streamSegments)
+    const toolCalls = s.streamSegments
+      .filter((seg): seg is { type: "tool_call"; toolCall: ToolCall } => seg.type === "tool_call")
+      .map((seg) => seg.toolCall)
     const assistantMsg: Message = {
       id: s.streamingMessageId || crypto.randomUUID(),
       session_id: s.currentSessionId,
       role: "assistant",
-      content: s.streamingText,
-      thinking_content: s.thinkingText,
+      content: fullText,
+      thinking_content: s.thinkingText || null,
+      tool_calls: toolCalls,
+      segments: [...s.streamSegments],
       model_id: null,
       tokens_in: null,
       tokens_out: null,
@@ -144,7 +183,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
     set({
       status: "idle",
-      streamingText: "",
+      streamSegments: [],
       streamingMessageId: "",
       isThinking: false,
       thinkingText: "",

@@ -9,10 +9,12 @@ from foundry_app.db.database import init_db, get_db, close_db
 from foundry_app.api import sessions, models, memory
 from foundry_app.api.ws import router as ws_router
 from foundry_app.api.sse import router as sse_router
+from foundry_app.logger import setup_logging
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    setup_logging(debug=settings.debug)
     db = await get_db()
     await init_db(db)
     yield

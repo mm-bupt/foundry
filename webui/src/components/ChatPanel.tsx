@@ -5,7 +5,8 @@ import { Alert, Select, Button, Tooltip } from "antd"
 import { CopyOutlined, CheckOutlined } from "@ant-design/icons"
 import { useAppStore } from "../store"
 import { MarkdownContent } from "./MarkdownContent"
-import type { Message } from "../types"
+import { ToolCallBlock } from "./ToolCallBlock"
+import type { Message, StreamSegment, TextSegment } from "../types"
 
 interface ChatItem {
   key: string
@@ -13,11 +14,19 @@ interface ChatItem {
   content: string
   thinkingText?: string
   isThinking?: boolean
+  segments?: StreamSegment[]
+}
+
+function getSegmentsText(segments: StreamSegment[]): string {
+  return segments
+    .filter((seg): seg is TextSegment => seg.type === "text")
+    .map((seg) => seg.content)
+    .join("")
 }
 
 function messagesToItems(
   messages: Message[],
-  streamingText: string,
+  streamSegments: StreamSegment[],
   streamingMessageId: string,
   thinkingText: string,
   isThinking: boolean,
@@ -28,19 +37,38 @@ function messagesToItems(
     content: m.content,
     thinkingText: m.thinking_content || undefined,
     isThinking: false,
+    segments: m.segments,
   }))
 
-  if (streamingMessageId && (streamingText || isThinking)) {
+  if (streamingMessageId && (streamSegments.length > 0 || isThinking)) {
     items.push({
       key: streamingMessageId,
       role: "ai",
-      content: streamingText,
+      content: getSegmentsText(streamSegments),
       thinkingText,
       isThinking,
+      segments: streamSegments,
     })
   }
 
   return items
+}
+
+function SegmentRenderer({ segments, fallback }: { segments?: StreamSegment[]; fallback: string }) {
+  if (!segments || segments.length === 0) {
+    return <MarkdownContent>{fallback}</MarkdownContent>
+  }
+  return (
+    <>
+      {segments.map((seg, i) => {
+        if (seg.type === "text") {
+          if (!seg.content) return null
+          return <MarkdownContent key={i}>{seg.content}</MarkdownContent>
+        }
+        return <ToolCallBlock key={seg.toolCall.toolCallId} toolCall={seg.toolCall} />
+      })}
+    </>
+  )
 }
 
 interface ChatPanelProps {
@@ -78,7 +106,7 @@ function CopyRawButton({ text }: { text: string }) {
 export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
   const messages = useAppStore((s) => s.messages)
   const status = useAppStore((s) => s.status)
-  const streamingText = useAppStore((s) => s.streamingText)
+  const streamSegments = useAppStore((s) => s.streamSegments)
   const streamingMessageId = useAppStore((s) => s.streamingMessageId)
   const currentSessionId = useAppStore((s) => s.currentSessionId)
   const errorMessage = useAppStore((s) => s.errorMessage)
@@ -92,9 +120,9 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
   const [inputValue, setInputValue] = useState("")
   const bubbleListRef = useRef<BubbleListRef>(null)
 
-  const items = messagesToItems(messages, streamingText, streamingMessageId, thinkingText, isThinking)
+  const items = messagesToItems(messages, streamSegments, streamingMessageId, thinkingText, isThinking)
   const isStreaming = status === "streaming" || status === "thinking"
-  const isLastItemStreaming = !!(streamingMessageId && (streamingText || isThinking))
+  const isLastItemStreaming = !!(streamingMessageId && (streamSegments.length > 0 || isThinking))
 
   function handleSubmit(message: string) {
     if (!message.trim()) return
@@ -105,6 +133,8 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
       session_id: store.currentSessionId,
       role: "user",
       content: message,
+      thinking_content: null,
+      tool_calls: [],
       model_id: null,
       tokens_in: null,
       tokens_out: null,
@@ -147,7 +177,11 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
               item.role === "ai"
             return {
               key: item.key,
-              content: item.content,
+              content: item.role === "ai"
+                ? ((
+                    <SegmentRenderer segments={item.segments} fallback={item.content} />
+                  ) as unknown as string)
+                : item.content,
               role: item.role,
               streaming: isStreamingBubble,
               header: (item.thinkingText || item.isThinking)
@@ -159,6 +193,13 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
                     >
                       {item.thinkingText && <MarkdownContent>{item.thinkingText}</MarkdownContent>}
                     </Think>
+                  ) as React.ReactNode)
+                : undefined,
+              footer: item.role === "ai"
+                ? ((
+                    <div style={{ borderTop: "1px solid #f0f0f0", marginTop: 4, paddingTop: 4, display: "flex", justifyContent: "flex-end" }}>
+                      <CopyRawButton text={item.content} />
+                    </div>
                   ) as React.ReactNode)
                 : undefined,
             }
@@ -173,14 +214,6 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
                 content: { maxWidth: "unset", margin: 0, width: "auto" },
                 footer: { maxWidth: "unset", margin: 0 },
               },
-              contentRender: (content: string) => (
-                <MarkdownContent>{content}</MarkdownContent>
-              ),
-              footer: (content: string) => (
-                <div style={{ borderTop: "1px solid #f0f0f0", marginTop: 4, paddingTop: 4, display: "flex", justifyContent: "flex-end" }}>
-                  <CopyRawButton text={content} />
-                </div>
-              ),
             },
             user: {
               placement: "end" as const,

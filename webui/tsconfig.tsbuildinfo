@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/store.ts","./src/types.ts","./src/ws.ts","./src/components/chatpanel.tsx"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/store.ts","./src/types.ts","./src/ws.ts","./src/components/chatpanel.tsx","./src/components/markdowncontent.tsx","./src/components/toolcallblock.tsx"],"version":"5.9.3"}

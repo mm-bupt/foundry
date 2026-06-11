@@ -1,8 +1,8 @@
-# Dream Foundry — Design Documents
+# Foundry — Design Documents
 
 ## Overview
 
-Dream Foundry is a full-stack AI Agent application with a separated backend (Python/FastAPI + Pydantic AI) and TUI frontend (Python/Textual), styled to match the opencode terminal UI.
+Foundry is a full-stack AI Agent application with a separated backend (Python/FastAPI + Pydantic AI) and TUI frontend (Python/Textual), styled to match the opencode terminal UI.
 
 ## Documents
 

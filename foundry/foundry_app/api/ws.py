@@ -5,6 +5,9 @@ import time
 
 from foundry_app.agent.core import stream_chat
 from foundry_app.shared_protocol import parse_command, to_dict, Pong
+from foundry_app.logger import get_logger
+
+logger = get_logger("api.ws")
 
 router = APIRouter()
 
@@ -12,6 +15,7 @@ router = APIRouter()
 @router.websocket("/ws/{session_id}")
 async def websocket_chat(websocket: WebSocket, session_id: str):
     await websocket.accept()
+    logger.debug("ws connected | session=%s", session_id)
 
     pending_task: asyncio.Task | None = None
 
@@ -31,6 +35,7 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
 
             data = json.loads(raw)
             msg_type = data.get("type", "")
+            logger.debug("ws recv | session=%s type=%s", session_id, msg_type)
 
             if msg_type == "ping":
                 await send_event(to_dict(Pong()))
@@ -40,6 +45,8 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                 if pending_task and not pending_task.done():
                     pending_task.cancel()
                     pending_task = None
+                else:
+                    await send_event({"type": "stream.done"})
                 continue
 
             if msg_type == "chat.message":
@@ -57,7 +64,7 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                 continue
 
     except WebSocketDisconnect:
-        pass
+        logger.debug("ws disconnected | session=%s", session_id)
     except Exception:
         pass
     finally:

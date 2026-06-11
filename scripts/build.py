@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Dream Foundry — Build Script
-Produces a self-contained dist/dream-foundry/ folder:
-  dist/dream-foundry/
-  ├── dream-foundry.bat (or .sh)   ← single entry point
+Foundry — Build Script
+Produces a self-contained dist/foundry/ folder:
+  dist/foundry/
+  ├── foundry.bat (or .sh)   ← single entry point
   ├── bin/
-  │   ├── dream-foundry-server.exe ← PyInstaller backend
-  │   └── bun.exe                  ← bundled Bun runtime
+  │   ├── foundry-server.exe ← PyInstaller backend
+  │   └── bun.exe            ← bundled Bun runtime
   └── lib/
-      └── tui/                     ← TUI sources + node_modules
+      └── tui/               ← TUI sources + node_modules
 """
 
 import json
@@ -20,7 +20,7 @@ import platform
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-DIST = ROOT / "dist" / "dream-foundry"
+DIST = ROOT / "dist" / "foundry"
 FOUNDRY = ROOT / "foundry"
 TUI = ROOT / "tui"
 
@@ -120,7 +120,7 @@ def build_backend():
 
     cmd = [
         sys.executable, "-m", "PyInstaller",
-        "--name", "dream-foundry-server",
+        "--name", "foundry-server",
         "--distpath", str(bin_dir),
         "--workpath", str(DIST.parent / ".build_backend"),
         "--specpath", str(DIST.parent),
@@ -146,7 +146,7 @@ def build_backend():
     run(cmd)
 
     shutil.rmtree(DIST.parent / ".build_backend", ignore_errors=True)
-    exe_name = "dream-foundry-server.exe" if IS_WINDOWS else "dream-foundry-server"
+    exe_name = "foundry-server.exe" if IS_WINDOWS else "foundry-server"
     exe_path = bin_dir / exe_name
     if not exe_path.exists():
         print(f"ERROR: Backend binary not found at {exe_path}")
@@ -184,16 +184,16 @@ def bundle_bun():
 
 def build_launcher():
     print("\n=== [4/4] Building Launcher ===")
-    server_name = "dream-foundry-server.exe" if IS_WINDOWS else "dream-foundry-server"
+    server_name = "foundry-server.exe" if IS_WINDOWS else "foundry-server"
     bun_name = "bun.exe" if IS_WINDOWS else "bun"
 
     if IS_WINDOWS:
-        launcher_path = DIST / "dream-foundry.bat"
+        launcher_path = DIST / "foundry.bat"
         content = f"""@echo off
 setlocal EnableDelayedExpansion
-title Dream Foundry
+title Foundry
 
-echo Dream Foundry v0.1.0
+echo Foundry v0.1.0
 echo.
 
 set "ROOT=%~dp0"
@@ -229,18 +229,18 @@ cd /d "%TUI_DIR%"
 set TUI_EXIT=%errorlevel%
 
 echo Cleaning up...
-for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq {server_name}" /NH 2^>nul ^| findstr /i dream-foundry') do (
+for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq {server_name}" /NH 2^>nul ^| findstr /i foundry') do (
     taskkill /F /PID %%a >nul 2>&1
 )
 
 exit /b %TUI_EXIT%
 """
     else:
-        launcher_path = DIST / "dream-foundry.sh"
+        launcher_path = DIST / "foundry.sh"
         content = f"""#!/usr/bin/env bash
 set -e
 
-echo "Dream Foundry v0.1.0"
+echo "Foundry v0.1.0"
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -290,9 +290,9 @@ def print_summary():
     print(f"  Output: {DIST}")
     print(f"  Size: {total / (1024*1024):.1f} MB")
     if IS_WINDOWS:
-        print(f"  Run: dist\\dream-foundry\\dream-foundry.bat")
+        print(f"  Run: dist\\foundry\\foundry.bat")
     else:
-        print(f"  Run: ./dist/dream-foundry/dream-foundry.sh")
+        print(f"  Run: ./dist/foundry/foundry.sh")
     print(f"{'='*50}\033[0m")
 
 

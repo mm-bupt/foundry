@@ -6,6 +6,7 @@ import { useAppStore } from "./store"
 import { createWSClient } from "./ws"
 import { ChatPanel } from "./components/ChatPanel"
 import type { ConversationsProps } from "@ant-design/x"
+import type { ToolCall } from "./types"
 
 const { Sider, Content } = Layout
 const { Title } = Typography
@@ -25,6 +26,8 @@ export default function App() {
   const startThinking = useAppStore((s) => s.startThinking)
   const appendThinkingText = useAppStore((s) => s.appendThinkingText)
   const endThinking = useAppStore((s) => s.endThinking)
+  const addToolCall = useAppStore((s) => s.addToolCall)
+  const updateToolResult = useAppStore((s) => s.updateToolResult)
   const ws = useMemo(() => createWSClient(), [])
 
   useEffect(() => {
@@ -48,6 +51,22 @@ export default function App() {
         case "thinking.end":
           endThinking()
           break
+        case "tool.call": {
+          const tc: ToolCall = {
+            toolCallId: (event.tool_call_id as string) ?? "",
+            toolName: (event.tool_name as string) ?? "",
+            args: (event.args as Record<string, unknown>) ?? {},
+            status: "running",
+          }
+          addToolCall(tc)
+          break
+        }
+        case "tool.result": {
+          const tcId = (event.tool_call_id as string) ?? ""
+          const result = (event.result as string) ?? ""
+          updateToolResult(tcId, result)
+          break
+        }
         case "stream.done":
           finalizeStreamWithMessage()
           break
@@ -138,7 +157,7 @@ export default function App() {
               D
             </div>
             <Title level={5} style={{ margin: 0, fontSize: 15 }}>
-              Dream Foundry
+              Foundry
             </Title>
           </div>
           <div style={{ flex: 1, overflow: "auto", padding: "8px 12px" }}>

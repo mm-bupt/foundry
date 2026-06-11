@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add thinking display, true streaming deltas, and markdown rendering to the Dream Foundry WebUI.
+**Goal:** Add thinking display, true streaming deltas, and markdown rendering to the Foundry WebUI.
 
 **Architecture:** Fix backend `core.py` to use `ModelRequestNode.stream()` for real incremental deltas (text + thinking), then update frontend to render markdown via `react-markdown` + `remark-gfm` and display thinking via `@ant-design/x` `Think` component.
 

@@ -1,10 +1,10 @@
-# AGENTS.md — Dream Foundry Project Guide
+# AGENTS.md — Foundry Project Guide
 
 ## 使用中文交互
 
 ## Project Overview
 
-Dream Foundry is a full-stack AI Agent application:
+Foundry is a full-stack AI Agent application:
 - **Backend (foundry/)**: Python/FastAPI + Pydantic AI + SQLite
 - **TUI Frontend (tui/)**: Python/Textual terminal UI (opencode-style)
 - **WebUI (webui/)**: React + Vite + Ant Design web interface
@@ -26,11 +26,11 @@ Dream Foundry is a full-stack AI Agent application:
 ## Project Structure
 
 ```
-dream-foundry/
+foundry/
 ├── foundry/                         # Backend package (pip install -e foundry)
 │   ├── foundry_app/               # Python package (importable as foundry_app.*)
 │   │   ├── main.py                  # FastAPI app entry, all routers registered
-│   │   ├── config.py                # Settings (env vars: DREAM_FOUNDRY_*)
+│   │   ├── config.py                # Settings (env vars: FOUNDRY_*)
 │   │   ├── shared_protocol.py       # WS/SSE message type definitions
 │   │   ├── api/
 │   │   │   ├── sessions.py          # CRUD /api/sessions
@@ -84,9 +84,9 @@ python scripts/build.py backend  # Backend only (PyInstaller onefile)
 python scripts/build.py tui      # TUI only (sources + node_modules)
 python scripts/build.py bun      # Bundle Bun runtime only
 
-# Output: dist/dream-foundry/
-#   dream-foundry.bat (or .sh)  ← double-click to run
-#   bin/dream-foundry-server    ← backend
+# Output: dist/foundry/
+#   foundry.bat (or .sh)  ← double-click to run
+#   bin/foundry-server    ← backend
 #   bin/bun                     ← Bun runtime (no install needed)
 #   lib/tui/                    ← TUI sources
 ```
@@ -127,15 +127,15 @@ Server → Client:
 
 ## Environment Variables
 
-All env vars use prefix `DREAM_FOUNDRY_`:
-- `DREAM_FOUNDRY_OPENAI_API_KEY` — OpenAI API key
-- `DREAM_FOUNDRY_ANTHROPIC_API_KEY` — Anthropic API key
-- `DREAM_FOUNDRY_DB_PATH` — SQLite database path (default: ~/.dream-foundry/dream-foundry.db)
-- `DREAM_FOUNDRY_WORK_DIR` — Agent working directory for file operations (default: cwd)
-- `DREAM_FOUNDRY_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
-- `DREAM_FOUNDRY_DEBUG` — Enable debug mode
+All env vars use prefix `FOUNDRY_`:
+- `FOUNDRY_OPENAI_API_KEY` — OpenAI API key
+- `FOUNDRY_ANTHROPIC_API_KEY` — Anthropic API key
+- `FOUNDRY_DB_PATH` — SQLite database path (default: ~/.foundry/foundry.db)
+- `FOUNDRY_WORK_DIR` — Agent working directory for file operations (default: cwd)
+- `FOUNDRY_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
+- `FOUNDRY_DEBUG` — Enable debug mode
 
-Work dir priority: `--work-dir` CLI arg > `DREAM_FOUNDRY_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
+Work dir priority: `--work-dir` CLI arg > `FOUNDRY_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
 
 ## Available Models
 
@@ -169,7 +169,7 @@ All phases P1-P8 complete. Future work:
 ## Project Structure (Updated)
 
 ```
-dream-foundry/
+foundry/
 ├── scripts/                        # Build & dev scripts
 │   ├── build.py                    # Production build (PyInstaller + Bun compile)
 │   ├── dev.bat                     # Windows CMD dev launcher

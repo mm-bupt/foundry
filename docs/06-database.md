@@ -12,10 +12,10 @@
 ### Database File
 
 ```
-~/.dream-foundry/dream-foundry.db
+~/.foundry/foundry.db
 ```
 
-Configurable via `DREAM_FOUNDRY_DB_PATH` environment variable.
+Configurable via `FOUNDRY_DB_PATH` environment variable.
 
 ## Tables
 
@@ -175,7 +175,7 @@ class ToolCall(SQLModel, table=True):
 import aiosqlite
 from pathlib import Path
 
-DB_PATH = Path.home() / ".dream-foundry" / "dream-foundry.db"
+DB_PATH = Path.home() / ".foundry" / "foundry.db"
 
 async def get_db() -> aiosqlite.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)

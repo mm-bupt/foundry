@@ -1,9 +1,12 @@
 import asyncio
 import json
 import time
-import sys
 from typing import Callable, Awaitable
 from dataclasses import dataclass
+
+from foundry_app.logger import get_logger
+
+logger = get_logger("agent.core")
 
 from pydantic_ai import Agent
 from pydantic_ai.messages import (
@@ -17,6 +20,7 @@ from pydantic_ai.messages import (
     ThinkingPart,
     TextPartDelta,
     ThinkingPartDelta,
+    ToolCallPartDelta,
     PartStartEvent,
     PartDeltaEvent,
     FunctionToolCallEvent,
@@ -117,6 +121,7 @@ async def stream_chat(
     user_message: str,
     send_event: Callable[[dict], Awaitable[None]],
 ):
+    logger.debug("stream_chat start | session=%s msg_len=%d", session_id, len(user_message))
     db = await get_db()
     session = await crud.get_session(db, session_id)
     if not session:
@@ -132,6 +137,7 @@ async def stream_chat(
         return
 
     model_id = session["model_id"]
+    logger.debug("resolved model: %s", model_id)
     model_info = get_model_info(model_id)
     if not model_info:
         await send_event(
@@ -188,8 +194,9 @@ async def stream_chat(
                                                 "type": "thinking.delta",
                                                 "message_id": user_msg["id"],
                                                 "text": part.content,
-                                            }
-                                        )
+                                        }
+                                    )
+                                    logger.debug("thinking.start | session=%s", session_id)
                                 elif isinstance(part, TextPart):
                                     if not assistant_id:
                                         assistant_id = (
@@ -201,6 +208,7 @@ async def stream_chat(
                                                 model_id=model_id,
                                             )
                                         )["id"]
+                                    logger.debug("text.start | session=%s assistant_id=%s", session_id, assistant_id)
                                     if thinking_text:
                                         await send_event(
                                             {
@@ -221,26 +229,10 @@ async def stream_chat(
                                 elif isinstance(part, ToolCallPart):
                                     tc_id = part.tool_call_id or ""
                                     tool_name = part.tool_name
-                                    args = (
-                                        part.args_as_dict()
-                                        if hasattr(part, "args_as_dict")
-                                        else (
-                                            part.args
-                                            if isinstance(part.args, dict)
-                                            else {}
-                                        )
-                                    )
                                     pending_tool_calls[tc_id] = {
-                                        "tool_name": tool_name
+                                        "tool_name": tool_name,
+                                        "args_json": part.args if isinstance(part.args, str) else "",
                                     }
-                                    await send_event(
-                                        {
-                                            "type": "tool.call",
-                                            "tool_call_id": tc_id,
-                                            "tool_name": tool_name,
-                                            "args": args,
-                                        }
-                                    )
                             elif isinstance(event, PartDeltaEvent):
                                 delta = event.delta
                                 if isinstance(delta, TextPartDelta):
@@ -263,15 +255,37 @@ async def stream_chat(
                                                 "text": delta.content_delta,
                                             }
                                         )
+                                elif isinstance(delta, ToolCallPartDelta):
+                                    if delta.tool_call_id and delta.tool_call_id in pending_tool_calls:
+                                        pending_tool_calls[delta.tool_call_id]["args_json"] += delta.args_delta or ""
 
                 elif isinstance(node, CallToolsNode):
                     async with node.stream(run.ctx) as stream:
                         async for event in stream:
-                            if isinstance(event, FunctionToolResultEvent):
+                            if isinstance(event, FunctionToolCallEvent):
+                                tc_part = event.part
+                                tc_id = tc_part.tool_call_id or ""
+                                tool_name = tc_part.tool_name
+                                args = tc_part.args_as_dict() if hasattr(tc_part, "args_as_dict") else {}
+                                if tc_id not in pending_tool_calls:
+                                    pending_tool_calls[tc_id] = {"tool_name": tool_name}
+                                await send_event(
+                                    {
+                                        "type": "tool.call",
+                                        "tool_call_id": tc_id,
+                                        "tool_name": tool_name,
+                                        "args": args,
+                                    }
+                                )
+                                logger.debug("tool.call | session=%s tool=%s args=%s", session_id, tool_name, json.dumps(args, ensure_ascii=False)[:500])
+                            elif isinstance(event, FunctionToolResultEvent):
                                 result_part = event.result
+                                logger.debug("tool result event | type=%s content_type=%s", type(result_part).__name__, type(getattr(result_part, 'content', None)).__name__)
                                 if isinstance(result_part, ToolReturnPart):
                                     tc_id = result_part.tool_call_id or ""
                                     meta = pending_tool_calls.pop(tc_id, {})
+                                    result_text = str(result_part.content)
+                                    logger.debug("tool.result | session=%s tool=%s result_len=%d preview=%s", session_id, meta.get("tool_name", ""), len(result_text), result_text[:200])
                                     await send_event(
                                         {
                                             "type": "tool.result",
@@ -279,9 +293,10 @@ async def stream_chat(
                                             "tool_name": meta.get(
                                                 "tool_name", ""
                                             ),
-                                            "result": str(result_part.content),
+                                            "result": result_text,
                                         }
                                     )
+                                    logger.debug("tool.result | session=%s tool=%s result_len=%d", session_id, meta.get("tool_name", ""), len(str(result_part.content)))
 
         result = run.result
         if result:
@@ -300,7 +315,7 @@ async def stream_chat(
                 else:
                     await crud.update_message(db, assistant_id, content=full_text)
 
-            usage = result.usage()
+            usage = result.usage
             if usage:
                 input_tokens = usage.request_tokens or 0
                 output_tokens = usage.response_tokens or 0
@@ -321,6 +336,7 @@ async def stream_chat(
                 )
 
         duration = int((time.monotonic() - start_time) * 1000)
+        logger.debug("stream.done | session=%s duration=%dms tokens=%d+%d text_len=%d", session_id, duration, input_tokens, output_tokens, len(full_text))
         await send_event(
             {
                 "type": "stream.done",
@@ -344,10 +360,42 @@ async def stream_chat(
                 generate_title(session_id, model_id, user_message, send_event)
             )
 
+    except asyncio.CancelledError:
+        try:
+            duration = int((time.monotonic() - start_time) * 1000)
+            if full_text and not assistant_id:
+                assistant_id = (
+                    await crud.create_message(
+                        db, session_id, "assistant", full_text,
+                        model_id=model_id,
+                    )
+                )["id"]
+            if assistant_id:
+                await crud.update_message(
+                    db, assistant_id,
+                    content=full_text,
+                    thinking_content=thinking_text,
+                    duration_ms=duration,
+                )
+            logger.debug("stream cancelled | session=%s text_len=%d duration=%dms", session_id, len(full_text), duration)
+            await send_event(
+                {
+                    "type": "stream.done",
+                    "message_id": user_msg["id"],
+                    "usage": {
+                        "input_tokens": input_tokens,
+                        "output_tokens": output_tokens,
+                        "total_tokens": input_tokens + output_tokens,
+                    },
+                    "duration_ms": duration,
+                }
+            )
+        except Exception:
+            logger.exception("cancelled cleanup failed | session=%s", session_id)
+        raise
+
     except Exception as e:
-        print(f"[stream_chat] EXCEPTION: {e}", file=sys.stderr, flush=True)
-        import traceback
-        traceback.print_exc(file=sys.stderr)
+        logger.exception("stream_chat error | session=%s error=%s", session_id, e)
         await send_event(
             {
                 "type": "stream.error",

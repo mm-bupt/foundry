@@ -3,7 +3,7 @@ import uvicorn
 from foundry_app.config import settings
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Dream Foundry Server")
+    parser = argparse.ArgumentParser(description="Foundry Server")
     parser.add_argument("--work-dir", type=str, default=None, help="Agent working directory")
     args, remaining = parser.parse_known_args()
 

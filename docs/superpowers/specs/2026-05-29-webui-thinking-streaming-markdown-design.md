@@ -2,7 +2,7 @@
 
 ## Overview
 
-Enhance the Dream Foundry WebUI with three features:
+Enhance the Foundry WebUI with three features:
 1. Display AI thinking process in a collapsible panel
 2. Fix streaming to use true incremental deltas (not full-text-at-once)
 3. Render markdown in AI response bubbles

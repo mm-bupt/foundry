@@ -1,9 +1,13 @@
 import asyncio
 import json as _json
+import subprocess
 from pathlib import Path
 
 from pydantic_ai import Agent, RunContext
 from foundry_app.agent.core import AgentDeps
+from foundry_app.logger import get_logger
+
+logger = get_logger("agent.tools")
 
 
 def register_file_tools(agent: Agent):
@@ -15,6 +19,7 @@ def register_file_tools(agent: Agent):
             path: File path (relative or absolute).
         """
         try:
+            logger.debug("tool exec: read_file | path=%s", path)
             target = _resolve_path(ctx.deps.work_dir, path)
             if not target.is_file():
                 return f"Error: '{path}' is not a file or does not exist."
@@ -35,6 +40,7 @@ def register_file_tools(agent: Agent):
             content: Content to write.
         """
         try:
+            logger.debug("tool exec: write_file | path=%s content_len=%d", path, len(content))
             target = _resolve_path(ctx.deps.work_dir, path)
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(content, encoding="utf-8")
@@ -55,20 +61,20 @@ def register_file_tools(agent: Agent):
             timeout: Timeout in seconds (default 120).
         """
         try:
-            proc = await asyncio.create_subprocess_shell(
+            logger.debug("tool exec: run_command | cmd=%s timeout=%d", command, timeout)
+            proc = await asyncio.to_thread(
+                subprocess.run,
                 command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
+                shell=True,
+                capture_output=True,
                 cwd=ctx.deps.work_dir,
-            )
-            stdout, stderr = await asyncio.wait_for(
-                proc.communicate(), timeout=timeout
+                timeout=timeout,
             )
             output = ""
-            if stdout:
-                output += stdout.decode("utf-8", errors="replace")
-            if stderr:
-                output += stderr.decode("utf-8", errors="replace")
+            if proc.stdout:
+                output += proc.stdout.decode("utf-8", errors="replace")
+            if proc.stderr:
+                output += proc.stderr.decode("utf-8", errors="replace")
             if proc.returncode != 0:
                 output += f"\n(exit code: {proc.returncode})"
             return output or "(no output)"
@@ -101,6 +107,7 @@ def register_search_tools(agent: Agent):
             path: The directory to search in. Defaults to working directory.
         """
         try:
+            logger.debug("tool exec: glob | pattern=%s path=%s", pattern, path)
             search_dir = _resolve_path(ctx.deps.work_dir, path) if path else Path(ctx.deps.work_dir).resolve()
             if not search_dir.is_dir():
                 return f"Error: '{path}' is not a directory."
@@ -109,19 +116,20 @@ def register_search_tools(agent: Agent):
                 "rg", "--no-config", "--files",
                 "--glob=!.git/*", f"--glob={pattern}", ".",
             ]
-            proc = await asyncio.create_subprocess_exec(
-                *args,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
+            proc = await asyncio.to_thread(
+                subprocess.run,
+                args,
+                capture_output=True,
                 cwd=str(search_dir),
+                timeout=30,
             )
-            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
 
             if proc.returncode == 2:
-                return f"Error: ripgrep failed — {stderr.decode(errors='replace')}"
+                return f"Error: ripgrep failed — {proc.stderr.decode(errors='replace')}"
 
-            raw = stdout.decode("utf-8", errors="replace").strip()
+            raw = proc.stdout.decode("utf-8", errors="replace").strip()
             lines = raw.split("\n") if raw else []
+            logger.debug("glob result | rc=%d raw_len=%d lines=%d cwd=%s", proc.returncode, len(raw), len(lines), str(search_dir))
             if not lines:
                 return "No files found"
 
@@ -144,10 +152,12 @@ def register_search_tools(agent: Agent):
                 result += "\n(Results are truncated. Consider using a more specific path or pattern.)"
             return result
         except FileNotFoundError:
+            logger.debug("glob error: rg not found (FileNotFoundError)")
             return _RG_INSTALL_HINT
         except asyncio.TimeoutError:
             return "Error: glob search timed out."
         except Exception as e:
+            logger.debug("glob error: %s: %s", type(e).__name__, repr(e))
             return f"Error: {e}"
 
     @agent.tool
@@ -167,6 +177,7 @@ def register_search_tools(agent: Agent):
             include: File pattern to include (e.g. "*.py", "*.{ts,tsx}").
         """
         try:
+            logger.debug("tool exec: grep | pattern=%s path=%s include=%s", pattern, path, include)
             search_dir = _resolve_path(ctx.deps.work_dir, path) if path else Path(ctx.deps.work_dir).resolve()
             if not search_dir.is_dir():
                 return f"Error: '{path}' is not a directory."
@@ -179,19 +190,19 @@ def register_search_tools(agent: Agent):
                 args.append(f"--glob={include}")
             args.extend(["--", pattern, "."])
 
-            proc = await asyncio.create_subprocess_exec(
-                *args,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
+            proc = await asyncio.to_thread(
+                subprocess.run,
+                args,
+                capture_output=True,
                 cwd=str(search_dir),
+                timeout=30,
             )
-            stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=30)
 
-            if not stdout.strip():
+            if not proc.stdout.strip():
                 return "No files found"
 
             file_matches: dict[str, list[tuple[int, str]]] = {}
-            for line in stdout.decode("utf-8", errors="replace").strip().split("\n"):
+            for line in proc.stdout.decode("utf-8", errors="replace").strip().split("\n"):
                 try:
                     data = _json.loads(line)
                     if data.get("type") != "match":
@@ -239,10 +250,12 @@ def register_search_tools(agent: Agent):
 
             return f"Found {total} matches\n" + "\n".join(parts)
         except FileNotFoundError:
+            logger.debug("grep error: rg not found (FileNotFoundError)")
             return _RG_INSTALL_HINT
         except asyncio.TimeoutError:
             return "Error: grep search timed out."
         except Exception as e:
+            logger.debug("grep error: %s: %s", type(e).__name__, repr(e))
             return f"Error: {e}"
 
 

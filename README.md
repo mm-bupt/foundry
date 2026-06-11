@@ -1,4 +1,4 @@
-# Dream Foundry
+# Foundry
 
 Full-stack AI Agent application with a FastAPI backend and terminal UI frontend.
 
@@ -60,8 +60,8 @@ scripts\dev.ps1          # Windows PowerShell
 
 # Or run individually
 pip install -e foundry
-$env:DREAM_FOUNDRY_WORK_DIR="D:\1-Project\playground"
-python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+$env:FOUNDRY_WORK_DIR="D:\1-Project\4-github\develop-cli"
+python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir foundry/foundry_app
 
 # default or web debug
 cd webui && bun install && bun run dev 
@@ -85,12 +85,12 @@ python scripts/build.py backend  # Backend only (PyInstaller)
 python scripts/build.py tui      # TUI only
 ```
 
-Output goes to `dist/dream-foundry/` with a launcher script.
+Output goes to `dist/foundry/` with a launcher script.
 
 ## Project Structure
 
 ```
-dream-foundry/
+foundry/
 ├── foundry/                          # Backend
 │   └── foundry_app/
 │       ├── main.py                   # FastAPI entry point
@@ -151,15 +151,15 @@ dream-foundry/
 
 ## Environment Variables
 
-All env vars use prefix `DREAM_FOUNDRY_`:
+All env vars use prefix `FOUNDRY_`:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DREAM_FOUNDRY_OPENAI_API_KEY` | | OpenAI API key |
-| `DREAM_FOUNDRY_ANTHROPIC_API_KEY` | | Anthropic API key |
-| `DREAM_FOUNDRY_DEFAULT_MODEL` | `claude-sonnet` | Default model ID |
-| `DREAM_FOUNDRY_DB_PATH` | `~/.dream-foundry/dream-foundry.db` | SQLite path |
-| `DREAM_FOUNDRY_DEBUG` | `false` | Debug mode |
+| `FOUNDRY_OPENAI_API_KEY` | | OpenAI API key |
+| `FOUNDRY_ANTHROPIC_API_KEY` | | Anthropic API key |
+| `FOUNDRY_DEFAULT_MODEL` | `claude-sonnet` | Default model ID |
+| `FOUNDRY_DB_PATH` | `~/.foundry/foundry.db` | SQLite path |
+| `FOUNDRY_DEBUG` | `false` | Debug mode |
 
 Environment variables take precedence over `config.yaml` values.
 

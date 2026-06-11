@@ -59,7 +59,7 @@
 ## Project Structure
 
 ```
-dream-foundry/
+foundry/
 ├── foundry/                              # Backend
 │   ├── app/
 │   │   ├── main.py                       # FastAPI app, CORS, lifespan

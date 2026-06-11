@@ -23,7 +23,7 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
 ### Agent Instructions (System Prompt)
 
 ```
-You are Dream Foundry AI, a helpful coding assistant.
+You are Foundry AI, a helpful coding assistant.
 
 You have access to long-term memory. Use `recall_memory` before responding
 to check for relevant user preferences and past context. Use `store_memory`
@@ -171,7 +171,7 @@ session.messages = result.all_messages()
 | `preference` | User preferences | "User prefers Chinese responses" |
 | `fact` | Important facts | "Project uses Python 3.12" |
 | `decision` | Design decisions | "Decided to use SQLite over Postgres" |
-| `project` | Project details | "Working on dream-foundry, an AI agent" |
+| `project` | Project details | "Working on foundry, an AI agent" |
 | `note` | General notes | "Deadline is next Friday" |
 
 ### Memory Summarization

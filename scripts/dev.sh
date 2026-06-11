@@ -19,7 +19,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-echo "Dream Foundry Dev"
+echo "Foundry Dev"
 echo ""
 
 if [ "$TARGET" = "all" ] || [ "$TARGET" = "backend" ]; then

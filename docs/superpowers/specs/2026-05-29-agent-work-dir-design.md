@@ -2,12 +2,12 @@
 
 ## Summary
 
-Add a configurable working directory for the Dream Foundry agent. All file operation tools (read, write, list, run command) will resolve relative paths against this directory. The work directory is a global setting (not per-session).
+Add a configurable working directory for the Foundry agent. All file operation tools (read, write, list, run command) will resolve relative paths against this directory. The work directory is a global setting (not per-session).
 
 ## Configuration Priority (highest to lowest)
 
 1. **CLI argument**: `--work-dir /path/to/project`
-2. **Environment variable**: `DREAM_FOUNDRY_WORK_DIR=/path/to/project`
+2. **Environment variable**: `FOUNDRY_WORK_DIR=/path/to/project`
 3. **YAML config**: `workDir: /path/to/project` in `~/.config/foundry/config.yaml`
 4. **Default**: `os.getcwd()` (current process working directory)
 
