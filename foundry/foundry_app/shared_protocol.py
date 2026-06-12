@@ -122,6 +122,13 @@ class CompactionDone:
     summary_message_id: str = ""
 
 
+@dataclass
+class TodoUpdated:
+    type: str = "todo.updated"
+    session_id: str = ""
+    todos: list = field(default_factory=list)
+
+
 def parse_command(data: dict) -> ChatMessageCmd | CompactCmd | None:
     msg_type = data.get("type", "")
     if msg_type == "chat.message":

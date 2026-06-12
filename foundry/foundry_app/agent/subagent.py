@@ -4,8 +4,9 @@ from dataclasses import dataclass, field
 
 from pydantic_ai import Agent
 
-from foundry_app.agent.core import AgentDeps
-from foundry_app.agent.registry import get_provider_prefix, get_model_info
+from foundry_app.agent.deps import AgentDeps
+from foundry_app.model.client import resolve_api_key, create_model_client
+from foundry_app.model.registry import get_provider_prefix, get_model_info
 from foundry_app.logger import get_logger
 
 logger = get_logger("agent.subagent")
@@ -89,9 +90,8 @@ def create_sub_agent(sub_def: SubAgentDef, model_id: str, work_dir: str) -> Agen
     instructions = f"{system_prompt}\n\n工作目录: {work_dir}"
 
     if model_info and model_info.api_base:
-        from foundry_app.agent.core import _create_model_client, _resolve_api_key
-        api_key = model_info.api_key or _resolve_api_key(model_info.provider)
-        model_obj = _create_model_client(
+        api_key = model_info.api_key or resolve_api_key(model_info.provider)
+        model_obj = create_model_client(
             model_string, model_info.provider, api_key, model_info.api_base
         )
         agent = Agent(

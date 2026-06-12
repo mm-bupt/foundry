@@ -1,15 +1,14 @@
-import sys
 from typing import Callable, Awaitable
 
 from pydantic_ai import Agent
 
-from foundry_app.agent.core import _resolve_api_key, _create_model_client
-from foundry_app.agent.registry import get_model_info, get_provider_prefix
+from foundry_app.model.client import resolve_api_key, create_model_client
+from foundry_app.model.registry import get_model_info, get_provider_prefix
 from foundry_app.db import crud
 from foundry_app.db.database import get_db
 from foundry_app.logger import get_logger
 
-logger = get_logger("agent.title")
+logger = get_logger("chat.title")
 
 TITLE_SYSTEM_PROMPT = (
     "Generate a concise title (<=10 words) for this conversation. "
@@ -23,8 +22,8 @@ def _create_title_agent(model_id: str) -> Agent:
     model_string = get_provider_prefix(model_id)
 
     if model_info and model_info.api_base:
-        api_key = model_info.api_key or _resolve_api_key(model_info.provider)
-        model_obj = _create_model_client(
+        api_key = model_info.api_key or resolve_api_key(model_info.provider)
+        model_obj = create_model_client(
             model_string, model_info.provider, api_key, model_info.api_base
         )
         return Agent(

@@ -90,6 +90,18 @@ CREATE INDEX IF NOT EXISTS idx_sessions_updated_at ON sessions(updated_at);
 CREATE INDEX IF NOT EXISTS idx_sessions_parent_id ON sessions(parent_id);
 CREATE INDEX IF NOT EXISTS idx_task_records_parent ON task_records(parent_session_id);
 
+CREATE TABLE IF NOT EXISTS todos (
+    session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('pending', 'in_progress', 'completed', 'cancelled')),
+    priority TEXT NOT NULL CHECK(priority IN ('high', 'medium', 'low')),
+    position INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (session_id, position)
+);
+
+CREATE INDEX IF NOT EXISTS idx_todos_session ON todos(session_id);
+
 CREATE VIRTUAL TABLE IF NOT EXISTS vec_memory USING vec0(
     id TEXT PRIMARY KEY,
     embedding float[1536]

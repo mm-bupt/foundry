@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, TaskCallSegment, SessionStats, TaskRecord } from "./types"
+import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, TaskCallSegment, SessionStats, TaskRecord, TodoItem } from "./types"
 import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel, updateSession } from "./api"
 
 const PERSIST_KEY = "foundry_webui_state"
@@ -123,8 +123,10 @@ interface AppState {
   errorMessage: string
   connected: boolean
   sessionStats: SessionStats | null
+  taskRecords: TaskRecord[]
   sidebarCollapsed: boolean
   statsPanelVisible: boolean
+  todos: TodoItem[]
 
   init: () => Promise<void>
   switchSession: (id: string) => Promise<void>
@@ -156,6 +158,7 @@ interface AppState {
   setSessionStats: (stats: SessionStats | null) => void
   toggleSidebar: () => void
   toggleStatsPanel: () => void
+  setTodos: (todos: TodoItem[]) => void
 }
 
 export const useAppStore = create<AppState>((set, get) => {
@@ -176,8 +179,10 @@ export const useAppStore = create<AppState>((set, get) => {
   errorMessage: "",
   connected: false,
   sessionStats: null,
+  taskRecords: [],
   sidebarCollapsed: persisted.sidebarCollapsed,
   statsPanelVisible: persisted.statsPanelVisible,
+  todos: [],
 
   init: async () => {
     const [sessions, models, active] = await Promise.all([
@@ -204,6 +209,8 @@ export const useAppStore = create<AppState>((set, get) => {
       thinkingMessageId: "",
       errorMessage: "",
       sessionStats: null,
+      taskRecords: [],
+      todos: [],
     })
     const detail = await getSession(id)
     if (detail) {
@@ -223,7 +230,13 @@ export const useAppStore = create<AppState>((set, get) => {
           segments: allSegments.length > 0 ? allSegments : undefined,
         }
       })
-      set({ messages: msgs, currentModel: modelId, sessionStats: detail.stats ?? null })
+      set({
+        messages: msgs,
+        currentModel: modelId,
+        sessionStats: detail.stats ?? null,
+        taskRecords: detail.task_records ?? [],
+        todos: detail.todos ?? [],
+      })
     }
   },
 
@@ -415,7 +428,12 @@ export const useAppStore = create<AppState>((set, get) => {
           segments: allSegments.length > 0 ? allSegments : undefined,
         }
       })
-      set({ messages: msgs, sessionStats: detail.stats ?? null })
+      set({
+        messages: msgs,
+        sessionStats: detail.stats ?? null,
+        taskRecords: detail.task_records ?? [],
+        todos: detail.todos ?? [],
+      })
     }
   },
 
@@ -431,4 +449,5 @@ export const useAppStore = create<AppState>((set, get) => {
     set({ statsPanelVisible: next })
     savePersisted({ sidebarCollapsed: get().sidebarCollapsed, statsPanelVisible: next })
   },
+  setTodos: (todos) => set({ todos }),
 }})

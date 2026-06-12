@@ -81,6 +81,7 @@ export default function App() {
   const statsPanelVisible = useAppStore((s) => s.statsPanelVisible)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
   const toggleStatsPanel = useAppStore((s) => s.toggleStatsPanel)
+  const setTodos = useAppStore((s) => s.setTodos)
   const ws = useMemo(() => createWSClient(), [])
 
   useEffect(() => {
@@ -170,6 +171,7 @@ export default function App() {
         }
         case "stream.done":
           finalizeStreamWithMessage()
+          useAppStore.getState().reloadMessages()
           setTimeout(() => {
             fetchSessions().then((sessions) => {
               if (sessions) useAppStore.getState().setSessions(sessions)
@@ -189,6 +191,11 @@ export default function App() {
           if (sid && title) {
             updateSessionTitle(sid, title)
           }
+          break
+        }
+        case "todo.updated": {
+          const todos = (event.todos as import("./types").TodoItem[]) ?? []
+          setTodos(todos)
           break
         }
       }

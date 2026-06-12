@@ -1,4 +1,4 @@
-import type { Session, SessionDetail, Model } from "./types"
+import type { Session, SessionDetail, Model, TodoItem } from "./types"
 
 const API_BASE = "/api"
 
@@ -54,4 +54,9 @@ export async function updateSession(sessionId: string, data: { model_id?: string
     method: "PATCH",
     body: JSON.stringify(data),
   })
+}
+
+export async function fetchTodos(sessionId: string): Promise<TodoItem[]> {
+  const data = await request<{ todos: TodoItem[] }>(`/sessions/${sessionId}/todos`)
+  return data?.todos ?? []
 }

@@ -1,6 +1,7 @@
-import { Progress, Typography, Button, Tooltip } from "antd"
-import { RightOutlined } from "@ant-design/icons"
+import { Progress, Typography, Button, Tooltip, Tag } from "antd"
+import { RightOutlined, RocketOutlined, CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined, CloudOutlined, StopOutlined } from "@ant-design/icons"
 import { useAppStore } from "../store"
+import type { StreamSegment } from "../types"
 
 const { Text, Title } = Typography
 
@@ -10,6 +11,41 @@ function formatTokens(n: number): string {
   return String(n)
 }
 
+interface TaskItem {
+  taskId: string
+  subagentType: string
+  description: string
+  status: "running" | "completed" | "error" | "cancelled"
+  background: boolean
+}
+
+function collectLiveTasks(segments: StreamSegment[]): TaskItem[] {
+  const tasks: TaskItem[] = []
+  for (const seg of segments) {
+    if (seg.type === "task_call") {
+      tasks.push({
+        taskId: seg.taskId,
+        subagentType: seg.subagentType,
+        description: seg.description,
+        status: seg.status,
+        background: seg.background,
+      })
+    }
+  }
+  return tasks
+}
+
+function mergeTasks(live: TaskItem[], persisted: TaskItem[]): TaskItem[] {
+  const map = new Map<string, TaskItem>()
+  for (const t of persisted) {
+    map.set(t.taskId, t)
+  }
+  for (const t of live) {
+    map.set(t.taskId, t)
+  }
+  return [...map.values()]
+}
+
 export function StatsPanel() {
   const sessionStats = useAppStore((s) => s.sessionStats)
   const currentModel = useAppStore((s) => s.currentModel)
@@ -17,6 +53,9 @@ export function StatsPanel() {
   const currentSessionId = useAppStore((s) => s.currentSessionId)
   const sessions = useAppStore((s) => s.sessions)
   const messages = useAppStore((s) => s.messages)
+  const taskRecords = useAppStore((s) => s.taskRecords)
+  const streamSegments = useAppStore((s) => s.streamSegments)
+  const status = useAppStore((s) => s.status)
   const toggleStatsPanel = useAppStore((s) => s.toggleStatsPanel)
 
   const model = models.find((m) => m.id === currentModel)
@@ -26,6 +65,27 @@ export function StatsPanel() {
   const contextPct = model && stats
     ? Math.min((stats.context_tokens / model.context_window) * 100, 100)
     : 0
+
+  const liveTasks = collectLiveTasks(streamSegments)
+  const persistedTasks: TaskItem[] = taskRecords
+    .map((r) => ({
+      taskId: r.id,
+      subagentType: r.subagent_type,
+      description: r.description,
+      status: r.status as TaskItem["status"],
+      background: r.background,
+    }))
+
+  const allTasks = status === "streaming"
+    ? mergeTasks(liveTasks, persistedTasks)
+    : liveTasks.length > 0
+      ? liveTasks
+      : persistedTasks
+
+  const runningCount = allTasks.filter((t) => t.status === "running").length
+  const completedCount = allTasks.filter((t) => t.status === "completed").length
+  const errorCount = allTasks.filter((t) => t.status === "error").length
+  const cancelledCount = allTasks.filter((t) => t.status === "cancelled").length
 
   return (
     <div
@@ -134,9 +194,41 @@ export function StatsPanel() {
           Tasks
         </Text>
         <div style={{ marginTop: 8 }}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            0 (即将支持)
-          </Text>
+          {allTasks.length === 0 ? (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              No tasks
+            </Text>
+          ) : (
+            <>
+              <div style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 12, flexWrap: "wrap" }}>
+                {runningCount > 0 && (
+                  <span style={{ color: "#1677ff" }}>
+                    <LoadingOutlined /> {runningCount} running
+                  </span>
+                )}
+                {completedCount > 0 && (
+                  <span style={{ color: "#52c41a" }}>
+                    <CheckCircleOutlined /> {completedCount} done
+                  </span>
+                )}
+                {errorCount > 0 && (
+                  <span style={{ color: "#ff4d4f" }}>
+                    <CloseCircleOutlined /> {errorCount} failed
+                  </span>
+                )}
+                {cancelledCount > 0 && (
+                  <span style={{ color: "#999" }}>
+                    {cancelledCount} cancelled
+                  </span>
+                )}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {allTasks.map((task) => (
+                  <TaskItem key={task.taskId} task={task} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -153,6 +245,65 @@ export function StatsPanel() {
         <div>Ctrl+S sidebar</div>
         <div>Ctrl+R stats</div>
       </div>
+    </div>
+  )
+}
+
+function TaskItem({ task }: { task: TaskItem }) {
+  const { status } = task
+  const isRunning = status === "running"
+  const isError = status === "error"
+  const isCancelled = status === "cancelled"
+
+  const borderColor = isRunning ? "#91caff" : isError ? "#ffccc7" : isCancelled ? "#f0f0f0" : "#d9f7be"
+  const bgColor = isRunning ? "#f0f5ff" : isError ? "#fff2f0" : isCancelled ? "#fafafa" : "#f6ffed"
+
+  const statusIcon = isRunning ? (
+    <LoadingOutlined style={{ color: "#1677ff", fontSize: 10 }} />
+  ) : isError ? (
+    <CloseCircleOutlined style={{ color: "#ff4d4f", fontSize: 10 }} />
+  ) : isCancelled ? (
+    <StopOutlined style={{ color: "#999", fontSize: 10 }} />
+  ) : (
+    <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 10 }} />
+  )
+
+  const tagColor = isRunning ? "processing" : isError ? "error" : isCancelled ? "default" : "success"
+
+  return (
+    <div
+      style={{
+        padding: "6px 8px",
+        borderRadius: 6,
+        border: `1px solid ${borderColor}`,
+        background: bgColor,
+        fontSize: 12,
+        opacity: isCancelled ? 0.55 : 1,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        {statusIcon}
+        <RocketOutlined style={{ color: "#999", fontSize: 10 }} />
+        <Tag
+          color={tagColor}
+          style={{ margin: 0, fontSize: 10, lineHeight: "16px", padding: "0 4px" }}
+        >
+          {task.subagentType}
+        </Tag>
+        {task.background && (
+          <CloudOutlined style={{ color: "#faad14", fontSize: 10 }} />
+        )}
+        <Text type="secondary" style={{ fontSize: 10, marginLeft: "auto" }}>
+          {isRunning ? "running" : isError ? "failed" : isCancelled ? "cancelled" : "done"}
+        </Text>
+      </div>
+      <Text
+        type="secondary"
+        ellipsis
+        style={{ fontSize: 11, display: "block", marginTop: 2, maxWidth: 210 }}
+      >
+        {task.description}
+      </Text>
     </div>
   )
 }

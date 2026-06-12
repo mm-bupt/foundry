@@ -500,3 +500,28 @@ async def get_child_sessions(
     )
     rows = await cursor.fetchall()
     return [dict(r) for r in rows]
+
+
+# ── Todos ─────────────────────────────────────────────────────────────
+
+
+async def update_todos(
+    db: aiosqlite.Connection, session_id: str, todos: list[dict]
+) -> None:
+    await db.execute("DELETE FROM todos WHERE session_id = ?", (session_id,))
+    now = utcnow()
+    for position, todo in enumerate(todos):
+        await db.execute(
+            "INSERT INTO todos (session_id, content, status, priority, position, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (session_id, todo["content"], todo["status"], todo["priority"], position, now),
+        )
+    await db.commit()
+
+
+async def get_todos(db: aiosqlite.Connection, session_id: str) -> list[dict]:
+    cursor = await db.execute(
+        "SELECT content, status, priority FROM todos WHERE session_id = ? ORDER BY position ASC",
+        (session_id,),
+    )
+    rows = await cursor.fetchall()
+    return [dict(r) for r in rows]

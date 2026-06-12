@@ -2,18 +2,9 @@ import asyncio
 import json
 import time
 from typing import Callable, Awaitable
-from dataclasses import dataclass
 
-from foundry_app.logger import get_logger
-
-logger = get_logger("agent.core")
-
-from pydantic_ai import Agent
 from pydantic_ai.messages import (
     ModelMessage,
-    ModelRequest,
-    ModelResponse,
-    SystemPromptPart,
     TextPart,
     ToolCallPart,
     ToolReturnPart,
@@ -29,102 +20,17 @@ from pydantic_ai.messages import (
 )
 from pydantic_ai.agent import ModelRequestNode, CallToolsNode
 
-from foundry_app.agent.registry import get_provider_prefix, get_model_info
-from foundry_app.agent.context import trim_and_summarize
-from foundry_app.agent.system_prompt import build_system_prompt
+from foundry_app.agent.factory import create_agent
+from foundry_app.agent.deps import AgentDeps
+from foundry_app.model.registry import get_model_info
+from foundry_app.session.history import load_history, serialize_msg
+from foundry_app.session.compaction import is_overflow, prune as compaction_prune, do_compaction
 from foundry_app.db import crud
 from foundry_app.db.database import get_db
 from foundry_app.config import settings
+from foundry_app.logger import get_logger
 
-
-@dataclass
-class AgentDeps:
-    session_id: str
-    model_id: str
-    work_dir: str = ""
-    send_event: Callable[[dict], Awaitable[None]] | None = None
-    is_subagent: bool = False
-    parent_session_id: str | None = None
-    task_id: str | None = None
-
-
-def create_agent(model_id: str, system_prompt: str = "") -> Agent:
-    model_info = get_model_info(model_id)
-    model_string = get_provider_prefix(model_id)
-
-    instructions = build_system_prompt(
-        model_id, str(settings.work_dir), custom_prompt=system_prompt
-    )
-
-    if model_info and model_info.api_base:
-        api_key = model_info.api_key or _resolve_api_key(model_info.provider)
-        model_obj = _create_model_client(
-            model_string, model_info.provider, api_key, model_info.api_base
-        )
-        agent = Agent(
-            model_obj,
-            instructions=instructions,
-            deps_type=AgentDeps,
-            history_processors=[trim_and_summarize],
-        )
-    else:
-        agent = Agent(
-            model_string,
-            instructions=instructions,
-            deps_type=AgentDeps,
-            history_processors=[trim_and_summarize],
-        )
-    _register_tools(agent)
-    return agent
-
-
-def _resolve_api_key(provider: str) -> str:
-    if provider == "openai":
-        return settings.openai_api_key
-    elif provider == "anthropic":
-        return settings.anthropic_api_key
-    return ""
-
-
-def _create_model_client(model_string: str, provider: str, api_key: str, base_url: str):
-    model_name = model_string.split(":", 1)[-1] if ":" in model_string else model_string
-    if provider == "anthropic":
-        try:
-            from anthropic import AsyncAnthropic
-            from pydantic_ai.models.anthropic import AnthropicModel
-            from pydantic_ai.providers.anthropic import AnthropicProvider
-
-            if base_url:
-                client = AsyncAnthropic(base_url=base_url, api_key=api_key)
-                provider_obj = AnthropicProvider(anthropic_client=client)
-            else:
-                provider_obj = AnthropicProvider(api_key=api_key)
-            return AnthropicModel(model_name, provider=provider_obj)
-        except Exception:
-            import traceback
-            traceback.print_exc()
-            return model_string
-    else:
-        try:
-            from pydantic_ai.models.openai import OpenAIModel
-            from pydantic_ai.providers.openai import OpenAIProvider
-
-            provider_obj = OpenAIProvider(base_url=base_url, api_key=api_key)
-            return OpenAIModel(model_name, provider=provider_obj)
-        except Exception:
-            import traceback
-            traceback.print_exc()
-            return model_string
-
-
-def _register_tools(agent: Agent):
-    from foundry_app.agent.tools import register_file_tools, register_search_tools, register_skill_tools
-    from foundry_app.agent.subagent_tools import register_task_tools
-
-    register_file_tools(agent)
-    register_search_tools(agent)
-    register_skill_tools(agent)
-    register_task_tools(agent)
+logger = get_logger("chat.orchestrator")
 
 
 async def stream_chat(
@@ -166,7 +72,7 @@ async def stream_chat(
     user_msg = await crud.create_message(db, session_id, "user", user_message)
 
     messages = await crud.list_messages(db, session_id)
-    history = _load_history(messages[:-1])
+    history = load_history(messages[:-1])
 
     agent = create_agent(model_id, session.get("system_prompt", ""))
     deps = AgentDeps(
@@ -348,9 +254,6 @@ async def stream_chat(
 
             all_msgs = result.all_messages()
 
-            from foundry_app.agent.overflow import is_overflow
-            from foundry_app.agent.compaction import prune as compaction_prune
-
             total_tokens_used = input_tokens + output_tokens
             if is_overflow(model_id, total_tokens_used):
                 logger.info(
@@ -358,7 +261,7 @@ async def stream_chat(
                     model_id,
                     total_tokens_used,
                 )
-                await _do_compaction(db, session_id, model_id, all_msgs, send_event)
+                await do_compaction(db, session_id, model_id, all_msgs, send_event)
 
             if assistant_id:
                 msgs_to_store = all_msgs
@@ -375,7 +278,7 @@ async def stream_chat(
                     output_tokens=output_tokens,
                     duration_ms=int((time.monotonic() - start_time) * 1000),
                     model_messages_json=json.dumps(
-                        [_serialize_msg(m) for m in msgs_to_store], default=str
+                        [serialize_msg(m) for m in msgs_to_store], default=str
                     ),
                 )
 
@@ -398,7 +301,7 @@ async def stream_chat(
             session.get("title") == "New Chat"
             and len(messages) <= 1
         ):
-            from foundry_app.agent.title import generate_title
+            from foundry_app.chat.title import generate_title
 
             asyncio.create_task(
                 generate_title(session_id, model_id, user_message, send_event)
@@ -447,91 +350,3 @@ async def stream_chat(
                 "error": {"code": "internal_error", "message": str(e)},
             }
         )
-
-
-def _serialize_msg(msg):
-    if hasattr(msg, "model_dump"):
-        return msg.model_dump()
-    return str(msg)
-
-
-def _find_previous_summary(messages: list[ModelMessage]) -> str | None:
-    for msg in messages:
-        if isinstance(msg, ModelRequest):
-            for part in msg.parts:
-                if (
-                    isinstance(part, SystemPromptPart)
-                    and part.content.startswith("[Conversation Summary]\n")
-                ):
-                    return part.content.replace("[Conversation Summary]\n", "")
-    return None
-
-
-async def _do_compaction(
-    db, session_id: str, model_id: str,
-    all_msgs: list[ModelMessage], send_event,
-):
-    from foundry_app.agent.compaction import process_compaction
-
-    previous_summary = _find_previous_summary(all_msgs)
-
-    summary = await process_compaction(all_msgs, model_id, previous_summary)
-
-    compaction_msg = await crud.create_message(
-        db, session_id, "user",
-        "[Compaction triggered]",
-        is_compaction=True,
-    )
-    summary_msg = await crud.create_message(
-        db, session_id, "assistant",
-        summary,
-        model_id=model_id,
-        is_summary=True,
-        tail_start_id=compaction_msg["id"],
-    )
-
-    logger.info(
-        "compaction done | session=%s summary_len=%d",
-        session_id,
-        len(summary),
-    )
-
-    await send_event({
-        "type": "compaction.done",
-        "session_id": session_id,
-        "summary_message_id": summary_msg["id"],
-    })
-
-    summary_part = SystemPromptPart(
-        content=f"[Conversation Summary]\n{summary}"
-    )
-    summary_model_msg = ModelRequest(parts=[summary_part])
-
-    compacted_json = json.dumps(
-        [_serialize_msg(summary_model_msg)], default=str
-    )
-    await crud.update_message(
-        db, summary_msg["id"], model_messages_json=compacted_json
-    )
-
-
-def _load_history(messages: list[dict]) -> list[ModelMessage]:
-    if not messages:
-        return []
-
-    for msg in reversed(messages):
-        raw = msg.get("model_messages_json", "[]")
-        if raw and raw != "[]":
-            try:
-                data = json.loads(raw)
-                result = []
-                for m in data:
-                    try:
-                        result.append(ModelMessage.model_validate(m))
-                    except Exception:
-                        pass
-                if result:
-                    return result
-            except Exception:
-                pass
-    return []

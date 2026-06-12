@@ -20,6 +20,7 @@ export interface SessionDetail extends Session {
   messages: Message[]
   stats: SessionStats
   task_records: TaskRecord[]
+  todos: TodoItem[]
 }
 
 export interface TaskRecord {
@@ -97,3 +98,9 @@ export interface Model {
 }
 
 export type AppStatus = "idle" | "streaming" | "thinking" | "error"
+
+export interface TodoItem {
+  content: string
+  status: "pending" | "in_progress" | "completed" | "cancelled"
+  priority: "high" | "medium" | "low"
+}

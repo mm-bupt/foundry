@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 from urllib.parse import quote as url_quote
 
-from foundry_app.agent.registry import get_model_info
+from foundry_app.model.registry import get_model_info
 
 AGENT_INTRO = """\
 你是 Foundry,一款交互式命令行工具,用于协助用户完成软件工程相关工作.\

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import json
+
 from pydantic_ai import Agent
 from pydantic_ai.messages import (
     ModelMessage,
@@ -11,12 +15,14 @@ from pydantic_ai.messages import (
     ThinkingPart,
 )
 
-from foundry_app.agent.registry import estimate_tokens, get_provider_prefix
-from foundry_app.agent.overflow import usable_tokens
+from foundry_app.model.registry import estimate_tokens, get_model_info, get_provider_prefix
+from foundry_app.session.history import serialize_msg
 from foundry_app.config import settings
 from foundry_app.logger import get_logger
 
-logger = get_logger("agent.compaction")
+logger = get_logger("session.compaction")
+
+COMPACTION_BUFFER = 20_000
 
 PRUNE_MINIMUM = 20_000
 PRUNE_PROTECT = 40_000
@@ -57,6 +63,25 @@ SUMMARY_TEMPLATE = """## Goal
 ## Relevant Files
 - path/to/file — [Why it matters]
 """
+
+
+def usable_tokens(model_id: str) -> int:
+    info = get_model_info(model_id)
+    if not info:
+        return 80_000
+    context = info.context_window
+    max_output = info.max_output_tokens
+    reserved = COMPACTION_BUFFER
+    return max(0, context - max_output - reserved)
+
+
+def is_overflow(model_id: str, tokens_used: int) -> bool:
+    if not settings.auto_compaction:
+        return False
+    info = get_model_info(model_id)
+    if info and info.context_window == 0:
+        return False
+    return tokens_used >= usable_tokens(model_id)
 
 
 def _count_msg_tokens(msg: ModelMessage) -> int:
@@ -252,6 +277,10 @@ def filter_compacted(messages: list[ModelMessage]) -> list[ModelMessage]:
     return messages
 
 
+async def trim_and_summarize(messages: list[ModelMessage]) -> list[ModelMessage]:
+    return filter_compacted(messages)
+
+
 async def process_compaction(
     messages: list[ModelMessage],
     model_id: str,
@@ -265,6 +294,66 @@ async def process_compaction(
 
     summary = await _generate_summary(head, model_id, previous_summary)
     return summary
+
+
+def _find_previous_summary(messages: list[ModelMessage]) -> str | None:
+    for msg in messages:
+        if isinstance(msg, ModelRequest):
+            for part in msg.parts:
+                if (
+                    isinstance(part, SystemPromptPart)
+                    and part.content.startswith("[Conversation Summary]\n")
+                ):
+                    return part.content.replace("[Conversation Summary]\n", "")
+    return None
+
+
+async def do_compaction(
+    db, session_id: str, model_id: str,
+    all_msgs: list[ModelMessage], send_event,
+):
+    from foundry_app.db import crud
+
+    previous_summary = _find_previous_summary(all_msgs)
+
+    summary = await process_compaction(all_msgs, model_id, previous_summary)
+
+    compaction_msg = await crud.create_message(
+        db, session_id, "user",
+        "[Compaction triggered]",
+        is_compaction=True,
+    )
+    summary_msg = await crud.create_message(
+        db, session_id, "assistant",
+        summary,
+        model_id=model_id,
+        is_summary=True,
+        tail_start_id=compaction_msg["id"],
+    )
+
+    logger.info(
+        "compaction done | session=%s summary_len=%d",
+        session_id,
+        len(summary),
+    )
+
+    await send_event({
+        "type": "compaction.done",
+        "session_id": session_id,
+        "summary_message_id": summary_msg["id"],
+    })
+
+    summary_part = SystemPromptPart(
+        content=f"[Conversation Summary]\n{summary}"
+    )
+    summary_model_msg = ModelRequest(parts=[summary_part])
+
+    compacted_json = json.dumps(
+        [serialize_msg(summary_model_msg)], default=str
+    )
+    await crud.update_message(
+        db, summary_msg["id"], model_messages_json=compacted_json
+    )
 
 
 async def prune(messages: list[ModelMessage]) -> list[ModelMessage]:

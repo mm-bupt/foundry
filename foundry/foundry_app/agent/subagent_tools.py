@@ -19,7 +19,8 @@ from pydantic_ai.messages import (
 )
 from pydantic_ai.agent import ModelRequestNode, CallToolsNode
 
-from foundry_app.agent.core import AgentDeps, _serialize_msg
+from foundry_app.agent.deps import AgentDeps
+from foundry_app.session.history import serialize_msg
 from foundry_app.agent.subagent import (
     get_subagent,
     create_sub_agent,
@@ -293,25 +294,8 @@ def _make_subagent_event_sender(
 
 
 def _load_history(messages: list[dict]) -> list[ModelMessage]:
-    if not messages:
-        return []
-    for msg in reversed(messages):
-        raw = msg.get("model_messages_json", "[]")
-        if raw and raw != "[]":
-            import json
-            try:
-                data = json.loads(raw)
-                result = []
-                for m in data:
-                    try:
-                        result.append(ModelMessage.model_validate(m))
-                    except Exception:
-                        pass
-                if result:
-                    return result
-            except Exception:
-                pass
-    return []
+    from foundry_app.session.history import load_history
+    return load_history(messages)
 
 
 def _list_subagent_names() -> list[str]:

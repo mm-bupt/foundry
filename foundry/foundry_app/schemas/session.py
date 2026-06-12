@@ -95,6 +95,12 @@ def map_message(msg: dict, tool_calls: list[dict] | None = None) -> MessageRespo
     )
 
 
+class TodoItemResponse(BaseModel):
+    content: str
+    status: str
+    priority: str
+
+
 class SessionDetailResponse(BaseModel):
     id: str
     title: str
@@ -106,3 +112,4 @@ class SessionDetailResponse(BaseModel):
     messages: list[MessageResponse]
     stats: SessionStats = SessionStats()
     task_records: list[TaskRecordResponse] = []
+    todos: list[TodoItemResponse] = []

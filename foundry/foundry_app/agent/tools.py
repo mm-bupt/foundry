@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 from pydantic_ai import Agent, RunContext
-from foundry_app.agent.core import AgentDeps
+from foundry_app.agent.deps import AgentDeps
 from foundry_app.logger import get_logger
 
 logger = get_logger("agent.tools")

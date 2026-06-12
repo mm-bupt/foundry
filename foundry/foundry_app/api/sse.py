@@ -3,7 +3,7 @@ from sse_starlette.sse import EventSourceResponse
 import asyncio
 import json
 
-from foundry_app.agent.core import stream_chat
+from foundry_app.chat.orchestrator import stream_chat
 from foundry_app.db.database import get_db
 from foundry_app.db import crud
 from foundry_app.shared_protocol import to_dict

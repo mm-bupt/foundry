@@ -10,6 +10,7 @@ from foundry_app.schemas.session import (
     SessionDetailResponse,
     SessionStats,
     TaskRecordResponse,
+    TodoItemResponse,
     map_message,
 )
 
@@ -52,11 +53,14 @@ async def get_session(session_id: str):
         tc_list = await crud.list_tool_calls(db, m["id"])
         mapped.append(map_message(m, tc_list))
     task_records = [TaskRecordResponse(**tr) for tr in task_records_raw]
+    todos_raw = await crud.get_todos(db, session_id)
+    todos = [TodoItemResponse(**t) for t in todos_raw]
     return SessionDetailResponse(
         **session,
         messages=mapped,
         stats=SessionStats(**stats),
         task_records=task_records,
+        todos=todos,
     )
 
 
@@ -105,3 +109,21 @@ async def delete_session(session_id: str):
                 }
             },
         )
+
+
+@router.get("/{session_id}/todos")
+async def get_session_todos(session_id: str):
+    db = await get_db()
+    session = await crud.get_session(db, session_id)
+    if not session:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": {
+                    "code": "session_not_found",
+                    "message": f"Session '{session_id}' not found",
+                }
+            },
+        )
+    todos = await crud.get_todos(db, session_id)
+    return {"todos": todos}
