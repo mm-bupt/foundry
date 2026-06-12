@@ -95,13 +95,18 @@ async def create_message(
     input_tokens: int = 0,
     output_tokens: int = 0,
     model_messages_json: str = "[]",
+    is_compaction: bool = False,
+    is_summary: bool = False,
+    tail_start_id: str | None = None,
 ) -> dict:
     mid = new_id()
     now = utcnow()
     await db.execute(
         """INSERT INTO messages
-           (id, session_id, role, content, model_id, duration_ms, input_tokens, output_tokens, model_messages_json, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           (id, session_id, role, content, model_id, duration_ms,
+            input_tokens, output_tokens, model_messages_json,
+            is_compaction, is_summary, tail_start_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             mid,
             session_id,
@@ -112,6 +117,9 @@ async def create_message(
             input_tokens,
             output_tokens,
             model_messages_json,
+            int(is_compaction),
+            int(is_summary),
+            tail_start_id,
             now,
         ),
     )
@@ -130,6 +138,9 @@ async def create_message(
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
         "model_messages_json": model_messages_json,
+        "is_compaction": is_compaction,
+        "is_summary": is_summary,
+        "tail_start_id": tail_start_id,
         "created_at": now,
     }
 
@@ -166,6 +177,10 @@ async def update_message(
             "input_tokens",
             "output_tokens",
             "model_messages_json",
+            "is_compaction",
+            "is_summary",
+            "tail_start_id",
+            "compacted_at",
         ):
             sets.append(f"{k} = ?")
             vals.append(v)

@@ -5,6 +5,9 @@ import time
 
 from foundry_app.agent.core import stream_chat
 from foundry_app.shared_protocol import parse_command, to_dict, Pong
+from foundry_app.db.database import get_db
+from foundry_app.db import crud
+from foundry_app.config import settings
 from foundry_app.logger import get_logger
 
 logger = get_logger("api.ws")
@@ -47,6 +50,22 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                     pending_task = None
                 else:
                     await send_event({"type": "stream.done"})
+                continue
+
+            if msg_type == "chat.compact":
+                async def do_compact():
+                    from foundry_app.agent.core import _do_compaction, _load_history
+                    db_conn = await get_db()
+                    msgs = await crud.list_messages(db_conn, session_id)
+                    sess = await crud.get_session(db_conn, session_id)
+                    model_id = (sess or {}).get("model_id", settings.default_model)
+                    history = _load_history(msgs)
+                    if history:
+                        await _do_compaction(db_conn, session_id, model_id, history, send_event)
+                    else:
+                        await send_event({"type": "compaction.done", "session_id": session_id, "summary_message_id": ""})
+
+                asyncio.create_task(do_compact())
                 continue
 
             if msg_type == "chat.message":

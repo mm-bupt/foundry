@@ -13,6 +13,7 @@ from pydantic_ai.messages import (
     ModelMessage,
     ModelRequest,
     ModelResponse,
+    SystemPromptPart,
     TextPart,
     ToolCallPart,
     ToolReturnPart,
@@ -346,7 +347,25 @@ async def stream_chat(
                 output_tokens = usage.response_tokens or 0
 
             all_msgs = result.all_messages()
+
+            from foundry_app.agent.overflow import is_overflow
+            from foundry_app.agent.compaction import prune as compaction_prune
+
+            total_tokens_used = input_tokens + output_tokens
+            if is_overflow(model_id, total_tokens_used):
+                logger.info(
+                    "overflow detected | model=%s tokens=%d, triggering compaction",
+                    model_id,
+                    total_tokens_used,
+                )
+                await _do_compaction(db, session_id, model_id, all_msgs, send_event)
+
             if assistant_id:
+                msgs_to_store = all_msgs
+                try:
+                    msgs_to_store = await compaction_prune(all_msgs)
+                except Exception:
+                    logger.exception("prune failed | session=%s", session_id)
                 await crud.update_message(
                     db,
                     assistant_id,
@@ -356,7 +375,7 @@ async def stream_chat(
                     output_tokens=output_tokens,
                     duration_ms=int((time.monotonic() - start_time) * 1000),
                     model_messages_json=json.dumps(
-                        [_serialize_msg(m) for m in all_msgs], default=str
+                        [_serialize_msg(m) for m in msgs_to_store], default=str
                     ),
                 )
 
@@ -436,9 +455,70 @@ def _serialize_msg(msg):
     return str(msg)
 
 
+def _find_previous_summary(messages: list[ModelMessage]) -> str | None:
+    for msg in messages:
+        if isinstance(msg, ModelRequest):
+            for part in msg.parts:
+                if (
+                    isinstance(part, SystemPromptPart)
+                    and part.content.startswith("[Conversation Summary]\n")
+                ):
+                    return part.content.replace("[Conversation Summary]\n", "")
+    return None
+
+
+async def _do_compaction(
+    db, session_id: str, model_id: str,
+    all_msgs: list[ModelMessage], send_event,
+):
+    from foundry_app.agent.compaction import process_compaction
+
+    previous_summary = _find_previous_summary(all_msgs)
+
+    summary = await process_compaction(all_msgs, model_id, previous_summary)
+
+    compaction_msg = await crud.create_message(
+        db, session_id, "user",
+        "[Compaction triggered]",
+        is_compaction=True,
+    )
+    summary_msg = await crud.create_message(
+        db, session_id, "assistant",
+        summary,
+        model_id=model_id,
+        is_summary=True,
+        tail_start_id=compaction_msg["id"],
+    )
+
+    logger.info(
+        "compaction done | session=%s summary_len=%d",
+        session_id,
+        len(summary),
+    )
+
+    await send_event({
+        "type": "compaction.done",
+        "session_id": session_id,
+        "summary_message_id": summary_msg["id"],
+    })
+
+    summary_part = SystemPromptPart(
+        content=f"[Conversation Summary]\n{summary}"
+    )
+    summary_model_msg = ModelRequest(parts=[summary_part])
+
+    compacted_json = json.dumps(
+        [_serialize_msg(summary_model_msg)], default=str
+    )
+    await crud.update_message(
+        db, summary_msg["id"], model_messages_json=compacted_json
+    )
+
+
 def _load_history(messages: list[dict]) -> list[ModelMessage]:
     if not messages:
         return []
+
     for msg in reversed(messages):
         raw = msg.get("model_messages_json", "[]")
         if raw and raw != "[]":

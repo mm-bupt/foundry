@@ -9,6 +9,7 @@ from foundry_app.db.database import init_db, get_db, close_db
 from foundry_app.api import sessions, models, memory
 from foundry_app.api.ws import router as ws_router
 from foundry_app.api.sse import router as sse_router
+from foundry_app.api.compact import router as compact_router
 from foundry_app.logger import setup_logging
 
 
@@ -38,6 +39,7 @@ app.add_middleware(
 app.include_router(sessions.router)
 app.include_router(models.router)
 app.include_router(memory.router)
+app.include_router(compact_router)
 app.include_router(ws_router)
 app.include_router(sse_router)
 

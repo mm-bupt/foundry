@@ -53,6 +53,10 @@ class Message(SQLModel, table=True):
     input_tokens: int = Field(default=0)
     output_tokens: int = Field(default=0)
     model_messages_json: str = Field(default="[]")
+    is_compaction: bool = Field(default=False)
+    is_summary: bool = Field(default=False)
+    tail_start_id: Optional[str] = Field(default=None)
+    compacted_at: Optional[str] = Field(default=None)
     created_at: str = Field(default_factory=utcnow)
 
 

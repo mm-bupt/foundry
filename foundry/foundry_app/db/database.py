@@ -41,6 +41,10 @@ CREATE TABLE IF NOT EXISTS messages (
     input_tokens INTEGER NOT NULL DEFAULT 0,
     output_tokens INTEGER NOT NULL DEFAULT 0,
     model_messages_json TEXT NOT NULL DEFAULT '[]',
+    is_compaction INTEGER NOT NULL DEFAULT 0,
+    is_summary INTEGER NOT NULL DEFAULT 0,
+    tail_start_id TEXT,
+    compacted_at TEXT,
     created_at TEXT NOT NULL
 );
 
@@ -108,6 +112,10 @@ async def _connect() -> aiosqlite.Connection:
 _MIGRATIONS = [
     "ALTER TABLE messages ADD COLUMN thinking_content TEXT NOT NULL DEFAULT ''",
     "ALTER TABLE sessions ADD COLUMN parent_id TEXT",
+    "ALTER TABLE messages ADD COLUMN is_compaction INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE messages ADD COLUMN is_summary INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE messages ADD COLUMN tail_start_id TEXT",
+    "ALTER TABLE messages ADD COLUMN compacted_at TEXT",
 ]
 
 

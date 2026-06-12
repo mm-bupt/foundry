@@ -19,13 +19,17 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
 
     default_model: str = "claude-sonnet"
-    summary_model: str = "openai:gpt-4o-mini"
     embedding_model: str = "openai:text-embedding-3-small"
     embedding_dimensions: int = 1536
 
     ws_heartbeat_interval: int = 30
     ws_heartbeat_timeout: int = 60
     context_window_threshold: float = 0.8
+
+    auto_compaction: bool = True
+    compaction_prune: bool = True
+    compaction_tail_turns: int = 2
+    compaction_reserved: int = 20_000
 
     cors_origins: list[str] = ["*"]
 

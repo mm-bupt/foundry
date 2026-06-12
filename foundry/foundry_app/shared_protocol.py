@@ -109,13 +109,30 @@ class TaskError:
     error: str = ""
 
 
-def parse_command(data: dict) -> ChatMessageCmd | None:
+@dataclass
+class CompactCmd:
+    type: str = "chat.compact"
+    session_id: str = ""
+
+
+@dataclass
+class CompactionDone:
+    type: str = "compaction.done"
+    session_id: str = ""
+    summary_message_id: str = ""
+
+
+def parse_command(data: dict) -> ChatMessageCmd | CompactCmd | None:
     msg_type = data.get("type", "")
     if msg_type == "chat.message":
         return ChatMessageCmd(
             message_id=data.get("message_id", str(uuid.uuid4())),
             content=data.get("content", ""),
             model_id=data.get("model_id", ""),
+        )
+    if msg_type == "chat.compact":
+        return CompactCmd(
+            session_id=data.get("session_id", ""),
         )
     return None
 
