@@ -7,8 +7,17 @@ export interface Session {
   updated_at: string
 }
 
+export interface SessionStats {
+  total_input_tokens: number
+  total_output_tokens: number
+  total_tokens: number
+  context_tokens: number
+  message_count: number
+}
+
 export interface SessionDetail extends Session {
   messages: Message[]
+  stats: SessionStats
 }
 
 export interface ToolCall {

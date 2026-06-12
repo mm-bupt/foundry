@@ -1,6 +1,27 @@
 import { create } from "zustand"
-import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment } from "./types"
+import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, SessionStats } from "./types"
 import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel, updateSession } from "./api"
+
+const PERSIST_KEY = "foundry_webui_state"
+
+interface PersistedState {
+  sidebarCollapsed: boolean
+  statsPanelVisible: boolean
+}
+
+function loadPersisted(): PersistedState {
+  try {
+    const raw = localStorage.getItem(PERSIST_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch {}
+  return { sidebarCollapsed: false, statsPanelVisible: true }
+}
+
+function savePersisted(data: PersistedState): void {
+  try {
+    localStorage.setItem(PERSIST_KEY, JSON.stringify(data))
+  } catch {}
+}
 
 interface AppState {
   sessions: Session[]
@@ -16,6 +37,9 @@ interface AppState {
   thinkingMessageId: string
   errorMessage: string
   connected: boolean
+  sessionStats: SessionStats | null
+  sidebarCollapsed: boolean
+  statsPanelVisible: boolean
 
   init: () => Promise<void>
   switchSession: (id: string) => Promise<void>
@@ -40,6 +64,9 @@ interface AppState {
   updateSessionTitle: (sessionId: string, title: string) => void
   reloadMessages: () => Promise<void>
   setSessions: (sessions: Session[]) => void
+  setSessionStats: (stats: SessionStats | null) => void
+  toggleSidebar: () => void
+  toggleStatsPanel: () => void
 }
 
 function getStreamingText(segments: StreamSegment[]): string {
@@ -63,7 +90,10 @@ function mapToolCalls(tcList: unknown[]): ToolCall[] {
   })
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+export const useAppStore = create<AppState>((set, get) => {
+  const persisted = loadPersisted()
+
+  return {
   sessions: [],
   currentSessionId: "",
   messages: [],
@@ -77,6 +107,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   thinkingMessageId: "",
   errorMessage: "",
   connected: false,
+  sessionStats: null,
+  sidebarCollapsed: persisted.sidebarCollapsed,
+  statsPanelVisible: persisted.statsPanelVisible,
 
   init: async () => {
     const [sessions, models, active] = await Promise.all([
@@ -102,6 +135,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       isThinking: false,
       thinkingMessageId: "",
       errorMessage: "",
+      sessionStats: null,
     })
     const detail = await getSession(id)
     if (detail) {
@@ -111,7 +145,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         ...m,
         tool_calls: mapToolCalls((m as unknown as Record<string, unknown>).tool_calls as unknown[]),
       }))
-      set({ messages: msgs, currentModel: modelId })
+      set({ messages: msgs, currentModel: modelId, sessionStats: detail.stats ?? null })
     }
   },
 
@@ -249,9 +283,20 @@ export const useAppStore = create<AppState>((set, get) => ({
         ...m,
         tool_calls: mapToolCalls((m as unknown as Record<string, unknown>).tool_calls as unknown[]),
       }))
-      set({ messages: msgs })
+      set({ messages: msgs, sessionStats: detail.stats ?? null })
     }
   },
 
   setSessions: (sessions) => set({ sessions }),
-}))
+  setSessionStats: (stats) => set({ sessionStats: stats }),
+  toggleSidebar: () => {
+    const next = !get().sidebarCollapsed
+    set({ sidebarCollapsed: next })
+    savePersisted({ sidebarCollapsed: next, statsPanelVisible: get().statsPanelVisible })
+  },
+  toggleStatsPanel: () => {
+    const next = !get().statsPanelVisible
+    set({ statsPanelVisible: next })
+    savePersisted({ sidebarCollapsed: get().sidebarCollapsed, statsPanelVisible: next })
+  },
+}})

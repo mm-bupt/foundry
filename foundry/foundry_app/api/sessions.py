@@ -8,6 +8,7 @@ from foundry_app.schemas.session import (
     SessionResponse,
     SessionListResponse,
     SessionDetailResponse,
+    SessionStats,
     map_message,
 )
 
@@ -43,6 +44,7 @@ async def get_session(session_id: str):
             },
         )
     messages = await crud.list_messages(db, session_id)
+    stats = await crud.get_session_stats(db, session_id)
     mapped = []
     for m in messages:
         tc_list = await crud.list_tool_calls(db, m["id"])
@@ -50,6 +52,7 @@ async def get_session(session_id: str):
     return SessionDetailResponse(
         **session,
         messages=mapped,
+        stats=SessionStats(**stats),
     )
 
 

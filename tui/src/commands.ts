@@ -96,12 +96,20 @@ const commands: Command[] = [
     },
   },
   {
+    name: "/stats",
+    aliases: [],
+    description: "Toggle stats panel",
+    action: (store) => {
+      store.toggleRightPanel()
+    },
+  },
+  {
     name: "/help",
     aliases: ["/h", "/?"],
     description: "Show commands",
     action: (store) => {
       store.setError(
-        "Commands: /new /sessions /model /delete /rename /clear /memories /sidebar /help /exit"
+        "Commands: /new /sessions /model /delete /rename /clear /memories /sidebar /stats /help /exit"
       )
     },
   },

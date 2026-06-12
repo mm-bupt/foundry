@@ -1,11 +1,12 @@
-import { onMount, onCleanup } from "solid-js"
+import { onMount, onCleanup, Show } from "solid-js"
 import { createAppStore } from "./store"
 import { createWSClient } from "./ws"
-import { fetchSessions, fetchModels, getSession, createSession, fetchMemories } from "./api"
+import { fetchSessions, fetchModels, getSession, createSession, deleteSession, fetchMemories } from "./api"
 import { ChatArea } from "./components/ChatArea"
 import { InputBar } from "./components/InputBar"
 import { StatusBar } from "./components/StatusBar"
 import { ContextPanel } from "./components/ContextPanel"
+import { StatsPanel } from "./components/StatsPanel"
 import { ModelPicker } from "./components/ModelPicker"
 import { theme } from "./theme"
 
@@ -59,7 +60,10 @@ export function App() {
     const sid = store.state.currentSessionId
     if (!sid) return
     const detail = await getSession(sid)
-    if (detail) store.setMessages(detail.messages)
+    if (detail) {
+      store.setMessages(detail.messages)
+      if (detail.stats) store.setSessionStats(detail.stats)
+    }
   }
 
   async function reloadMemories() {
@@ -74,18 +78,42 @@ export function App() {
     store.setCurrentSession(id)
     store.setMessages([])
     store.setStatus("idle")
-    store.setState({ streamingText: "", lastDurationMs: null, lastTokens: null })
+    store.setState({ streamingText: "", lastDurationMs: null, lastTokens: null, sessionStats: null })
 
     const detail = await getSession(id)
     if (detail) {
       store.setMessages(detail.messages)
       store.setCurrentModel(detail.model_id)
+      if (detail.stats) store.setSessionStats(detail.stats)
     }
 
     const memories = await fetchMemories(id)
     store.setMemories(memories)
 
     ws.connect(id)
+  }
+
+  async function handleDeleteSession(sessionId: string) {
+    const success = await deleteSession(sessionId)
+    if (!success) {
+      store.setError("Failed to delete session")
+      return
+    }
+
+    const sessions = store.state.sessions.filter((s) => s.id !== sessionId)
+    store.setSessions(sessions)
+
+    if (store.state.currentSessionId === sessionId) {
+      ws.disconnect()
+      if (sessions.length > 0) {
+        await switchSession(sessions[0].id)
+      } else {
+        store.setCurrentSession("")
+        store.setMessages([])
+        store.setMemories([])
+        store.setSessionStats(null)
+      }
+    }
   }
 
   async function handleSubmit(content: string) {
@@ -138,13 +166,24 @@ export function App() {
   return (
     <box flexDirection="column" width="100%" height="100%" backgroundColor={theme.bg}>
       <box flexDirection="row" flexGrow={1}>
+        <Show when={store.state.contextVisible}>
+          <ContextPanel
+            store={store}
+            onSwitchSession={switchSession}
+            onClose={() => store.toggleContext()}
+            onDelete={handleDeleteSession}
+          />
+        </Show>
         <box flexDirection="column" flexGrow={1}>
           <ChatArea store={store} />
           <InputBar store={store} onSubmit={handleSubmit} />
         </box>
-        {store.state.contextVisible && (
-          <ContextPanel store={store} onSwitchSession={switchSession} />
-        )}
+        <Show when={store.state.rightPanelVisible}>
+          <StatsPanel
+            store={store}
+            onClose={() => store.toggleRightPanel()}
+          />
+        </Show>
       </box>
       <StatusBar store={store} onInterrupt={() => ws.interrupt()} />
       {store.state.showModelPicker && (

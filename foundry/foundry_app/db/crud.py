@@ -362,3 +362,35 @@ async def list_tool_calls(db: aiosqlite.Connection, message_id: str) -> list[dic
     )
     rows = await cursor.fetchall()
     return [dict(r) for r in rows]
+
+
+async def get_session_stats(db: aiosqlite.Connection, session_id: str) -> dict:
+    cursor = await db.execute(
+        """
+        SELECT
+            COALESCE(SUM(input_tokens), 0) as total_input_tokens,
+            COALESCE(SUM(output_tokens), 0) as total_output_tokens,
+            COUNT(*) as message_count
+        FROM messages
+        WHERE session_id = ?
+        """,
+        (session_id,),
+    )
+    row = await cursor.fetchone()
+    if not row:
+        return {
+            "total_input_tokens": 0,
+            "total_output_tokens": 0,
+            "total_tokens": 0,
+            "context_tokens": 0,
+            "message_count": 0,
+        }
+    total_input = row[0] or 0
+    total_output = row[1] or 0
+    return {
+        "total_input_tokens": total_input,
+        "total_output_tokens": total_output,
+        "total_tokens": total_input + total_output,
+        "context_tokens": total_input,
+        "message_count": row[2] or 0,
+    }

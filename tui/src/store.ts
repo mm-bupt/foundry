@@ -1,5 +1,7 @@
 import { createStore } from "solid-js/store"
-import type { Session, Message, Model, Memory, ToolCall } from "./types"
+import { createEffect } from "solid-js"
+import type { Session, Message, Model, Memory, ToolCall, SessionStats } from "./types"
+import { loadPersistedState, savePersistedState } from "./persistence"
 
 export type AppStatus = "idle" | "streaming" | "thinking" | "error" | "disconnected"
 
@@ -18,11 +20,14 @@ interface AppState {
   lastTokens: { input: number; output: number } | null
   connected: boolean
   contextVisible: boolean
+  rightPanelVisible: boolean
   showModelPicker: boolean
   memories: Memory[]
+  sessionStats: SessionStats | null
 }
 
 export function createAppStore() {
+  const persisted = loadPersistedState()
   const [state, setState] = createStore<AppState>({
     sessions: [],
     currentSessionId: "",
@@ -37,9 +42,18 @@ export function createAppStore() {
     lastDurationMs: null,
     lastTokens: null,
     connected: false,
-    contextVisible: true,
+    contextVisible: persisted?.contextVisible ?? true,
+    rightPanelVisible: persisted?.rightPanelVisible ?? true,
     showModelPicker: false,
     memories: [],
+    sessionStats: null,
+  })
+
+  createEffect(() => {
+    savePersistedState({
+      contextVisible: state.contextVisible,
+      rightPanelVisible: state.rightPanelVisible,
+    })
   })
 
   return {
@@ -76,10 +90,12 @@ export function createAppStore() {
       setState("pendingToolCalls", id, { result, duration_ms: durationMs }),
 
     toggleContext: () => setState("contextVisible", (v) => !v),
+    toggleRightPanel: () => setState("rightPanelVisible", (v) => !v),
     toggleModelPicker: () => setState("showModelPicker", (v) => !v),
     setShowModelPicker: (show: boolean) => setState({ showModelPicker: show }),
 
     setMemories: (memories: Memory[]) => setState({ memories }),
+    setSessionStats: (stats: SessionStats | null) => setState({ sessionStats: stats }),
   }
 }
 

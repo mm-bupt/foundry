@@ -33,6 +33,14 @@ class SessionListResponse(BaseModel):
     sessions: list[SessionResponse]
 
 
+class SessionStats(BaseModel):
+    total_input_tokens: int = 0
+    total_output_tokens: int = 0
+    total_tokens: int = 0
+    context_tokens: int = 0
+    message_count: int = 0
+
+
 class MessageResponse(BaseModel):
     id: str
     session_id: str
@@ -81,3 +89,4 @@ class SessionDetailResponse(BaseModel):
     created_at: str
     updated_at: str
     messages: list[MessageResponse]
+    stats: SessionStats = SessionStats()
