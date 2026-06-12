@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import aiosqlite
 
-from foundry_app.db.models import Session, Message, MemoryVector, ToolCallRecord
+from foundry_app.db.models import Session, Message, MemoryVector, ToolCallRecord, TaskRecord
 
 
 def utcnow() -> str:
@@ -18,13 +18,16 @@ def new_id() -> str:
 
 
 async def create_session(
-    db: aiosqlite.Connection, title: str = "New Chat", model_id: str = "claude-sonnet"
+    db: aiosqlite.Connection,
+    title: str = "New Chat",
+    model_id: str = "claude-sonnet",
+    parent_id: str | None = None,
 ) -> dict:
     sid = new_id()
     now = utcnow()
     await db.execute(
-        "INSERT INTO sessions (id, title, model_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
-        (sid, title, model_id, now, now),
+        "INSERT INTO sessions (id, title, model_id, parent_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (sid, title, model_id, parent_id, now, now),
     )
     await db.commit()
     return {
@@ -32,6 +35,7 @@ async def create_session(
         "title": title,
         "model_id": model_id,
         "system_prompt": "",
+        "parent_id": parent_id,
         "created_at": now,
         "updated_at": now,
     }
@@ -59,7 +63,7 @@ async def update_session(
     sets = []
     vals = []
     for k, v in kwargs.items():
-        if k in ("title", "model_id", "system_prompt"):
+        if k in ("title", "model_id", "system_prompt", "parent_id"):
             sets.append(f"{k} = ?")
             vals.append(v)
     if not sets:
@@ -394,3 +398,90 @@ async def get_session_stats(db: aiosqlite.Connection, session_id: str) -> dict:
         "context_tokens": total_input,
         "message_count": row[2] or 0,
     }
+
+
+# ── Task Records ─────────────────────────────────────────────────────
+
+
+async def create_task_record(
+    db: aiosqlite.Connection,
+    parent_session_id: str,
+    subagent_type: str,
+    description: str = "",
+    parent_message_id: str | None = None,
+    background: bool = False,
+) -> dict:
+    tid = new_id()
+    now = utcnow()
+    await db.execute(
+        """INSERT INTO task_records
+           (id, parent_session_id, parent_message_id, subagent_type, description, status, background, created_at)
+           VALUES (?, ?, ?, ?, ?, 'running', ?, ?)""",
+        (tid, parent_session_id, parent_message_id, subagent_type, description, int(background), now),
+    )
+    await db.commit()
+    return {
+        "id": tid,
+        "parent_session_id": parent_session_id,
+        "parent_message_id": parent_message_id,
+        "subagent_type": subagent_type,
+        "description": description,
+        "status": "running",
+        "background": background,
+        "result_preview": None,
+        "created_at": now,
+        "completed_at": None,
+    }
+
+
+async def get_task_record(db: aiosqlite.Connection, task_id: str) -> dict | None:
+    cursor = await db.execute("SELECT * FROM task_records WHERE id = ?", (task_id,))
+    row = await cursor.fetchone()
+    return dict(row) if row else None
+
+
+async def update_task_record(
+    db: aiosqlite.Connection,
+    task_id: str,
+    status: str | None = None,
+    result_preview: str | None = None,
+) -> dict | None:
+    sets = []
+    vals = []
+    if status is not None:
+        sets.append("status = ?")
+        vals.append(status)
+    if result_preview is not None:
+        sets.append("result_preview = ?")
+        vals.append(result_preview)
+    if status in ("completed", "error", "cancelled"):
+        sets.append("completed_at = ?")
+        vals.append(utcnow())
+    if not sets:
+        return await get_task_record(db, task_id)
+    vals.append(task_id)
+    await db.execute(f"UPDATE task_records SET {', '.join(sets)} WHERE id = ?", vals)
+    await db.commit()
+    return await get_task_record(db, task_id)
+
+
+async def list_task_records(
+    db: aiosqlite.Connection, parent_session_id: str
+) -> list[dict]:
+    cursor = await db.execute(
+        "SELECT * FROM task_records WHERE parent_session_id = ? ORDER BY created_at ASC",
+        (parent_session_id,),
+    )
+    rows = await cursor.fetchall()
+    return [dict(r) for r in rows]
+
+
+async def get_child_sessions(
+    db: aiosqlite.Connection, parent_session_id: str
+) -> list[dict]:
+    cursor = await db.execute(
+        "SELECT * FROM sessions WHERE parent_id = ? ORDER BY created_at ASC",
+        (parent_session_id,),
+    )
+    rows = await cursor.fetchall()
+    return [dict(r) for r in rows]

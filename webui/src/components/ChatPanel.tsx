@@ -6,6 +6,7 @@ import { CopyOutlined, CheckOutlined } from "@ant-design/icons"
 import { useAppStore } from "../store"
 import { MarkdownContent } from "./MarkdownContent"
 import { ToolCallBlock } from "./ToolCallBlock"
+import { TaskBlock } from "./TaskBlock"
 import type { Message, StreamSegment, TextSegment } from "../types"
 
 interface ChatItem {
@@ -74,6 +75,9 @@ function SegmentRenderer({ segments, fallback }: { segments?: StreamSegment[]; f
         if (seg.type === "text") {
           if (!seg.content) return null
           return <MarkdownContent key={i}>{seg.content}</MarkdownContent>
+        }
+        if (seg.type === "task_call") {
+          return <TaskBlock key={seg.taskId} segment={seg} />
         }
         return <ToolCallBlock key={seg.toolCall.toolCallId} toolCall={seg.toolCall} />
       })}

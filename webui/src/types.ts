@@ -3,6 +3,7 @@ export interface Session {
   title: string
   model_id: string
   system_prompt: string | null
+  parent_id: string | null
   created_at: string
   updated_at: string
 }
@@ -18,6 +19,20 @@ export interface SessionStats {
 export interface SessionDetail extends Session {
   messages: Message[]
   stats: SessionStats
+  task_records: TaskRecord[]
+}
+
+export interface TaskRecord {
+  id: string
+  parent_session_id: string
+  parent_message_id: string | null
+  subagent_type: string
+  description: string
+  status: "running" | "completed" | "error" | "cancelled"
+  background: boolean
+  result_preview: string | null
+  created_at: string
+  completed_at: string | null
 }
 
 export interface ToolCall {
@@ -38,7 +53,18 @@ export interface ToolCallSegment {
   toolCall: ToolCall
 }
 
-export type StreamSegment = TextSegment | ToolCallSegment
+export interface TaskCallSegment {
+  type: "task_call"
+  taskId: string
+  subagentType: string
+  description: string
+  status: "running" | "completed" | "error"
+  background: boolean
+  result?: string
+  subSegments: StreamSegment[]
+}
+
+export type StreamSegment = TextSegment | ToolCallSegment | TaskCallSegment
 
 export interface Message {
   id: string

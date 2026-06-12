@@ -25,12 +25,26 @@ class SessionResponse(BaseModel):
     title: str
     model_id: str
     system_prompt: str
+    parent_id: str | None = None
     created_at: str
     updated_at: str
 
 
 class SessionListResponse(BaseModel):
     sessions: list[SessionResponse]
+
+
+class TaskRecordResponse(BaseModel):
+    id: str
+    parent_session_id: str
+    parent_message_id: str | None = None
+    subagent_type: str = ""
+    description: str = ""
+    status: str = "running"
+    background: bool = False
+    result_preview: str | None = None
+    created_at: str = ""
+    completed_at: str | None = None
 
 
 class SessionStats(BaseModel):
@@ -86,7 +100,9 @@ class SessionDetailResponse(BaseModel):
     title: str
     model_id: str
     system_prompt: str
+    parent_id: str | None = None
     created_at: str
     updated_at: str
     messages: list[MessageResponse]
     stats: SessionStats = SessionStats()
+    task_records: list[TaskRecordResponse] = []

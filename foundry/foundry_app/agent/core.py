@@ -42,6 +42,9 @@ class AgentDeps:
     model_id: str
     work_dir: str = ""
     send_event: Callable[[dict], Awaitable[None]] | None = None
+    is_subagent: bool = False
+    parent_session_id: str | None = None
+    task_id: str | None = None
 
 
 def create_agent(model_id: str, system_prompt: str = "") -> Agent:
@@ -115,10 +118,12 @@ def _create_model_client(model_string: str, provider: str, api_key: str, base_ur
 
 def _register_tools(agent: Agent):
     from foundry_app.agent.tools import register_file_tools, register_search_tools, register_skill_tools
+    from foundry_app.agent.subagent_tools import register_task_tools
 
     register_file_tools(agent)
     register_search_tools(agent)
     register_skill_tools(agent)
+    register_task_tools(agent)
 
 
 async def stream_chat(

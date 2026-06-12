@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, SessionStats } from "./types"
+import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, TaskCallSegment, SessionStats, TaskRecord } from "./types"
 import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel, updateSession } from "./api"
 
 const PERSIST_KEY = "foundry_webui_state"
@@ -21,6 +21,91 @@ function savePersisted(data: PersistedState): void {
   try {
     localStorage.setItem(PERSIST_KEY, JSON.stringify(data))
   } catch {}
+}
+
+function getStreamingText(segments: StreamSegment[]): string {
+  return segments
+    .filter((seg): seg is TextSegment => seg.type === "text")
+    .map((seg) => seg.content)
+    .join("")
+}
+
+function updateTaskInSegments(
+  segments: StreamSegment[],
+  taskId: string,
+  updater: (seg: TaskCallSegment) => TaskCallSegment
+): StreamSegment[] {
+  return segments.map((seg) => {
+    if (seg.type === "task_call" && seg.taskId === taskId) {
+      return updater(seg)
+    }
+    return seg
+  })
+}
+
+function appendToTaskSubSegments(
+  segments: StreamSegment[],
+  taskId: string,
+  subSegment: StreamSegment
+): StreamSegment[] {
+  return updateTaskInSegments(segments, taskId, (task) => ({
+    ...task,
+    subSegments: [...task.subSegments, subSegment],
+  }))
+}
+
+function updateTaskSubToolResult(
+  segments: StreamSegment[],
+  taskId: string,
+  toolCallId: string,
+  result: string
+): StreamSegment[] {
+  return updateTaskInSegments(segments, taskId, (task) => ({
+    ...task,
+    subSegments: task.subSegments.map((sub) => {
+      if (
+        sub.type === "tool_call" &&
+        sub.toolCall.toolCallId === toolCallId
+      ) {
+        return {
+          ...sub,
+          toolCall: { ...sub.toolCall, result, status: "done" as const },
+        }
+      }
+      return sub
+    }),
+  }))
+}
+
+function mapToolCalls(tcList: unknown[]): ToolCall[] {
+  if (!Array.isArray(tcList)) return []
+  return tcList.map((raw) => {
+    const tc = raw as Record<string, unknown>
+    return {
+      toolCallId: (tc.id as string) ?? "",
+      toolName: (tc.tool_name as string) ?? "",
+      args: (() => { try { return JSON.parse((tc.args_json as string) || "{}") } catch { return {} } })(),
+      result: (tc.result as string) ?? undefined,
+      status: (tc.status as "running" | "done") ?? "pending",
+    }
+  })
+}
+
+function taskRecordsToSegments(records: TaskRecord[]): StreamSegment[] {
+  return records
+    .filter((r) => r.status !== "cancelled")
+    .map(
+      (r): TaskCallSegment => ({
+        type: "task_call",
+        taskId: r.id,
+        subagentType: r.subagent_type,
+        description: r.description,
+        status: r.status as TaskCallSegment["status"],
+        background: r.background,
+        result: r.result_preview ?? undefined,
+        subSegments: [],
+      })
+    )
 }
 
 interface AppState {
@@ -50,6 +135,10 @@ interface AppState {
   setConnected: (connected: boolean) => void
   addToolCall: (tc: ToolCall) => void
   updateToolResult: (toolCallId: string, result: string) => void
+  addTaskCall: (params: { taskId: string; subagentType: string; description: string; background: boolean }) => void
+  updateTaskResult: (taskId: string, result: string, status: "completed" | "error") => void
+  appendTaskSubSegment: (taskId: string, subSegment: StreamSegment) => void
+  updateTaskSubToolResult: (taskId: string, toolCallId: string, result: string) => void
   startStreaming: (messageId: string) => void
   appendStreamText: (text: string) => void
   finalizeStream: () => void
@@ -67,27 +156,6 @@ interface AppState {
   setSessionStats: (stats: SessionStats | null) => void
   toggleSidebar: () => void
   toggleStatsPanel: () => void
-}
-
-function getStreamingText(segments: StreamSegment[]): string {
-  return segments
-    .filter((seg): seg is TextSegment => seg.type === "text")
-    .map((seg) => seg.content)
-    .join("")
-}
-
-function mapToolCalls(tcList: unknown[]): ToolCall[] {
-  if (!Array.isArray(tcList)) return []
-  return tcList.map((raw) => {
-    const tc = raw as Record<string, unknown>
-    return {
-      toolCallId: (tc.id as string) ?? "",
-      toolName: (tc.tool_name as string) ?? "",
-      args: (() => { try { return JSON.parse((tc.args_json as string) || "{}") } catch { return {} } })(),
-      result: (tc.result as string) ?? undefined,
-      status: (tc.status as "running" | "done") ?? "pending",
-    }
-  })
 }
 
 export const useAppStore = create<AppState>((set, get) => {
@@ -141,10 +209,20 @@ export const useAppStore = create<AppState>((set, get) => {
     if (detail) {
       const availableIds = get().models.map((m) => m.id)
       const modelId = availableIds.includes(detail.model_id) ? detail.model_id : get().currentModel
-      const msgs: Message[] = detail.messages.map((m) => ({
-        ...m,
-        tool_calls: mapToolCalls((m as unknown as Record<string, unknown>).tool_calls as unknown[]),
-      }))
+      const taskSegments = taskRecordsToSegments(detail.task_records ?? [])
+      const msgs: Message[] = detail.messages.map((m) => {
+        const raw = m as unknown as Record<string, unknown>
+        const tcList = (raw.tool_calls as unknown[]) ?? []
+        const toolSegments = tcList.length > 0
+          ? (mapToolCalls(tcList).map((tc) => ({ type: "tool_call" as const, toolCall: tc })))
+          : []
+        const allSegments = [...taskSegments, ...toolSegments]
+        return {
+          ...m,
+          tool_calls: mapToolCalls(tcList),
+          segments: allSegments.length > 0 ? allSegments : undefined,
+        }
+      })
       set({ messages: msgs, currentModel: modelId, sessionStats: detail.stats ?? null })
     }
   },
@@ -197,6 +275,50 @@ export const useAppStore = create<AppState>((set, get) => {
         seg.type === "tool_call" && seg.toolCall.toolCallId === toolCallId
           ? { ...seg, toolCall: { ...seg.toolCall, result, status: "done" as const } }
           : seg
+      ),
+    })),
+
+  addTaskCall: ({ taskId, subagentType, description, background }) =>
+    set((s) => ({
+      streamSegments: [
+        ...s.streamSegments,
+        {
+          type: "task_call" as const,
+          taskId,
+          subagentType,
+          description,
+          status: "running" as const,
+          background,
+          subSegments: [],
+        },
+      ],
+    })),
+
+  updateTaskResult: (taskId, result, status) =>
+    set((s) => ({
+      streamSegments: updateTaskInSegments(
+        s.streamSegments,
+        taskId,
+        (task) => ({ ...task, status, result })
+      ),
+    })),
+
+  appendTaskSubSegment: (taskId, subSegment) =>
+    set((s) => ({
+      streamSegments: appendToTaskSubSegments(
+        s.streamSegments,
+        taskId,
+        subSegment
+      ),
+    })),
+
+  updateTaskSubToolResult: (taskId, toolCallId, result) =>
+    set((s) => ({
+      streamSegments: updateTaskSubToolResult(
+        s.streamSegments,
+        taskId,
+        toolCallId,
+        result
       ),
     })),
 
@@ -279,10 +401,20 @@ export const useAppStore = create<AppState>((set, get) => {
     if (!sid) return
     const detail = await getSession(sid)
     if (detail) {
-      const msgs: Message[] = detail.messages.map((m) => ({
-        ...m,
-        tool_calls: mapToolCalls((m as unknown as Record<string, unknown>).tool_calls as unknown[]),
-      }))
+      const taskSegments = taskRecordsToSegments(detail.task_records ?? [])
+      const msgs: Message[] = detail.messages.map((m) => {
+        const raw = m as unknown as Record<string, unknown>
+        const tcList = (raw.tool_calls as unknown[]) ?? []
+        const toolSegments = tcList.length > 0
+          ? (mapToolCalls(tcList).map((tc) => ({ type: "tool_call" as const, toolCall: tc })))
+          : []
+        const allSegments = [...taskSegments, ...toolSegments]
+        return {
+          ...m,
+          tool_calls: mapToolCalls(tcList),
+          segments: allSegments.length > 0 ? allSegments : undefined,
+        }
+      })
       set({ messages: msgs, sessionStats: detail.stats ?? null })
     }
   },

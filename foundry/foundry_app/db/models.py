@@ -20,8 +20,24 @@ class Session(SQLModel, table=True):
     title: str = Field(default="New Chat")
     model_id: str = Field(default="claude-sonnet")
     system_prompt: str = Field(default="")
+    parent_id: Optional[str] = Field(default=None)
     created_at: str = Field(default_factory=utcnow)
     updated_at: str = Field(default_factory=utcnow)
+
+
+class TaskRecord(SQLModel, table=True):
+    __tablename__ = "task_records"
+
+    id: str = Field(default_factory=new_id, primary_key=True)
+    parent_session_id: str = Field(foreign_key="sessions.id")
+    parent_message_id: Optional[str] = Field(default=None, foreign_key="messages.id")
+    subagent_type: str = ""
+    description: str = ""
+    status: str = Field(default="running")
+    background: bool = Field(default=False)
+    result_preview: Optional[str] = Field(default=None)
+    created_at: str = Field(default_factory=utcnow)
+    completed_at: Optional[str] = Field(default=None)
 
 
 class Message(SQLModel, table=True):

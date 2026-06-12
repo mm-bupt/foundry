@@ -83,6 +83,32 @@ class SessionTitleUpdated:
     title: str = ""
 
 
+@dataclass
+class TaskStarted:
+    type: str = "task.started"
+    task_id: str = ""
+    subagent_type: str = ""
+    description: str = ""
+    background: bool = False
+
+
+@dataclass
+class TaskCompleted:
+    type: str = "task.completed"
+    task_id: str = ""
+    subagent_type: str = ""
+    result_preview: str = ""
+    duration_ms: int = 0
+
+
+@dataclass
+class TaskError:
+    type: str = "task.error"
+    task_id: str = ""
+    subagent_type: str = ""
+    error: str = ""
+
+
 def parse_command(data: dict) -> ChatMessageCmd | None:
     msg_type = data.get("type", "")
     if msg_type == "chat.message":

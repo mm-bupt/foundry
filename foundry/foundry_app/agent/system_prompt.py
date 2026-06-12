@@ -263,9 +263,25 @@ def _scan_skills(work_dir: str) -> list[dict]:
     if global_dir.is_dir():
         _scan_skill_dir(global_dir, seen)
 
+    opencode_global = Path.home() / ".opencode" / "skill"
+    if opencode_global.is_dir():
+        _scan_skill_dir(opencode_global, seen)
+
+    claude_global = Path.home() / ".claude" / "skills"
+    if claude_global.is_dir():
+        _scan_skill_dir(claude_global, seen)
+
     project_dir = Path(work_dir) / ".foundry" / "skills"
     if project_dir.is_dir():
         _scan_skill_dir(project_dir, seen)
+
+    opencode_project = Path(work_dir) / ".opencode" / "skill"
+    if opencode_project.is_dir():
+        _scan_skill_dir(opencode_project, seen)
+
+    claude_project = Path(work_dir) / ".claude" / "skills"
+    if claude_project.is_dir():
+        _scan_skill_dir(claude_project, seen)
 
     return list(seen.values())
 
@@ -294,13 +310,29 @@ def _extract_skill_description(path: Path) -> str:
         text = path.read_text(encoding="utf-8")
     except Exception:
         return ""
+    if text.startswith("---"):
+        end = text.find("---", 3)
+        if end != -1:
+            frontmatter = text[3:end].strip()
+            try:
+                import yaml
+                meta = yaml.safe_load(frontmatter)
+                if isinstance(meta, dict) and meta.get("description"):
+                    desc = str(meta["description"])
+                    return desc[:200] + "..." if len(desc) > 200 else desc
+            except Exception:
+                pass
+            body = text[end + 3:].strip()
+            for line in body.splitlines():
+                stripped = line.strip()
+                if not stripped or stripped.startswith("#"):
+                    continue
+                return stripped[:200] + "..." if len(stripped) > 200 else stripped
     for line in text.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
-        if len(stripped) > 200:
-            stripped = stripped[:200] + "..."
-        return stripped
+        return stripped[:200] + "..." if len(stripped) > 200 else stripped
     return ""
 
 
@@ -326,3 +358,24 @@ def _is_git_repo(path: str) -> bool:
         return result.stdout.strip().lower() == "true"
     except Exception:
         return (Path(path) / ".git").exists()
+
+
+def build_subagent_prompt(work_dir: str) -> str:
+    platform = os.name
+    if platform == "nt":
+        platform = "win32"
+    elif platform == "posix":
+        import sys
+        platform = sys.platform
+
+    is_git = _is_git_repo(work_dir)
+    today = datetime.date.today().strftime("%Y-%m-%d")
+
+    return (
+        "你是一个自主子 Agent，正在协助父 Agent 完成任务。\n"
+        "请专注于你的任务，完成后返回详细的结果报告。\n\n"
+        f"工作目录: {work_dir}\n"
+        f"平台: {platform}\n"
+        f"日期: {today}\n"
+        f"Git 仓库: {'是' if is_git else '否'}"
+    )

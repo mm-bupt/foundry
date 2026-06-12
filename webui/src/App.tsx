@@ -73,6 +73,10 @@ export default function App() {
   const endThinking = useAppStore((s) => s.endThinking)
   const addToolCall = useAppStore((s) => s.addToolCall)
   const updateToolResult = useAppStore((s) => s.updateToolResult)
+  const addTaskCall = useAppStore((s) => s.addTaskCall)
+  const updateTaskResultStore = useAppStore((s) => s.updateTaskResult)
+  const appendTaskSubSegment = useAppStore((s) => s.appendTaskSubSegment)
+  const updateTaskSubToolResult = useAppStore((s) => s.updateTaskSubToolResult)
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed)
   const statsPanelVisible = useAppStore((s) => s.statsPanelVisible)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
@@ -101,19 +105,67 @@ export default function App() {
           endThinking()
           break
         case "tool.call": {
-          const tc: ToolCall = {
-            toolCallId: (event.tool_call_id as string) ?? "",
-            toolName: (event.tool_name as string) ?? "",
-            args: (event.args as Record<string, unknown>) ?? {},
-            status: "running",
+          const toolCallId = (event.tool_call_id as string) ?? ""
+          const toolName = (event.tool_name as string) ?? ""
+          const args = (event.args as Record<string, unknown>) ?? {}
+          const taskId = event.task_id as string | undefined
+
+          if (taskId) {
+            appendTaskSubSegment(taskId, {
+              type: "tool_call",
+              toolCall: {
+                toolCallId,
+                toolName,
+                args,
+                status: "running",
+              },
+            })
+          } else {
+            const tc: ToolCall = {
+              toolCallId,
+              toolName,
+              args,
+              status: "running",
+            }
+            addToolCall(tc)
           }
-          addToolCall(tc)
           break
         }
         case "tool.result": {
           const tcId = (event.tool_call_id as string) ?? ""
           const result = (event.result as string) ?? ""
-          updateToolResult(tcId, result)
+          const taskId = event.task_id as string | undefined
+
+          if (taskId) {
+            updateTaskSubToolResult(taskId, tcId, result)
+          } else {
+            updateToolResult(tcId, result)
+          }
+          break
+        }
+        case "task.started": {
+          const taskId = (event.task_id as string) ?? ""
+          const subagentType = (event.subagent_type as string) ?? ""
+          const desc = (event.description as string) ?? ""
+          const bg = (event.background as boolean) ?? false
+          addTaskCall({
+            taskId,
+            subagentType,
+            description: desc,
+            background: bg,
+          })
+          break
+        }
+        case "task.completed": {
+          const taskId = (event.task_id as string) ?? ""
+          const preview = (event.result_preview as string) ?? ""
+          updateTaskResultStore(taskId, preview, "completed")
+          break
+        }
+        case "task.error": {
+          const taskId = (event.task_id as string) ?? ""
+          const errMsg = (event.error as string) ?? "Unknown error"
+          updateTaskResultStore(taskId, errMsg, "error")
           break
         }
         case "stream.done":

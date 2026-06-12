@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     title TEXT NOT NULL DEFAULT 'New Chat',
     model_id TEXT NOT NULL DEFAULT 'claude-sonnet',
     system_prompt TEXT NOT NULL DEFAULT '',
+    parent_id TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -63,12 +64,27 @@ CREATE TABLE IF NOT EXISTS tool_calls (
     created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS task_records (
+    id TEXT PRIMARY KEY,
+    parent_session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    parent_message_id TEXT REFERENCES messages(id) ON DELETE SET NULL,
+    subagent_type TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'running',
+    background INTEGER NOT NULL DEFAULT 0,
+    result_preview TEXT,
+    created_at TEXT NOT NULL,
+    completed_at TEXT
+);
+
 CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_memory_vectors_session_id ON memory_vectors(session_id);
 CREATE INDEX IF NOT EXISTS idx_memory_vectors_category ON memory_vectors(category);
 CREATE INDEX IF NOT EXISTS idx_tool_calls_message_id ON tool_calls(message_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_updated_at ON sessions(updated_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_parent_id ON sessions(parent_id);
+CREATE INDEX IF NOT EXISTS idx_task_records_parent ON task_records(parent_session_id);
 
 CREATE VIRTUAL TABLE IF NOT EXISTS vec_memory USING vec0(
     id TEXT PRIMARY KEY,
@@ -91,17 +107,18 @@ async def _connect() -> aiosqlite.Connection:
 
 _MIGRATIONS = [
     "ALTER TABLE messages ADD COLUMN thinking_content TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE sessions ADD COLUMN parent_id TEXT",
 ]
 
 
 async def init_db(db: aiosqlite.Connection):
-    await db.executescript(_SCHEMA)
     for migration in _MIGRATIONS:
         try:
             await db.execute(migration)
             await db.commit()
         except Exception:
             await db.rollback()
+    await db.executescript(_SCHEMA)
     await db.commit()
 
 
