@@ -319,6 +319,8 @@ def _is_git_repo(path: str) -> bool:
             cwd=path,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=5,
         )
         return result.stdout.strip().lower() == "true"

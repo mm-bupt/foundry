@@ -24,6 +24,11 @@ function getSegmentsText(segments: StreamSegment[]): string {
     .join("")
 }
 
+function toolCallsToSegments(toolCalls: import("../types").ToolCall[]): StreamSegment[] {
+  if (!toolCalls || toolCalls.length === 0) return []
+  return toolCalls.map((tc) => ({ type: "tool_call" as const, toolCall: tc }))
+}
+
 function messagesToItems(
   messages: Message[],
   streamSegments: StreamSegment[],
@@ -31,14 +36,19 @@ function messagesToItems(
   thinkingText: string,
   isThinking: boolean,
 ): ChatItem[] {
-  const items: ChatItem[] = messages.map((m) => ({
-    key: m.id,
-    role: m.role === "assistant" ? ("ai" as const) : ("user" as const),
-    content: m.content,
-    thinkingText: m.thinking_content || undefined,
-    isThinking: false,
-    segments: m.segments,
-  }))
+  const items: ChatItem[] = messages.map((m) => {
+    const segments = m.segments && m.segments.length > 0
+      ? m.segments
+      : toolCallsToSegments(m.tool_calls)
+    return {
+      key: m.id,
+      role: m.role === "assistant" ? ("ai" as const) : ("user" as const),
+      content: m.content,
+      thinkingText: m.thinking_content || undefined,
+      isThinking: false,
+      segments,
+    }
+  })
 
   if (streamingMessageId && (streamSegments.length > 0 || isThinking)) {
     items.push({

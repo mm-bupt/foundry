@@ -1,5 +1,6 @@
 import asyncio
 import json as _json
+import os
 import subprocess
 from pathlib import Path
 
@@ -8,6 +9,14 @@ from foundry_app.agent.core import AgentDeps
 from foundry_app.logger import get_logger
 
 logger = get_logger("agent.tools")
+
+
+def _utf8_env() -> dict[str, str]:
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["LANG"] = "en_US.UTF-8"
+    env["LC_ALL"] = "en_US.UTF-8"
+    return env
 
 
 def register_file_tools(agent: Agent):
@@ -69,12 +78,15 @@ def register_file_tools(agent: Agent):
                 capture_output=True,
                 cwd=ctx.deps.work_dir,
                 timeout=timeout,
+                env=_utf8_env(),
+                encoding="utf-8",
+                errors="replace",
             )
             output = ""
             if proc.stdout:
-                output += proc.stdout.decode("utf-8", errors="replace")
+                output += proc.stdout
             if proc.stderr:
-                output += proc.stderr.decode("utf-8", errors="replace")
+                output += proc.stderr
             if proc.returncode != 0:
                 output += f"\n(exit code: {proc.returncode})"
             return output or "(no output)"
@@ -122,12 +134,15 @@ def register_search_tools(agent: Agent):
                 capture_output=True,
                 cwd=str(search_dir),
                 timeout=30,
+                env=_utf8_env(),
+                encoding="utf-8",
+                errors="replace",
             )
 
             if proc.returncode == 2:
-                return f"Error: ripgrep failed — {proc.stderr.decode(errors='replace')}"
+                return f"Error: ripgrep failed — {proc.stderr}"
 
-            raw = proc.stdout.decode("utf-8", errors="replace").strip()
+            raw = proc.stdout.strip()
             lines = raw.split("\n") if raw else []
             logger.debug("glob result | rc=%d raw_len=%d lines=%d cwd=%s", proc.returncode, len(raw), len(lines), str(search_dir))
             if not lines:
@@ -196,13 +211,16 @@ def register_search_tools(agent: Agent):
                 capture_output=True,
                 cwd=str(search_dir),
                 timeout=30,
+                env=_utf8_env(),
+                encoding="utf-8",
+                errors="replace",
             )
 
             if not proc.stdout.strip():
                 return "No files found"
 
             file_matches: dict[str, list[tuple[int, str]]] = {}
-            for line in proc.stdout.decode("utf-8", errors="replace").strip().split("\n"):
+            for line in proc.stdout.strip().split("\n"):
                 try:
                     data = _json.loads(line)
                     if data.get("type") != "match":

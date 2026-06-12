@@ -7,6 +7,9 @@ from foundry_app.agent.core import _resolve_api_key, _create_model_client
 from foundry_app.agent.registry import get_model_info, get_provider_prefix
 from foundry_app.db import crud
 from foundry_app.db.database import get_db
+from foundry_app.logger import get_logger
+
+logger = get_logger("agent.title")
 
 TITLE_SYSTEM_PROMPT = (
     "Generate a concise title (<=10 words) for this conversation. "
@@ -43,18 +46,25 @@ async def generate_title(
     send_event: "Callable[[dict], Awaitable[None]] | None" = None,
 ) -> None:
     try:
+        logger.debug("generate_title start | session=%s model=%s", session_id, model_id)
         agent = _create_title_agent(model_id)
+        logger.debug("generate_title agent created, calling run...")
         result = await agent.run(first_message)
+        logger.debug("generate_title agent.run done | output=%s", repr(result.output)[:100])
         title = result.output.strip() if result.output else ""
         if not title:
+            logger.debug("generate_title empty title, skipping")
             return
         db = await get_db()
         session = await crud.get_session(db, session_id)
         if not session:
+            logger.debug("generate_title session not found")
             return
         if session["title"] != "New Chat":
+            logger.debug("generate_title title already set: %s", session["title"])
             return
         await crud.update_session(db, session_id, title=title)
+        logger.debug("generate_title updated | title=%s", title)
         if send_event:
             await send_event(
                 {
@@ -63,5 +73,6 @@ async def generate_title(
                     "title": title,
                 }
             )
+            logger.debug("generate_title event sent")
     except Exception as e:
-        print(f"[generate_title] failed: {e}", file=sys.stderr, flush=True)
+        logger.exception("generate_title failed | session=%s error=%s", session_id, e)

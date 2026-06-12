@@ -4,6 +4,7 @@ import { ConfigProvider, Layout, theme, Typography } from "antd"
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons"
 import { useAppStore } from "./store"
 import { createWSClient } from "./ws"
+import { fetchSessions } from "./api"
 import { ChatPanel } from "./components/ChatPanel"
 import type { ConversationsProps } from "@ant-design/x"
 import type { ToolCall } from "./types"
@@ -69,6 +70,11 @@ export default function App() {
         }
         case "stream.done":
           finalizeStreamWithMessage()
+          setTimeout(() => {
+            fetchSessions().then((sessions) => {
+              if (sessions) useAppStore.getState().setSessions(sessions)
+            })
+          }, 8000)
           break
         case "stream.error": {
           const msg =

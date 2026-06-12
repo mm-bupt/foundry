@@ -49,6 +49,20 @@ function getStreamingText(segments: StreamSegment[]): string {
     .join("")
 }
 
+function mapToolCalls(tcList: unknown[]): ToolCall[] {
+  if (!Array.isArray(tcList)) return []
+  return tcList.map((raw) => {
+    const tc = raw as Record<string, unknown>
+    return {
+      toolCallId: (tc.id as string) ?? "",
+      toolName: (tc.tool_name as string) ?? "",
+      args: (() => { try { return JSON.parse((tc.args_json as string) || "{}") } catch { return {} } })(),
+      result: (tc.result as string) ?? undefined,
+      status: (tc.status as "running" | "done") ?? "pending",
+    }
+  })
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   sessions: [],
   currentSessionId: "",
@@ -93,7 +107,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (detail) {
       const availableIds = get().models.map((m) => m.id)
       const modelId = availableIds.includes(detail.model_id) ? detail.model_id : get().currentModel
-      set({ messages: detail.messages, currentModel: modelId })
+      const msgs: Message[] = detail.messages.map((m) => ({
+        ...m,
+        tool_calls: mapToolCalls((m as unknown as Record<string, unknown>).tool_calls as unknown[]),
+      }))
+      set({ messages: msgs, currentModel: modelId })
     }
   },
 
@@ -227,7 +245,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!sid) return
     const detail = await getSession(sid)
     if (detail) {
-      set({ messages: detail.messages })
+      const msgs: Message[] = detail.messages.map((m) => ({
+        ...m,
+        tool_calls: mapToolCalls((m as unknown as Record<string, unknown>).tool_calls as unknown[]),
+      }))
+      set({ messages: msgs })
     }
   },
 

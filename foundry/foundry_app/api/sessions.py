@@ -43,9 +43,13 @@ async def get_session(session_id: str):
             },
         )
     messages = await crud.list_messages(db, session_id)
+    mapped = []
+    for m in messages:
+        tc_list = await crud.list_tool_calls(db, m["id"])
+        mapped.append(map_message(m, tc_list))
     return SessionDetailResponse(
         **session,
-        messages=[map_message(m) for m in messages],
+        messages=mapped,
     )
 
 

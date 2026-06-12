@@ -27,7 +27,6 @@ from pydantic_ai.messages import (
     FunctionToolResultEvent,
 )
 from pydantic_ai.agent import ModelRequestNode, CallToolsNode
-from pydantic_ai.capabilities import ProcessHistory
 
 from foundry_app.agent.registry import get_provider_prefix, get_model_info
 from foundry_app.agent.context import trim_and_summarize
@@ -62,14 +61,14 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
             model_obj,
             instructions=instructions,
             deps_type=AgentDeps,
-            capabilities=[ProcessHistory(trim_and_summarize)],
+            history_processors=[trim_and_summarize],
         )
     else:
         agent = Agent(
             model_string,
             instructions=instructions,
             deps_type=AgentDeps,
-            capabilities=[ProcessHistory(trim_and_summarize)],
+            history_processors=[trim_and_summarize],
         )
     _register_tools(agent)
     return agent
@@ -179,6 +178,16 @@ async def stream_chat(
     output_tokens = 0
     pending_tool_calls: dict[str, dict] = {}
 
+    async def _ensure_assistant_id() -> str:
+        nonlocal assistant_id
+        if not assistant_id:
+            assistant_id = (
+                await crud.create_message(
+                    db, session_id, "assistant", "", model_id=model_id,
+                )
+            )["id"]
+        return assistant_id
+
     try:
         async with agent.iter(user_message, message_history=history, deps=deps) as run:
             async for node in run:
@@ -205,16 +214,7 @@ async def stream_chat(
                                     )
                                     logger.debug("thinking.start | session=%s", session_id)
                                 elif isinstance(part, TextPart):
-                                    if not assistant_id:
-                                        assistant_id = (
-                                            await crud.create_message(
-                                                db,
-                                                session_id,
-                                                "assistant",
-                                                "",
-                                                model_id=model_id,
-                                            )
-                                        )["id"]
+                                    await _ensure_assistant_id()
                                     logger.debug("text.start | session=%s assistant_id=%s", session_id, assistant_id)
                                     if thinking_text:
                                         await send_event(
@@ -234,6 +234,7 @@ async def stream_chat(
                                             }
                                         )
                                 elif isinstance(part, ToolCallPart):
+                                    await _ensure_assistant_id()
                                     tc_id = part.tool_call_id or ""
                                     tool_name = part.tool_name
                                     pending_tool_calls[tc_id] = {
@@ -276,6 +277,12 @@ async def stream_chat(
                                 args = tc_part.args_as_dict() if hasattr(tc_part, "args_as_dict") else {}
                                 if tc_id not in pending_tool_calls:
                                     pending_tool_calls[tc_id] = {"tool_name": tool_name}
+                                await _ensure_assistant_id()
+                                tc_record = await crud.create_tool_call(
+                                        db, assistant_id, tool_name,
+                                        args_json=json.dumps(args, ensure_ascii=False),
+                                    )
+                                pending_tool_calls[tc_id]["db_id"] = tc_record["id"]
                                 await send_event(
                                     {
                                         "type": "tool.call",
@@ -287,11 +294,17 @@ async def stream_chat(
                                 logger.debug("tool.call | session=%s tool=%s args=%s", session_id, tool_name, json.dumps(args, ensure_ascii=False)[:500])
                             elif isinstance(event, FunctionToolResultEvent):
                                 result_part = event.result
-                                logger.debug("tool result event | type=%s content_type=%s", type(result_part).__name__, type(getattr(result_part, 'content', None)).__name__)
                                 if isinstance(result_part, ToolReturnPart):
                                     tc_id = result_part.tool_call_id or ""
                                     meta = pending_tool_calls.pop(tc_id, {})
                                     result_text = str(result_part.content)
+                                    db_id = meta.get("db_id")
+                                    if db_id:
+                                        await crud.update_tool_call(
+                                            db, db_id,
+                                            result=result_text,
+                                            status="done",
+                                        )
                                     logger.debug("tool.result | session=%s tool=%s result_len=%d preview=%s", session_id, meta.get("tool_name", ""), len(result_text), result_text[:200])
                                     await send_event(
                                         {

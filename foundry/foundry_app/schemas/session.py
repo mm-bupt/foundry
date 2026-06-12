@@ -1,6 +1,14 @@
 from pydantic import BaseModel
 
 
+class ToolCallResponse(BaseModel):
+    id: str
+    tool_name: str
+    args_json: str = "{}"
+    result: str | None = None
+    status: str = "pending"
+
+
 class SessionCreate(BaseModel):
     title: str = "New Chat"
     model_id: str = "claude-sonnet"
@@ -36,9 +44,20 @@ class MessageResponse(BaseModel):
     tokens_in: int = 0
     tokens_out: int = 0
     created_at: str
+    tool_calls: list[ToolCallResponse] = []
 
 
-def map_message(msg: dict) -> MessageResponse:
+def map_message(msg: dict, tool_calls: list[dict] | None = None) -> MessageResponse:
+    tc_list = []
+    if tool_calls:
+        for tc in tool_calls:
+            tc_list.append(ToolCallResponse(
+                id=tc["id"],
+                tool_name=tc["tool_name"],
+                args_json=tc.get("args_json", "{}"),
+                result=tc.get("result"),
+                status=tc.get("status", "pending"),
+            ))
     return MessageResponse(
         id=msg["id"],
         session_id=msg["session_id"],
@@ -50,6 +69,7 @@ def map_message(msg: dict) -> MessageResponse:
         tokens_in=msg.get("input_tokens", 0),
         tokens_out=msg.get("output_tokens", 0),
         created_at=msg["created_at"],
+        tool_calls=tc_list,
     )
 
 
