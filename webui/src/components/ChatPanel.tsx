@@ -7,7 +7,6 @@ import { useAppStore } from "../store"
 import { MarkdownContent } from "./MarkdownContent"
 import { ToolCallBlock } from "./ToolCallBlock"
 import { TaskBlock } from "./TaskBlock"
-import { TodoDock } from "./TodoDock"
 import type { Message, StreamSegment, TextSegment } from "../types"
 
 interface ChatItem {
@@ -131,7 +130,6 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
   const connected = useAppStore((s) => s.connected)
   const thinkingText = useAppStore((s) => s.thinkingText)
   const isThinking = useAppStore((s) => s.isThinking)
-  const todos = useAppStore((s) => s.todos)
 
   const [inputValue, setInputValue] = useState("")
   const bubbleListRef = useRef<BubbleListRef>(null)
@@ -250,7 +248,6 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
           />
         </div>
       )}
-      <TodoDock todos={todos} />
       <div style={{ padding: "12px 16px 8px", borderTop: "1px solid #f0f0f0" }}>
         <Sender
           value={inputValue}

@@ -1,7 +1,7 @@
 import { Progress, Typography, Button, Tooltip, Tag } from "antd"
-import { RightOutlined, RocketOutlined, CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined, CloudOutlined, StopOutlined } from "@ant-design/icons"
+import { RightOutlined, RocketOutlined, CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined, CloudOutlined, StopOutlined, CheckCircleFilled, ClockCircleOutlined, MinusCircleFilled, SyncOutlined } from "@ant-design/icons"
 import { useAppStore } from "../store"
-import type { StreamSegment } from "../types"
+import type { StreamSegment, TodoItem } from "../types"
 
 const { Text, Title } = Typography
 
@@ -57,6 +57,7 @@ export function StatsPanel() {
   const streamSegments = useAppStore((s) => s.streamSegments)
   const status = useAppStore((s) => s.status)
   const toggleStatsPanel = useAppStore((s) => s.toggleStatsPanel)
+  const todos = useAppStore((s) => s.todos)
 
   const model = models.find((m) => m.id === currentModel)
   const session = sessions.find((s) => s.id === currentSessionId)
@@ -191,6 +192,38 @@ export function StatsPanel() {
 
       <div style={{ padding: "12px 16px", borderBottom: "1px solid #f0f0f0" }}>
         <Text type="secondary" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          Todos
+        </Text>
+        <div style={{ marginTop: 8 }}>
+          {todos.length === 0 ? (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              No todos
+            </Text>
+          ) : (
+            <>
+              <div style={{ marginBottom: 8 }}>
+                <Progress
+                  percent={Math.round((todos.filter((t) => t.status === "completed").length / todos.length) * 100)}
+                  size="small"
+                  showInfo={false}
+                  strokeColor={todos.every((t) => t.status === "completed") ? "#52c41a" : "#1677ff"}
+                />
+                <Text type="secondary" style={{ fontSize: 11, marginTop: 2, display: "block" }}>
+                  {todos.filter((t) => t.status === "completed").length}/{todos.length} completed
+                </Text>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                {todos.map((todo, i) => (
+                  <TodoItemRow key={i} todo={todo} />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid #f0f0f0" }}>
+        <Text type="secondary" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Tasks
         </Text>
         <div style={{ marginTop: 8 }}>
@@ -304,6 +337,65 @@ function TaskItem({ task }: { task: TaskItem }) {
       >
         {task.description}
       </Text>
+    </div>
+  )
+}
+
+function getTodoStatusIcon(status: TodoItem["status"]) {
+  switch (status) {
+    case "in_progress":
+      return <SyncOutlined spin style={{ color: "#1677ff", fontSize: 10 }} />
+    case "completed":
+      return <CheckCircleFilled style={{ color: "#52c41a", fontSize: 10 }} />
+    case "cancelled":
+      return <MinusCircleFilled style={{ color: "#999", fontSize: 10 }} />
+    default:
+      return <ClockCircleOutlined style={{ color: "#d9d9d9", fontSize: 10 }} />
+  }
+}
+
+function TodoItemRow({ todo }: { todo: TodoItem }) {
+  const isDimmed = todo.status === "completed" || todo.status === "cancelled"
+  const borderColor = todo.status === "in_progress" ? "#91caff" : isDimmed ? "#f0f0f0" : "#e8e8e8"
+  const bgColor = todo.status === "in_progress" ? "#f0f5ff" : isDimmed ? "#fafafa" : "#fff"
+
+  return (
+    <div
+      style={{
+        padding: "4px 8px",
+        borderRadius: 4,
+        border: `1px solid ${borderColor}`,
+        background: bgColor,
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        opacity: isDimmed ? 0.55 : 1,
+      }}
+    >
+      {getTodoStatusIcon(todo.status)}
+      <span
+        style={{
+          fontSize: 11,
+          textDecoration: isDimmed ? "line-through" : "none",
+          color: todo.status === "in_progress" ? "#1677ff" : undefined,
+          fontWeight: todo.status === "in_progress" ? 500 : 400,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          flex: 1,
+        }}
+      >
+        {todo.content}
+      </span>
+      <div
+        style={{
+          width: 4,
+          height: 4,
+          borderRadius: "50%",
+          background: todo.priority === "high" ? "#ff4d4f" : todo.priority === "medium" ? "#faad14" : "#d9d9d9",
+          flexShrink: 0,
+        }}
+      />
     </div>
   )
 }
