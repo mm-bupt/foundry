@@ -206,29 +206,27 @@ async def stream_chat(
                                 logger.debug("tool.call | session=%s tool=%s args=%s", session_id, tool_name, json.dumps(args, ensure_ascii=False)[:500])
                             elif isinstance(event, FunctionToolResultEvent):
                                 result_part = event.result
-                                if isinstance(result_part, ToolReturnPart):
-                                    tc_id = result_part.tool_call_id or ""
-                                    meta = pending_tool_calls.pop(tc_id, {})
-                                    result_text = str(result_part.content)
-                                    db_id = meta.get("db_id")
-                                    if db_id:
-                                        await crud.update_tool_call(
-                                            db, db_id,
-                                            result=result_text,
-                                            status="done",
-                                        )
-                                    logger.debug("tool.result | session=%s tool=%s result_len=%d preview=%s", session_id, meta.get("tool_name", ""), len(result_text), result_text[:200])
-                                    await send_event(
-                                        {
-                                            "type": "tool.result",
-                                            "tool_call_id": tc_id,
-                                            "tool_name": meta.get(
-                                                "tool_name", ""
-                                            ),
-                                            "result": result_text,
-                                        }
+                                tc_id = (getattr(result_part, "tool_call_id", "") or "")
+                                meta = pending_tool_calls.pop(tc_id, {})
+                                result_text = str(getattr(result_part, "content", result_part))
+                                db_id = meta.get("db_id")
+                                if db_id:
+                                    await crud.update_tool_call(
+                                        db, db_id,
+                                        result=result_text,
+                                        status="done",
                                     )
-                                    logger.debug("tool.result | session=%s tool=%s result_len=%d", session_id, meta.get("tool_name", ""), len(str(result_part.content)))
+                                logger.debug("tool.result | session=%s tool=%s result_len=%d preview=%s", session_id, meta.get("tool_name", ""), len(result_text), result_text[:200])
+                                await send_event(
+                                    {
+                                        "type": "tool.result",
+                                        "tool_call_id": tc_id,
+                                        "tool_name": meta.get(
+                                            "tool_name", ""
+                                        ),
+                                        "result": result_text,
+                                    }
+                                )
 
         result = run.result
         if result:

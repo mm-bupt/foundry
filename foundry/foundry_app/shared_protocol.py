@@ -129,7 +129,14 @@ class TodoUpdated:
     todos: list = field(default_factory=list)
 
 
-def parse_command(data: dict) -> ChatMessageCmd | CompactCmd | None:
+@dataclass
+class QuestionAsked:
+    type: str = "question.asked"
+    question_id: str = ""
+    questions: list = field(default_factory=list)
+
+
+def parse_command(data: dict) -> ChatMessageCmd | CompactCmd | dict | None:
     msg_type = data.get("type", "")
     if msg_type == "chat.message":
         return ChatMessageCmd(
@@ -141,6 +148,8 @@ def parse_command(data: dict) -> ChatMessageCmd | CompactCmd | None:
         return CompactCmd(
             session_id=data.get("session_id", ""),
         )
+    if msg_type in ("question.reply", "question.reject"):
+        return data
     return None
 
 

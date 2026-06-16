@@ -82,6 +82,7 @@ export default function App() {
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
   const toggleStatsPanel = useAppStore((s) => s.toggleStatsPanel)
   const setTodos = useAppStore((s) => s.setTodos)
+  const setPendingQuestion = useAppStore((s) => s.setPendingQuestion)
   const ws = useMemo(() => createWSClient(), [])
 
   useEffect(() => {
@@ -171,6 +172,7 @@ export default function App() {
         }
         case "stream.done":
           finalizeStreamWithMessage()
+          setPendingQuestion(null)
           useAppStore.getState().reloadMessages()
           setTimeout(() => {
             fetchSessions().then((sessions) => {
@@ -183,6 +185,7 @@ export default function App() {
             ((event.error as Record<string, string>)?.message as string) ??
             "Unknown error"
           setError(msg)
+          setPendingQuestion(null)
           break
         }
         case "session.title_updated": {
@@ -196,6 +199,15 @@ export default function App() {
         case "todo.updated": {
           const todos = (event.todos as import("./types").TodoItem[]) ?? []
           setTodos(todos)
+          break
+        }
+        case "question.asked": {
+          const qid = (event.question_id as string) ?? ""
+          const sid = (event.session_id as string) ?? ""
+          const questions = (event.questions as import("./types").QuestionInfo[]) ?? []
+          if (qid && questions.length > 0) {
+            setPendingQuestion({ questionId: qid, sessionId: sid, questions })
+          }
           break
         }
       }
@@ -364,7 +376,7 @@ export default function App() {
 
         {/* 中间聊天区 */}
         <Content style={{ display: "flex", flexDirection: "column", background: "#fff", flex: 1 }}>
-          <ChatPanel onSend={handleSend} onInterrupt={handleInterrupt} />
+          <ChatPanel onSend={handleSend} onInterrupt={handleInterrupt} ws={ws} />
         </Content>
 
         {/* 右侧统计面板 */}

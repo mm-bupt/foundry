@@ -71,9 +71,28 @@ export function createWSClient() {
     }
   }
 
+  function questionReply(questionId: string, answers: string[][]) {
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: "question.reply",
+        question_id: questionId,
+        answers,
+      }))
+    }
+  }
+
+  function questionReject(questionId: string) {
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: "question.reject",
+        question_id: questionId,
+      }))
+    }
+  }
+
   function setEventHandler(h: WSEventHandler) {
     handler = h
   }
 
-  return { connect, disconnect, send, interrupt, setEventHandler }
+  return { connect, disconnect, send, interrupt, questionReply, questionReject, setEventHandler }
 }

@@ -42,9 +42,11 @@ def _register_tools(agent: Agent):
     from foundry_app.agent.tools import register_file_tools, register_search_tools, register_skill_tools
     from foundry_app.agent.subagent_tools import register_task_tools
     from foundry_app.agent.todo_tools import register_todo_tools
+    from foundry_app.agent.question_tools import register_question_tools
 
     register_file_tools(agent)
     register_search_tools(agent)
     register_skill_tools(agent)
     register_task_tools(agent)
     register_todo_tools(agent)
+    register_question_tools(agent)

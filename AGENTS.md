@@ -115,6 +115,8 @@ python scripts/build.py bun      # Bundle Bun runtime only
 Client → Server:
 - `{"type": "chat.message", "content": "...", "message_id": "uuid"}`
 - `{"type": "chat.interrupt"}`
+- `{"type": "question.reply", "question_id": "...", "answers": [["label1"], ["label2"]]}`
+- `{"type": "question.reject", "question_id": "..."}`
 - `{"type": "ping"}`
 
 Server → Client:
@@ -123,6 +125,7 @@ Server → Client:
 - `{"type": "stream.error", "error": {"code": "...", "message": "..."}}`
 - `{"type": "tool.call", "tool_call_id": "...", "tool_name": "...", "args": {...}}`
 - `{"type": "tool.result", "tool_call_id": "...", "tool_name": "...", "result": "..."}`
+- `{"type": "question.asked", "question_id": "...", "session_id": "...", "questions": [...]}`
 - `{"type": "pong"}`
 
 ## Environment Variables

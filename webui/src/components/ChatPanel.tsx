@@ -7,6 +7,7 @@ import { useAppStore } from "../store"
 import { MarkdownContent } from "./MarkdownContent"
 import { ToolCallBlock } from "./ToolCallBlock"
 import { TaskBlock } from "./TaskBlock"
+import { QuestionBlock } from "./QuestionBlock"
 import type { Message, StreamSegment, TextSegment } from "../types"
 
 interface ChatItem {
@@ -88,6 +89,7 @@ function SegmentRenderer({ segments, fallback }: { segments?: StreamSegment[]; f
 interface ChatPanelProps {
   onSend: (content: string) => void
   onInterrupt: () => void
+  ws: { questionReply: (questionId: string, answers: string[][]) => void; questionReject: (questionId: string) => void }
 }
 
 function CopyRawButton({ text }: { text: string }) {
@@ -117,7 +119,7 @@ function CopyRawButton({ text }: { text: string }) {
   )
 }
 
-export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
+export function ChatPanel({ onSend, onInterrupt, ws }: ChatPanelProps) {
   const messages = useAppStore((s) => s.messages)
   const status = useAppStore((s) => s.status)
   const streamSegments = useAppStore((s) => s.streamSegments)
@@ -130,11 +132,20 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
   const connected = useAppStore((s) => s.connected)
   const thinkingText = useAppStore((s) => s.thinkingText)
   const isThinking = useAppStore((s) => s.isThinking)
+  const pendingQuestion = useAppStore((s) => s.pendingQuestion)
+  const setPendingQuestion = useAppStore((s) => s.setPendingQuestion)
 
   const [inputValue, setInputValue] = useState("")
   const bubbleListRef = useRef<BubbleListRef>(null)
 
   const items = messagesToItems(messages, streamSegments, streamingMessageId, thinkingText, isThinking)
+  if (pendingQuestion) {
+    items.push({
+      key: `question-${pendingQuestion.questionId}`,
+      role: "user",
+      content: "",
+    })
+  }
   const isStreaming = status === "streaming" || status === "thinking"
   const isLastItemStreaming = !!(streamingMessageId && (streamSegments.length > 0 || isThinking))
 
@@ -189,13 +200,28 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
               isLastItemStreaming &&
               idx === items.length - 1 &&
               item.role === "ai"
+            const isQuestionBubble = item.key.startsWith("question-")
             return {
               key: item.key,
-              content: item.role === "ai"
+              content: isQuestionBubble
                 ? ((
-                    <SegmentRenderer segments={item.segments} fallback={item.content} />
+                    <QuestionBlock
+                      pendingQuestion={pendingQuestion!}
+                      onReply={(qid, answers) => {
+                        ws.questionReply(qid, answers)
+                        setPendingQuestion({ ...pendingQuestion!, submittedAnswers: answers })
+                      }}
+                      onReject={(qid) => {
+                        ws.questionReject(qid)
+                        setPendingQuestion(null)
+                      }}
+                    />
                   ) as unknown as string)
-                : item.content,
+                : item.role === "ai"
+                  ? ((
+                      <SegmentRenderer segments={item.segments} fallback={item.content} />
+                    ) as unknown as string)
+                  : item.content,
               role: item.role,
               streaming: isStreamingBubble,
               header: (item.thinkingText || item.isThinking)
@@ -224,17 +250,20 @@ export function ChatPanel({ onSend, onInterrupt }: ChatPanelProps) {
               variant: "borderless" as const,
               styles: {
                 root: { width: "100%" },
-                body: { maxWidth: 800, margin: "0 auto", width: "100%" },
+                body: { maxWidth: "unset", margin: 0, width: "100%" },
                 content: { maxWidth: "unset", margin: 0, width: "auto" },
                 footer: { maxWidth: "unset", margin: 0 },
               },
             },
             user: {
               placement: "end" as const,
+              styles: {
+                root: { maxWidth: 800, width: "100%", marginLeft: "auto", marginRight: "auto" },
+              },
             },
           }}
           styles={{ bubble: { width: "100%" } }}
-          style={{ height: "100%" }}
+          style={{ height: "100%", maxWidth: 800, margin: "0 auto", padding: "0 16px" }}
         />
       </div>
       {status === "error" && errorMessage && (

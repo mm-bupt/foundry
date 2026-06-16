@@ -74,9 +74,11 @@ if ($Target -in "all", "webui") {
     Push-Location (Join-Path $RootDir "webui")
     if (!(Test-Path "node_modules")) {
         Write-Host "Installing WebUI dependencies..." -ForegroundColor Yellow
-        npm install
+        bun install
     }
-    $webUiProc = Start-Process -FilePath "npm" `
+    $BunExe = (Get-Command bun.exe -CommandType Application -ErrorAction SilentlyContinue).Source
+    if (-not $BunExe) { $BunExe = "$env:USERPROFILE\.bun\bin\bun.exe" }
+    $webUiProc = Start-Process -FilePath $BunExe `
         -ArgumentList "run", "dev" `
         -PassThru -NoNewWindow
     $WebUiPid = $webUiProc.Id

@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, TaskCallSegment, SessionStats, TaskRecord, TodoItem } from "./types"
+import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, TaskCallSegment, SessionStats, TaskRecord, TodoItem, PendingQuestion } from "./types"
 import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel, updateSession } from "./api"
 
 const PERSIST_KEY = "foundry_webui_state"
@@ -127,6 +127,7 @@ interface AppState {
   sidebarCollapsed: boolean
   statsPanelVisible: boolean
   todos: TodoItem[]
+  pendingQuestion: PendingQuestion | null
 
   init: () => Promise<void>
   switchSession: (id: string) => Promise<void>
@@ -159,6 +160,7 @@ interface AppState {
   toggleSidebar: () => void
   toggleStatsPanel: () => void
   setTodos: (todos: TodoItem[]) => void
+  setPendingQuestion: (q: PendingQuestion | null) => void
 }
 
 export const useAppStore = create<AppState>((set, get) => {
@@ -183,6 +185,7 @@ export const useAppStore = create<AppState>((set, get) => {
   sidebarCollapsed: persisted.sidebarCollapsed,
   statsPanelVisible: persisted.statsPanelVisible,
   todos: [],
+  pendingQuestion: null,
 
   init: async () => {
     const [sessions, models, active] = await Promise.all([
@@ -211,6 +214,7 @@ export const useAppStore = create<AppState>((set, get) => {
       sessionStats: null,
       taskRecords: [],
       todos: [],
+      pendingQuestion: null,
     })
     const detail = await getSession(id)
     if (detail) {
@@ -450,4 +454,5 @@ export const useAppStore = create<AppState>((set, get) => {
     savePersisted({ sidebarCollapsed: get().sidebarCollapsed, statsPanelVisible: next })
   },
   setTodos: (todos) => set({ todos }),
+  setPendingQuestion: (q) => set({ pendingQuestion: q }),
 }})

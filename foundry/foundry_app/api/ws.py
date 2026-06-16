@@ -6,6 +6,7 @@ from foundry_app.chat.orchestrator import stream_chat
 from foundry_app.shared_protocol import parse_command, to_dict, Pong
 from foundry_app.session.history import load_history
 from foundry_app.session.compaction import do_compaction
+from foundry_app.agent import question as question_mod
 from foundry_app.db.database import get_db
 from foundry_app.db import crud
 from foundry_app.config import settings
@@ -66,6 +67,23 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                         await send_event({"type": "compaction.done", "session_id": session_id, "summary_message_id": ""})
 
                 asyncio.create_task(do_compact())
+                continue
+
+            if msg_type == "question.reply":
+                qid = data.get("question_id", "")
+                answers = data.get("answers", [])
+                if qid and question_mod.resolve(qid, answers):
+                    logger.debug("question reply resolved | session=%s id=%s", session_id, qid)
+                else:
+                    logger.warning("question reply ignored | session=%s id=%s", session_id, qid)
+                continue
+
+            if msg_type == "question.reject":
+                qid = data.get("question_id", "")
+                if qid and question_mod.reject(qid):
+                    logger.debug("question rejected | session=%s id=%s", session_id, qid)
+                else:
+                    logger.warning("question reject ignored | session=%s id=%s", session_id, qid)
                 continue
 
             if msg_type == "chat.message":

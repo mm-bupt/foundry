@@ -97,7 +97,26 @@ export interface Model {
   max_output_tokens: number
 }
 
-export type AppStatus = "idle" | "streaming" | "thinking" | "error"
+export type AppStatus = "idle" | "streaming" | "thinking" | "error" | "waiting_answer"
+
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+export interface QuestionInfo {
+  question: string
+  header: string
+  options: QuestionOption[]
+  multiple?: boolean
+}
+
+export interface PendingQuestion {
+  questionId: string
+  sessionId: string
+  questions: QuestionInfo[]
+  submittedAnswers?: string[][]
+}
 
 export interface TodoItem {
   content: string
