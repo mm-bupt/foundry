@@ -23,7 +23,7 @@ export function ContextPanel(props: {
       <box padding={1} flexDirection="row" justifyContent="space-between">
         <box flexDirection="row">
           <text>
-            <span fg={theme.primary}>foundry</span>
+            <span fg={theme.primary}>var</span>
           </text>
           <Show when={s().connected} fallback={<text fg={theme.error}> ●</text>}>
             <text fg={theme.secondary}> ●</text>

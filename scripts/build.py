@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Foundry — Build Script
-Produces a self-contained dist/foundry/ folder:
-  dist/foundry/
-  ├── foundry.bat (or .sh)   ← single entry point
+Var — Build Script
+Produces a self-contained dist/var/ folder:
+  dist/var/
+  ├── var.bat (or .sh)   ← single entry point
   ├── bin/
-  │   ├── foundry-server.exe ← PyInstaller backend
+  │   ├── var-server.exe ← PyInstaller backend
   │   └── bun.exe            ← bundled Bun runtime
   └── lib/
       └── tui/               ← TUI sources + node_modules
@@ -20,8 +20,8 @@ import platform
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-DIST = ROOT / "dist" / "foundry"
-FOUNDRY = ROOT / "foundry"
+DIST = ROOT / "dist" / "var"
+VAR = ROOT / "var"
 TUI = ROOT / "tui"
 
 IS_WINDOWS = platform.system() == "Windows"
@@ -29,26 +29,26 @@ IS_MACOS = platform.system() == "Darwin"
 IS_LINUX = platform.system() == "Linux"
 
 HIDDEN_IMPORTS = [
-    "foundry_app",
-    "foundry_app.main",
-    "foundry_app.config",
-    "foundry_app.agent.core",
-    "foundry_app.agent.registry",
-    "foundry_app.agent.tools",
-    "foundry_app.agent.memory",
-    "foundry_app.agent.context",
-    "foundry_app.api.sessions",
-    "foundry_app.api.models",
-    "foundry_app.api.ws",
-    "foundry_app.api.sse",
-    "foundry_app.api.memory",
-    "foundry_app.db.database",
-    "foundry_app.db.crud",
-    "foundry_app.db.models",
-    "foundry_app.shared_protocol",
-    "foundry_app.schemas.session",
-    "foundry_app.schemas.chat",
-    "foundry_app.schemas.memory",
+    "var_app",
+    "var_app.main",
+    "var_app.config",
+    "var_app.agent.core",
+    "var_app.agent.registry",
+    "var_app.agent.tools",
+    "var_app.agent.memory",
+    "var_app.agent.context",
+    "var_app.api.sessions",
+    "var_app.api.models",
+    "var_app.api.ws",
+    "var_app.api.sse",
+    "var_app.api.memory",
+    "var_app.db.database",
+    "var_app.db.crud",
+    "var_app.db.models",
+    "var_app.shared_protocol",
+    "var_app.schemas.session",
+    "var_app.schemas.chat",
+    "var_app.schemas.memory",
     "aiosqlite",
     "sqlite_vec",
     "uvicorn.logging",
@@ -112,7 +112,7 @@ def find_bun_exe():
 
 def build_backend():
     print("\n=== [1/4] Building Python Backend (PyInstaller) ===")
-    run([sys.executable, "-m", "pip", "install", "-e", str(FOUNDRY)])
+    run([sys.executable, "-m", "pip", "install", "-e", str(VAR)])
     run([sys.executable, "-m", "pip", "install", "pyinstaller"])
 
     bin_dir = DIST / "bin"
@@ -120,7 +120,7 @@ def build_backend():
 
     cmd = [
         sys.executable, "-m", "PyInstaller",
-        "--name", "foundry-server",
+        "--name", "var-server",
         "--distpath", str(bin_dir),
         "--workpath", str(DIST.parent / ".build_backend"),
         "--specpath", str(DIST.parent),
@@ -142,11 +142,11 @@ def build_backend():
     if os.path.exists(vec_dll):
         cmd += ["--add-binary", f"{vec_dll}{os.pathsep}sqlite_vec"]
 
-    cmd += ["-y", str(FOUNDRY / "foundry_app" / "__main__.py")]
+    cmd += ["-y", str(VAR / "var_app" / "__main__.py")]
     run(cmd)
 
     shutil.rmtree(DIST.parent / ".build_backend", ignore_errors=True)
-    exe_name = "foundry-server.exe" if IS_WINDOWS else "foundry-server"
+    exe_name = "var-server.exe" if IS_WINDOWS else "var-server"
     exe_path = bin_dir / exe_name
     if not exe_path.exists():
         print(f"ERROR: Backend binary not found at {exe_path}")
@@ -184,16 +184,16 @@ def bundle_bun():
 
 def build_launcher():
     print("\n=== [4/4] Building Launcher ===")
-    server_name = "foundry-server.exe" if IS_WINDOWS else "foundry-server"
+    server_name = "var-server.exe" if IS_WINDOWS else "var-server"
     bun_name = "bun.exe" if IS_WINDOWS else "bun"
 
     if IS_WINDOWS:
-        launcher_path = DIST / "foundry.bat"
+        launcher_path = DIST / "var.bat"
         content = f"""@echo off
 setlocal EnableDelayedExpansion
-title Foundry
+title Var
 
-echo Foundry v0.1.0
+echo Var v0.1.0
 echo.
 
 set "ROOT=%~dp0"
@@ -229,18 +229,18 @@ cd /d "%TUI_DIR%"
 set TUI_EXIT=%errorlevel%
 
 echo Cleaning up...
-for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq {server_name}" /NH 2^>nul ^| findstr /i foundry') do (
+for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq {server_name}" /NH 2^>nul ^| findstr /i var') do (
     taskkill /F /PID %%a >nul 2>&1
 )
 
 exit /b %TUI_EXIT%
 """
     else:
-        launcher_path = DIST / "foundry.sh"
+        launcher_path = DIST / "var.sh"
         content = f"""#!/usr/bin/env bash
 set -e
 
-echo "Foundry v0.1.0"
+echo "Var v0.1.0"
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -290,9 +290,9 @@ def print_summary():
     print(f"  Output: {DIST}")
     print(f"  Size: {total / (1024*1024):.1f} MB")
     if IS_WINDOWS:
-        print(f"  Run: dist\\foundry\\foundry.bat")
+        print(f"  Run: dist\\var\\var.bat")
     else:
-        print(f"  Run: ./dist/foundry/foundry.sh")
+        print(f"  Run: ./dist/var/var.sh")
     print(f"{'='*50}\033[0m")
 
 

@@ -2,13 +2,13 @@
 
 ## Summary
 
-Add a configurable working directory for the Foundry agent. All file operation tools (read, write, list, run command) will resolve relative paths against this directory. The work directory is a global setting (not per-session).
+Add a configurable working directory for the Var agent. All file operation tools (read, write, list, run command) will resolve relative paths against this directory. The work directory is a global setting (not per-session).
 
 ## Configuration Priority (highest to lowest)
 
 1. **CLI argument**: `--work-dir /path/to/project`
-2. **Environment variable**: `FOUNDRY_WORK_DIR=/path/to/project`
-3. **YAML config**: `workDir: /path/to/project` in `~/.config/foundry/config.yaml`
+2. **Environment variable**: `VAR_WORK_DIR=/path/to/project`
+3. **YAML config**: `workDir: /path/to/project` in `~/.config/var/config.yaml`
 4. **Default**: `os.getcwd()` (current process working directory)
 
 ## Changes
@@ -19,7 +19,7 @@ Add `work_dir: Path` field with default `Path.cwd()`. After `Settings` is constr
 
 ### 2. `yaml_config.py` — Parse `workDir`
 
-Add `work_dir: str` to `FoundryConfig`. Parse `workDir` from YAML top-level key. Apply to `settings.work_dir` in the existing config merge block.
+Add `work_dir: str` to `VarConfig`. Parse `workDir` from YAML top-level key. Apply to `settings.work_dir` in the existing config merge block.
 
 ### 3. `__main__.py` — CLI argument
 

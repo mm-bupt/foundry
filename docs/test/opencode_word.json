@@ -97,21 +97,21 @@ assistant: Clients are marked as failed in the `connectToServer` function in src
 You are powered by the model named glm-4.7. The exact model ID is zhipuai-coding-plan/glm-4.7
 Here is some useful information about the environment you are running in:
 <env>
-  Working directory: D:\\1-Project\\foundry
-  Workspace root folder: D:\\1-Project\\foundry
+  Working directory: D:\\1-Project\\var
+  Workspace root folder: D:\\1-Project\\var
   Is directory a git repo: yes
   Platform: win32
   Today's date: Sun May 31 2026
 </env>
-Instructions from: D:\\1-Project\\foundry\\AGENTS.md
-# AGENTS.md — Dream Foundry Project Guide
+Instructions from: D:\\1-Project\\var\\AGENTS.md
+# AGENTS.md — Dream Var Project Guide
 
 ## 使用中文交互
 
 ## Project Overview
 
-Dream Foundry is a full-stack AI Agent application:
-- **Backend (foundry/)**: Python/FastAPI + Pydantic AI + SQLite
+Dream Var is a full-stack AI Agent application:
+- **Backend (var/)**: Python/FastAPI + Pydantic AI + SQLite
 - **TUI Frontend (tui/)**: Python/Textual terminal UI (opencode-style)
 - **WebUI (webui/)**: React + Vite + Ant Design web interface
 - **Communication**: WebSocket (default) + SSE (fallback)
@@ -132,11 +132,11 @@ Dream Foundry is a full-stack AI Agent application:
 ## Project Structure
 
 ```
-dream-foundry/
-├── foundry/                         # Backend package (pip install -e foundry)
-│   ├── foundry_app/               # Python package (importable as foundry_app.*)
+dream-var/
+├── var/                         # Backend package (pip install -e var)
+│   ├── var_app/               # Python package (importable as var_app.*)
 │   │   ├── main.py                  # FastAPI app entry, all routers registered
-│   │   ├── config.py                # Settings (env vars: DREAM_FOUNDRY_*)
+│   │   ├── config.py                # Settings (env vars: DREAM_VAR_*)
 │   │   ├── shared_protocol.py       # WS/SSE message type definitions
 │   │   ├── api/
 │   │   │   ├── sessions.py          # CRUD /api/sessions
@@ -160,7 +160,7 @@ dream-foundry/
 │   │       └── memory.py            # Memory response models
 │   └── pyproject.toml
 ├── tui/                             # TUI frontend (not yet implemented)
-├── shared/                          # Original shared protocol (copied into foundry)
+├── shared/                          # Original shared protocol (copied into var)
 ├── docs/                            # Design documents
 └── AGENTS.md                        # This file
 ```
@@ -179,8 +179,8 @@ scripts\\dev.ps1
 scripts\\dev.bat
 
 # Individual components:
-pip install -e foundry                  # Install backend
-python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
+pip install -e var                  # Install backend
+python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
 cd webui && npm install && npm run dev   # WebUI only
 cd tui && bun install && bun run src/index.tsx  # TUI only
 
@@ -190,9 +190,9 @@ python scripts/build.py backend  # Backend only (PyInstaller onefile)
 python scripts/build.py tui      # TUI only (sources + node_modules)
 python scripts/build.py bun      # Bundle Bun runtime only
 
-# Output: dist/dream-foundry/
-#   dream-foundry.bat (or .sh)  ← double-click to run
-#   bin/dream-foundry-server    ← backend
+# Output: dist/dream-var/
+#   dream-var.bat (or .sh)  ← double-click to run
+#   bin/dream-var-server    ← backend
 #   bin/bun                     ← Bun runtime (no install needed)
 #   lib/tui/                    ← TUI sources
 ```
@@ -233,15 +233,15 @@ Server → Client:
 
 ## Environment Variables
 
-All env vars use prefix `DREAM_FOUNDRY_`:
-- `DREAM_FOUNDRY_OPENAI_API_KEY` — OpenAI API key
-- `DREAM_FOUNDRY_ANTHROPIC_API_KEY` — Anthropic API key
-- `DREAM_FOUNDRY_DB_PATH` — SQLite database path (default: ~/.dream-foundry/dream-foundry.db)
-- `DREAM_FOUNDRY_WORK_DIR` — Agent working directory for file operations (default: cwd)
-- `DREAM_FOUNDRY_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
-- `DREAM_FOUNDRY_DEBUG` — Enable debug mode
+All env vars use prefix `DREAM_VAR_`:
+- `DREAM_VAR_OPENAI_API_KEY` — OpenAI API key
+- `DREAM_VAR_ANTHROPIC_API_KEY` — Anthropic API key
+- `DREAM_VAR_DB_PATH` — SQLite database path (default: ~/.dream-var/dream-var.db)
+- `DREAM_VAR_WORK_DIR` — Agent working directory for file operations (default: cwd)
+- `DREAM_VAR_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
+- `DREAM_VAR_DEBUG` — Enable debug mode
 
-Work dir priority: `--work-dir` CLI arg > `DREAM_FOUNDRY_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
+Work dir priority: `--work-dir` CLI arg > `DREAM_VAR_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
 
 ## Available Models
 
@@ -275,14 +275,14 @@ All phases P1-P8 complete. Future work:
 ## Project Structure (Updated)
 
 ```
-dream-foundry/
+dream-var/
 ├── scripts/                        # Build & dev scripts
 │   ├── build.py                    # Production build (PyInstaller + Bun compile)
 │   ├── dev.bat                     # Windows CMD dev launcher
 │   ├── dev.ps1                     # PowerShell dev launcher
 │   └── dev.sh                      # Linux/macOS dev launcher
-├── foundry/                         # Backend (Python/FastAPI/Pydantic AI)
-│   └── foundry_app/
+├── var/                         # Backend (Python/FastAPI/Pydantic AI)
+│   └── var_app/
 │       ├── main.py, config.py
 │       ├── agent/ (core, registry, tools, memory, context)
 │       ├── api/ (sessions, models, ws, sse, memory)
@@ -309,8 +309,8 @@ dream-foundry/
 
 ### 后端调试
 ```bash
-pip install -e foundry
-python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+pip install -e var
+python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 更新后使用 uvicorn --reload 自动重载。
 
@@ -348,12 +348,12 @@ Use the skill tool to load a skill when a task matches its description.
   <skill>
     <name>building-pydantic-ai-agents</name>
     <description>Build AI agents with Pydantic AI — tools, capabilities, structured output, streaming, testing, and multi-agent patterns. Use when the user mentions Pydantic AI, imports pydantic_ai, or asks to build an AI agent, add tools/capabilities, stream output, define agents from YAML, or test agent behavior.</description>
-    <location>file:///D:/1-Project/foundry/.opencode/skills/building-pydantic-ai-agents/SKILL.md</location>
+    <location>file:///D:/1-Project/var/.opencode/skills/building-pydantic-ai-agents/SKILL.md</location>
   </skill>
   <skill>
     <name>customize-opencode</name>
     <description>Use ONLY when the user is editing or creating opencode's own configuration: opencode.json, opencode.jsonc, files under .opencode/, or files under ~/.config/opencode/. Also use when creating or fixing opencode agents, subagents, skills, plugins, MCP servers, or permission rules. Do not use for the user's own application code, or for any project that is not configuring opencode itself.</description>
-    <location>file:///D:/1-Project/foundry/%3Cbuilt-in%3E</location>
+    <location>file:///D:/1-Project/var/%3Cbuilt-in%3E</location>
   </skill>
   <skill>
     <name>dispatching-parallel-agents</name>
@@ -373,12 +373,12 @@ Use the skill tool to load a skill when a task matches its description.
   <skill>
     <name>logfire-instrumentation</name>
     <description>Add Pydantic Logfire observability to applications. Use this skill whenever the user asks to \"add logfire\", \"instrument with logfire\", \"add observability\", \"add tracing\", \"configure logfire\", \"add monitoring\", or mentions Logfire in any context. Supports Python, JavaScript/TypeScript, and Rust. Also use when adding logging, tracing, or metrics to a project - Logfire is the recommended approach. Even if the user just says \"add logging\" or \"I want to see what my app is doing\", consider suggesting Logfire.</description>
-    <location>file:///D:/1-Project/foundry/.opencode/skills/logfire-instrumentation/SKILL.md</location>
+    <location>file:///D:/1-Project/var/.opencode/skills/logfire-instrumentation/SKILL.md</location>
   </skill>
   <skill>
     <name>logfire-query</name>
     <description>Query Logfire telemetry data — traces, logs, spans, and metrics. Use this skill when the user asks to \"query logfire\", \"search traces\", \"find logs\", \"query data\", \"search spans\", \"look up errors in logfire\", \"get metrics from logfire\", \"analyze telemetry\", or wants to add Logfire querying capabilities to their code. Also use when the user wants to explore OpenTelemetry data, investigate production issues by querying, or build dashboards/reports from Logfire data.</description>
-    <location>file:///D:/1-Project/foundry/.opencode/skills/logfire-query/SKILL.md</location>
+    <location>file:///D:/1-Project/var/.opencode/skills/logfire-query/SKILL.md</location>
   </skill>
   <skill>
     <name>opentui</name>

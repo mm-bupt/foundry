@@ -1,8 +1,8 @@
-# Foundry — Design Documents
+# Var — Design Documents
 
 ## Overview
 
-Foundry is a full-stack AI Agent application with a separated backend (Python/FastAPI + Pydantic AI) and TUI frontend (Python/Textual), styled to match the opencode terminal UI.
+Var is a full-stack AI Agent application with a separated backend (Python/FastAPI + Pydantic AI) and TUI frontend (Python/Textual), styled to match the opencode terminal UI.
 
 ## Documents
 
@@ -20,13 +20,13 @@ Foundry is a full-stack AI Agent application with a separated backend (Python/Fa
 
 ```bash
 # Backend
-cd foundry && pip install -e ".[dev]"
-python -m foundry.app.main
+cd var && pip install -e ".[dev]"
+python -m var.app.main
 
 # TUI
 cd tui && pip install -e ".[dev]"
 python -m tui.src.app
 
 # Or single-process mode
-python -m foundry_app
+python -m var_app
 ```

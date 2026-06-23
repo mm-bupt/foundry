@@ -7,7 +7,7 @@
 set -e
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-BACKEND_CMD="python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload"
+BACKEND_CMD="python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload"
 TUI_CMD="bun run src/index.tsx"
 
 TARGET="${1:-all}"
@@ -19,12 +19,12 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-echo "Foundry Dev"
+echo "Var Dev"
 echo ""
 
 if [ "$TARGET" = "all" ] || [ "$TARGET" = "backend" ]; then
     echo "Starting backend..."
-    (cd "$ROOT_DIR/foundry" && $BACKEND_CMD) &
+    (cd "$ROOT_DIR/var" && $BACKEND_CMD) &
     BACKEND_PID=$!
 fi
 

@@ -14,11 +14,11 @@
 
 | File | Action | Responsibility |
 |------|--------|----------------|
-| `foundry/foundry_app/logger.py` | Create | 日志配置模块，提供 `get_logger()` 工厂 |
-| `foundry/foundry_app/main.py` | Modify | 启动时初始化日志配置 |
-| `foundry/foundry_app/agent/core.py` | Modify | 添加 stream_chat 各阶段 debug 日志 |
-| `foundry/foundry_app/api/ws.py` | Modify | 添加连接/消息/断开日志 |
-| `foundry/foundry_app/agent/tools.py` | Modify | 添加工具执行前后的日志 |
+| `var/var_app/logger.py` | Create | 日志配置模块，提供 `get_logger()` 工厂 |
+| `var/var_app/main.py` | Modify | 启动时初始化日志配置 |
+| `var/var_app/agent/core.py` | Modify | 添加 stream_chat 各阶段 debug 日志 |
+| `var/var_app/api/ws.py` | Modify | 添加连接/消息/断开日志 |
+| `var/var_app/agent/tools.py` | Modify | 添加工具执行前后的日志 |
 | `webui/src/types.ts` | Modify | 新增 `ToolCall` 接口，`Message` 增加 `tool_calls` 字段 |
 | `webui/src/store.ts` | Modify | 新增 `activeToolCalls` 状态和相关 actions |
 | `webui/src/App.tsx` | Modify | 添加 `tool.call` / `tool.result` 事件处理 |
@@ -30,8 +30,8 @@
 ## Task 1: 后端日志模块
 
 **Files:**
-- Create: `foundry/foundry_app/logger.py`
-- Modify: `foundry/foundry_app/main.py`
+- Create: `var/var_app/logger.py`
+- Modify: `var/var_app/main.py`
 
 - [ ] **Step 1: 创建 logger.py**
 
@@ -49,15 +49,15 @@ def setup_logging(debug: bool = False):
             datefmt="%H:%M:%S",
         )
     )
-    root = logging.getLogger("foundry_app")
+    root = logging.getLogger("var_app")
     root.setLevel(level)
     root.handlers.clear()
     root.addHandler(handler)
 
 
 def get_logger(name: str) -> logging.Logger:
-    if not name.startswith("foundry_app"):
-        name = f"foundry_app.{name}"
+    if not name.startswith("var_app"):
+        name = f"var_app.{name}"
     return logging.getLogger(name)
 ```
 
@@ -66,7 +66,7 @@ def get_logger(name: str) -> logging.Logger:
 在 `main.py` 的 import 区域添加：
 
 ```python
-from foundry_app.logger import setup_logging
+from var_app.logger import setup_logging
 ```
 
 在 `lifespan` 函数体开头（`db = await get_db()` 之前）添加：
@@ -77,21 +77,21 @@ setup_logging(debug=settings.debug)
 
 - [ ] **Step 3: 验证**
 
-启动后端 `python -m uvicorn foundry_app.main:app --reload`，确认无报错。
+启动后端 `python -m uvicorn var_app.main:app --reload`，确认无报错。
 
 ---
 
 ## Task 2: core.py 添加 debug 日志
 
 **Files:**
-- Modify: `foundry/foundry_app/agent/core.py`
+- Modify: `var/var_app/agent/core.py`
 
 - [ ] **Step 1: 导入 logger**
 
 在 `core.py` import 区域添加：
 
 ```python
-from foundry_app.logger import get_logger
+from var_app.logger import get_logger
 
 logger = get_logger("agent.core")
 ```
@@ -158,21 +158,21 @@ logger.exception("stream_chat error | session=%s error=%s", session_id, e)
 
 - [ ] **Step 7: 验证**
 
-设置 `FOUNDRY_DEBUG=true`，启动后端发送一条消息，观察 stderr 中出现 debug 日志。
+设置 `VAR_DEBUG=true`，启动后端发送一条消息，观察 stderr 中出现 debug 日志。
 
 ---
 
 ## Task 3: ws.py 添加连接/消息日志
 
 **Files:**
-- Modify: `foundry/foundry_app/api/ws.py`
+- Modify: `var/var_app/api/ws.py`
 
 - [ ] **Step 1: 导入 logger**
 
 在 `ws.py` import 区域添加：
 
 ```python
-from foundry_app.logger import get_logger
+from var_app.logger import get_logger
 
 logger = get_logger("api.ws")
 ```
@@ -210,18 +210,18 @@ logger.debug("ws disconnected | session=%s", session_id)
 ## Task 4: tools.py 添加工具执行日志
 
 **Files:**
-- Modify: `foundry/foundry_app/agent/tools.py`
+- Modify: `var/var_app/agent/tools.py`
 
 - [ ] **Step 1: 读取 tools.py 了解结构**
 
-先读取 `foundry/foundry_app/agent/tools.py`，了解各工具注册函数的实现方式。
+先读取 `var/var_app/agent/tools.py`，了解各工具注册函数的实现方式。
 
 - [ ] **Step 2: 导入 logger**
 
 在 `tools.py` import 区域添加：
 
 ```python
-from foundry_app.logger import get_logger
+from var_app.logger import get_logger
 
 logger = get_logger("agent.tools")
 ```
@@ -722,7 +722,7 @@ store.addMessage({
 
 - [ ] **Step 1: 后端 debug 日志验证**
 
-1. 设置 `FOUNDRY_DEBUG=true`
+1. 设置 `VAR_DEBUG=true`
 2. 启动后端
 3. 通过 WebUI 发送消息
 4. 确认 stderr 输出包含：`ws connected`、`stream_chat start`、`text.start`、`tool.call`、`tool.result`、`stream.done`、`ws disconnected` 等日志

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add thinking display, true streaming deltas, and markdown rendering to the Foundry WebUI.
+**Goal:** Add thinking display, true streaming deltas, and markdown rendering to the Var WebUI.
 
 **Architecture:** Fix backend `core.py` to use `ModelRequestNode.stream()` for real incremental deltas (text + thinking), then update frontend to render markdown via `react-markdown` + `remark-gfm` and display thinking via `@ant-design/x` `Think` component.
 
@@ -13,8 +13,8 @@
 ## File Structure
 
 ### Backend
-- Modify: `foundry/foundry_app/agent/core.py` — rewrite streaming to use `ModelRequestNode.stream()`, emit thinking events
-- Modify: `foundry/foundry_app/shared_protocol.py` — add `thinking.start` and `thinking.end` event types
+- Modify: `var/var_app/agent/core.py` — rewrite streaming to use `ModelRequestNode.stream()`, emit thinking events
+- Modify: `var/var_app/shared_protocol.py` — add `thinking.start` and `thinking.end` event types
 
 ### Frontend
 - Modify: `webui/package.json` — add react-markdown, remark-gfm
@@ -29,7 +29,7 @@
 ### Task 1: Backend — Rewrite streaming in core.py
 
 **Files:**
-- Modify: `foundry/foundry_app/agent/core.py`
+- Modify: `var/var_app/agent/core.py`
 
 - [ ] **Step 1: Add new imports to core.py**
 
@@ -239,7 +239,7 @@ async def stream_chat(
             session.get("title") == "New Chat"
             and len(messages) <= 1
         ):
-            from foundry_app.agent.title import generate_title
+            from var_app.agent.title import generate_title
             asyncio.create_task(generate_title(session_id, model_id, user_message, send_event))
 
     except Exception as e:
@@ -261,7 +261,7 @@ Ensure the imports section has all the new types listed in Step 1 and remove any
 
 - [ ] **Step 4: Verify no lint errors**
 
-Run: `cd foundry && python -c "from foundry_app.agent.core import stream_chat; print('OK')"`
+Run: `cd var && python -c "from var_app.agent.core import stream_chat; print('OK')"`
 
 ---
 
@@ -705,7 +705,7 @@ Run: `cd webui && npx tsc --noEmit`
 
 - [ ] **Step 1: Start backend**
 
-Run: `cd foundry && python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload`
+Run: `cd var && python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload`
 
 - [ ] **Step 2: Start frontend**
 

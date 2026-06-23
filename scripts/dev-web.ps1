@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    Foundry Dev Launcher (PowerShell)
+    Var Dev Launcher (PowerShell)
 .DESCRIPTION
     Starts backend and/or UI for development.
 .EXAMPLE
@@ -37,13 +37,13 @@ function Cleanup {
 
 trap { Cleanup; break }
 
-Write-Host "Foundry Dev (WebUI)" -ForegroundColor Cyan
+Write-Host "Var Dev (WebUI)" -ForegroundColor Cyan
 Write-Host ""
 
 if ($Target -in "all", "backend") {
     Write-Host "Starting backend..." -ForegroundColor Green
     $backendProc = Start-Process -FilePath $VenvPython `
-        -ArgumentList "-m", "uvicorn", "foundry_app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", (Join-Path $RootDir "foundry" "foundry_app") `
+        -ArgumentList "-m", "uvicorn", "var_app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", (Join-Path $RootDir "var" "var_app") `
         -WorkingDirectory $RootDir `
         -PassThru -NoNewWindow
     $BackendPid = $backendProc.Id

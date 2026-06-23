@@ -110,7 +110,7 @@ export function StatusBar(props: { store: AppStore; onInterrupt: () => void }) {
         <span fg={theme.text}>{tokenText() ? "  " + tokenText() : ""}</span>
         <span fg={theme.textMuted}>  </span>
         <span fg={theme.secondary}>*</span>
-        <span fg={theme.textMuted}> foundry</span>
+        <span fg={theme.textMuted}> var</span>
       </text>
     </box>
   )

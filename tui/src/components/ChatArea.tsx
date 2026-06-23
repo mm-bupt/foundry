@@ -14,7 +14,7 @@ export function ChatArea(props: { store: AppStore }) {
           <box flexGrow={1} justifyContent="center" alignItems="center">
             <box flexDirection="column" alignItems="center" gap={1}>
               <text>
-                <span fg={theme.primary}>foundry</span>
+                <span fg={theme.primary}>var</span>
               </text>
               <text fg={theme.textMuted}>AI Agent TUI</text>
               <text fg={theme.textMuted}>Type a message or /help for commands</text>

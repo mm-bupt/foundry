@@ -1,4 +1,4 @@
-const STORAGE_KEY = "foundry_tui_state"
+const STORAGE_KEY = "var_tui_state"
 
 export interface PersistedState {
   contextVisible: boolean

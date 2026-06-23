@@ -10,7 +10,7 @@
 
 **Files to create**:
 ```
-foundry/
+var/
 ├── pyproject.toml
 ├── app/
 │   ├── __init__.py
@@ -39,7 +39,7 @@ foundry/
 
 **Files to create**:
 ```
-foundry/app/
+var/app/
 ├── agent/
 │   ├── __init__.py
 │   ├── core.py               # Agent factory
@@ -66,7 +66,7 @@ shared/
 
 **Files to create**:
 ```
-foundry/app/
+var/app/
 ├── agent/
 │   ├── tools.py              # store_memory, recall_memory tools
 │   ├── memory.py             # Embedding, vector ops
@@ -78,9 +78,9 @@ foundry/app/
 ```
 
 **Update**:
-- `foundry/app/agent/core.py` — add tools to agent
-- `foundry/app/db/database.py` — add vec_memory virtual table
-- `foundry/app/db/crud.py` — add memory CRUD + search
+- `var/app/agent/core.py` — add tools to agent
+- `var/app/db/database.py` — add vec_memory virtual table
+- `var/app/db/crud.py` — add memory CRUD + search
 
 **Verify**: Agent stores/recalls memories during conversation
 
@@ -96,7 +96,7 @@ tui/
 ├── pyproject.toml
 ├── src/
 │   ├── __init__.py
-│   ├── app.py                # DreamFoundryApp
+│   ├── app.py                # DreamVarApp
 │   ├── screens/
 │   │   ├── __init__.py
 │   │   └── main_screen.py   # 3-panel layout
@@ -202,7 +202,7 @@ tui/src/
 ├── widgets/chat/
 │   ├── tool_call.py          # Spinner animation
 │   └── message_bubble.py     # Error state rendering
-foundry/app/main.py           # Single-process launcher option
+var/app/main.py           # Single-process launcher option
 Makefile                      # Dev commands
 ```
 
@@ -219,7 +219,7 @@ Makefile                      # Dev commands
 
 **Single-process mode**:
 ```python
-# python -m foundry_app
+# python -m var_app
 # Starts FastAPI + TUI in one process
 ```
 

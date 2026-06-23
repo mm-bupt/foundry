@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 参考 opencode 的 context 压缩系统，为 foundry 实现完整的 head/tail 分割压缩、增量摘要生成、工具输出裁剪和手动压缩 API。
+**Goal:** 参考 opencode 的 context 压缩系统，为 var 实现完整的 head/tail 分割压缩、增量摘要生成、工具输出裁剪和手动压缩 API。
 
 **Architecture:** 重构现有 `context.py` 的简单 `trim_and_summarize`，引入 `compaction.py`（head/tail 分割 + 摘要生成）、`overflow.py`（溢出检测），仍作为 pydantic-ai `history_processor` 集成。压缩使用 session 当前模型。DB schema 新增 `is_compaction`/`is_summary`/`tail_start_id`/`compacted_at` 四个独立字段。
 
@@ -36,17 +36,17 @@
 
 | 操作 | 文件 | 职责 |
 |------|------|------|
-| 新增 | `foundry/foundry_app/agent/overflow.py` | token 预算计算 + 溢出检测 |
-| 新增 | `foundry/foundry_app/agent/compaction.py` | head/tail 分割、摘要生成、prune、filter_compacted |
-| 修改 | `foundry/foundry_app/agent/context.py` | 重构为调用 compaction 模块 |
-| 修改 | `foundry/foundry_app/agent/core.py` | 传入 model_id 给 history_processor、添加 prune 调用 |
-| 修改 | `foundry/foundry_app/db/database.py` | schema 新增字段 + migration |
-| 修改 | `foundry/foundry_app/db/models.py` | Message model 新增字段 |
-| 修改 | `foundry/foundry_app/db/crud.py` | create/update 支持新字段 |
-| 修改 | `foundry/foundry_app/config.py` | 新增压缩相关配置项 |
-| 修改 | `foundry/foundry_app/shared_protocol.py` | 新增 `CompactCmd` + `CompactionDone` |
-| 修改 | `foundry/foundry_app/api/ws.py` | 处理 `chat.compact` 命令 |
-| 新增 | `foundry/foundry_app/api/compact.py` | REST API `POST /api/sessions/{id}/compact` |
+| 新增 | `var/var_app/agent/overflow.py` | token 预算计算 + 溢出检测 |
+| 新增 | `var/var_app/agent/compaction.py` | head/tail 分割、摘要生成、prune、filter_compacted |
+| 修改 | `var/var_app/agent/context.py` | 重构为调用 compaction 模块 |
+| 修改 | `var/var_app/agent/core.py` | 传入 model_id 给 history_processor、添加 prune 调用 |
+| 修改 | `var/var_app/db/database.py` | schema 新增字段 + migration |
+| 修改 | `var/var_app/db/models.py` | Message model 新增字段 |
+| 修改 | `var/var_app/db/crud.py` | create/update 支持新字段 |
+| 修改 | `var/var_app/config.py` | 新增压缩相关配置项 |
+| 修改 | `var/var_app/shared_protocol.py` | 新增 `CompactCmd` + `CompactionDone` |
+| 修改 | `var/var_app/api/ws.py` | 处理 `chat.compact` 命令 |
+| 新增 | `var/var_app/api/compact.py` | REST API `POST /api/sessions/{id}/compact` |
 
 ---
 
@@ -55,13 +55,13 @@
 ### Task 1: 新增 overflow.py — token 预算计算与溢出检测
 
 **Files:**
-- 新增: `foundry/foundry_app/agent/overflow.py`
+- 新增: `var/var_app/agent/overflow.py`
 
 - [ ] **Step 1: 创建 overflow.py**
 
 ```python
-# foundry/foundry_app/agent/overflow.py
-from foundry_app.agent.registry import get_model_info
+# var/var_app/agent/overflow.py
+from var_app.agent.registry import get_model_info
 
 COMPACTION_BUFFER = 20_000
 
@@ -77,7 +77,7 @@ def usable_tokens(model_id: str) -> int:
 
 
 def is_overflow(model_id: str, tokens_used: int) -> bool:
-    from foundry_app.config import settings
+    from var_app.config import settings
     if not settings.auto_compaction:
         return False
     info = get_model_info(model_id)
@@ -89,7 +89,7 @@ def is_overflow(model_id: str, tokens_used: int) -> bool:
 - [ ] **Step 2: 验证**
 
 ```bash
-cd foundry && python -c "from foundry_app.agent.overflow import usable_tokens, is_overflow; print(usable_tokens('gpt-4o'), is_overflow('gpt-4o', 50000)); print(usable_tokens('claude-sonnet'), is_overflow('claude-sonnet', 50000))"
+cd var && python -c "from var_app.agent.overflow import usable_tokens, is_overflow; print(usable_tokens('gpt-4o'), is_overflow('gpt-4o', 50000)); print(usable_tokens('claude-sonnet'), is_overflow('claude-sonnet', 50000))"
 ```
 
 预期: `gpt-4o` usable ≈ 91616, `claude-sonnet` usable ≈ 171808
@@ -99,7 +99,7 @@ cd foundry && python -c "from foundry_app.agent.overflow import usable_tokens, i
 ### Task 2: 扩展 config.py — 新增压缩配置项
 
 **Files:**
-- 修改: `foundry/foundry_app/config.py`
+- 修改: `var/var_app/config.py`
 
 - [ ] **Step 1: 在 Settings 类中新增字段**
 
@@ -120,9 +120,9 @@ cd foundry && python -c "from foundry_app.agent.overflow import usable_tokens, i
 ### Task 3: DB schema 变更 — messages 表新增字段
 
 **Files:**
-- 修改: `foundry/foundry_app/db/database.py`
-- 修改: `foundry/foundry_app/db/models.py`
-- 修改: `foundry/foundry_app/db/crud.py`
+- 修改: `var/var_app/db/database.py`
+- 修改: `var/var_app/db/models.py`
+- 修改: `var/var_app/db/crud.py`
 
 - [ ] **Step 1: 更新 models.py — Message 类新增字段**
 
@@ -203,9 +203,9 @@ if k in (
 - [ ] **Step 4: 验证 migration**
 
 ```bash
-cd foundry && python -c "
+cd var && python -c "
 import asyncio
-from foundry_app.db.database import init_db, _connect
+from var_app.db.database import init_db, _connect
 async def test():
     db = await _connect()
     await init_db(db)
@@ -223,7 +223,7 @@ asyncio.run(test())
 - [ ] **Step 5: Commit**
 
 ```bash
-git add foundry/foundry_app/agent/overflow.py foundry/foundry_app/config.py foundry/foundry_app/db/database.py foundry/foundry_app/db/models.py foundry/foundry_app/db/crud.py
+git add var/var_app/agent/overflow.py var/var_app/config.py var/var_app/db/database.py var/var_app/db/models.py var/var_app/db/crud.py
 git commit -m "feat: add overflow detection, compaction config, and DB schema for context compression"
 ```
 
@@ -234,14 +234,14 @@ git commit -m "feat: add overflow detection, compaction config, and DB schema fo
 ### Task 4: 创建 compaction.py — 完整实现
 
 **Files:**
-- 新增: `foundry/foundry_app/agent/compaction.py`
+- 新增: `var/var_app/agent/compaction.py`
 
 此文件包含 5 个核心函数，按依赖顺序实现。
 
 - [ ] **Step 1: 创建文件骨架 + 常量 + 辅助函数**
 
 ```python
-# foundry/foundry_app/agent/compaction.py
+# var/var_app/agent/compaction.py
 import json
 from pydantic_ai import Agent
 from pydantic_ai.messages import (
@@ -256,10 +256,10 @@ from pydantic_ai.messages import (
     ThinkingPart,
 )
 
-from foundry_app.agent.registry import estimate_tokens, get_model_info, get_provider_prefix
-from foundry_app.agent.overflow import usable_tokens
-from foundry_app.config import settings
-from foundry_app.logger import get_logger
+from var_app.agent.registry import estimate_tokens, get_model_info, get_provider_prefix
+from var_app.agent.overflow import usable_tokens
+from var_app.config import settings
+from var_app.logger import get_logger
 
 logger = get_logger("agent.compaction")
 
@@ -637,13 +637,13 @@ async def prune(
 - [ ] **Step 11: 验证模块可导入**
 
 ```bash
-cd foundry && python -c "from foundry_app.agent.compaction import select, filter_compacted, process_compaction, prune; print('OK')"
+cd var && python -c "from var_app.agent.compaction import select, filter_compacted, process_compaction, prune; print('OK')"
 ```
 
 - [ ] **Step 12: Commit**
 
 ```bash
-git add foundry/foundry_app/agent/compaction.py
+git add var/var_app/agent/compaction.py
 git commit -m "feat: add compaction engine with head/tail split, summary generation, and prune"
 ```
 
@@ -654,7 +654,7 @@ git commit -m "feat: add compaction engine with head/tail split, summary generat
 ### Task 5: 重构 context.py — 调用 compaction 模块
 
 **Files:**
-- 修改: `foundry/foundry_app/agent/context.py`
+- 修改: `var/var_app/agent/context.py`
 
 - [ ] **Step 1: 重写 context.py**
 
@@ -663,7 +663,7 @@ git commit -m "feat: add compaction engine with head/tail split, summary generat
 ```python
 from pydantic_ai.messages import ModelMessage
 
-from foundry_app.agent.compaction import filter_compacted
+from var_app.agent.compaction import filter_compacted
 
 
 async def trim_and_summarize(messages: list[ModelMessage]) -> list[ModelMessage]:
@@ -675,7 +675,7 @@ async def trim_and_summarize(messages: list[ModelMessage]) -> list[ModelMessage]
 - [ ] **Step 2: Commit**
 
 ```bash
-git add foundry/foundry_app/agent/context.py
+git add var/var_app/agent/context.py
 git commit -m "refactor: simplify context.py to delegate to compaction module"
 ```
 
@@ -684,7 +684,7 @@ git commit -m "refactor: simplify context.py to delegate to compaction module"
 ### Task 6: 修改 core.py — 集成压缩主流程
 
 **Files:**
-- 修改: `foundry/foundry_app/agent/core.py`
+- 修改: `var/var_app/agent/core.py`
 
 这是最关键的集成点。需要修改 `stream_chat` 函数：
 
@@ -703,7 +703,7 @@ pydantic-ai 的 `history_processors` 签名是 `async (messages) -> messages`，
 def create_agent(model_id: str, system_prompt: str = "") -> Agent:
     # ... 现有 model 解析逻辑不变 ...
 
-    from foundry_app.agent.context import trim_and_summarize
+    from var_app.agent.context import trim_and_summarize
 
     agent = Agent(
         model_obj_or_string,  # 根据现有逻辑
@@ -732,8 +732,8 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
             output_tokens = usage.response_tokens or 0 if usage else 0
 
             # ── Overflow 检测 + 压缩 ──
-            from foundry_app.agent.overflow import is_overflow
-            from foundry_app.agent.compaction import process_compaction, prune
+            from var_app.agent.overflow import is_overflow
+            from var_app.agent.compaction import process_compaction, prune
 
             total_tokens = input_tokens + output_tokens
             if is_overflow(model_id, total_tokens):
@@ -772,8 +772,8 @@ async def _do_compaction(
     db, session_id: str, model_id: str,
     all_msgs: list[ModelMessage], send_event
 ):
-    from foundry_app.agent.compaction import process_compaction
-    from foundry_app.db import crud
+    from var_app.agent.compaction import process_compaction
+    from var_app.db import crud
 
     previous_summary = _find_previous_summary(all_msgs)
 
@@ -881,8 +881,8 @@ def _load_history(messages: list[dict]) -> list[ModelMessage]:
 - [ ] **Step 5: 验证基本流程**
 
 ```bash
-cd foundry && python -c "
-from foundry_app.agent.core import create_agent, _load_history
+cd var && python -c "
+from var_app.agent.core import create_agent, _load_history
 agent = create_agent('gpt-4o')
 print('Agent created with history_processors:', agent._history_processors)
 print('_load_history([]):', _load_history([]))
@@ -892,7 +892,7 @@ print('_load_history([]):', _load_history([]))
 - [ ] **Step 6: Commit**
 
 ```bash
-git add foundry/foundry_app/agent/core.py foundry/foundry_app/agent/context.py
+git add var/var_app/agent/core.py var/var_app/agent/context.py
 git commit -m "feat: integrate compaction into stream_chat with overflow detection, summary storage, and prune"
 ```
 
@@ -903,7 +903,7 @@ git commit -m "feat: integrate compaction into stream_chat with overflow detecti
 ### Task 7: 新增 shared_protocol 事件类型
 
 **Files:**
-- 修改: `foundry/foundry_app/shared_protocol.py`
+- 修改: `var/var_app/shared_protocol.py`
 
 - [ ] **Step 1: 新增 CompactCmd 和 CompactionDone 事件**
 
@@ -944,7 +944,7 @@ def parse_command(data: dict) -> ChatMessageCmd | CompactCmd | None:
 - [ ] **Step 2: Commit**
 
 ```bash
-git add foundry/foundry_app/shared_protocol.py
+git add var/var_app/shared_protocol.py
 git commit -m "feat: add CompactCmd and CompactionDone protocol types"
 ```
 
@@ -953,7 +953,7 @@ git commit -m "feat: add CompactCmd and CompactionDone protocol types"
 ### Task 8: WebSocket 处理 chat.compact 命令
 
 **Files:**
-- 修改: `foundry/foundry_app/api/ws.py`
+- 修改: `var/var_app/api/ws.py`
 
 - [ ] **Step 1: 在 websocket_chat 中添加 compact 处理**
 
@@ -962,8 +962,8 @@ git commit -m "feat: add CompactCmd and CompactionDone protocol types"
 ```python
             if msg_type == "chat.compact":
                 async def do_compact():
-                    from foundry_app.agent.core import _do_compaction, _load_history
-                    from foundry_app.db import crud
+                    from var_app.agent.core import _do_compaction, _load_history
+                    from var_app.db import crud
                     db_conn = await get_db()
                     msgs = await crud.list_messages(db_conn, session_id)
                     model_id = (await crud.get_session(db_conn, session_id) or {}).get("model_id", settings.default_model)
@@ -980,13 +980,13 @@ git commit -m "feat: add CompactCmd and CompactionDone protocol types"
 同时添加 `get_db` import：
 
 ```python
-from foundry_app.db.database import get_db
+from var_app.db.database import get_db
 ```
 
 - [ ] **Step 2: Commit**
 
 ```bash
-git add foundry/foundry_app/api/ws.py
+git add var/var_app/api/ws.py
 git commit -m "feat: handle chat.compact WebSocket command"
 ```
 
@@ -995,17 +995,17 @@ git commit -m "feat: handle chat.compact WebSocket command"
 ### Task 9: REST API — POST /api/sessions/{id}/compact
 
 **Files:**
-- 新增: `foundry/foundry_app/api/compact.py`
-- 修改: `foundry/foundry_app/main.py`
+- 新增: `var/var_app/api/compact.py`
+- 修改: `var/var_app/main.py`
 
 - [ ] **Step 1: 创建 compact.py**
 
 ```python
 from fastapi import APIRouter, HTTPException
 
-from foundry_app.db.database import get_db
-from foundry_app.db import crud
-from foundry_app.agent.core import _do_compaction, _load_history
+from var_app.db.database import get_db
+from var_app.db import crud
+from var_app.agent.core import _do_compaction, _load_history
 
 router = APIRouter(tags=["compaction"])
 
@@ -1035,14 +1035,14 @@ async def compact_session(session_id: str):
 - [ ] **Step 2: 在 main.py 中注册路由**
 
 ```python
-from foundry_app.api.compact import router as compact_router
+from var_app.api.compact import router as compact_router
 app.include_router(compact_router)
 ```
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add foundry/foundry_app/api/compact.py foundry/foundry_app/main.py
+git add var/var_app/api/compact.py var/var_app/main.py
 git commit -m "feat: add POST /api/sessions/{id}/compact endpoint"
 ```
 
@@ -1055,12 +1055,12 @@ git commit -m "feat: add POST /api/sessions/{id}/compact endpoint"
 - [ ] **Step 1: 启动后端验证所有模块加载正常**
 
 ```bash
-cd foundry && python -c "
-from foundry_app.agent.overflow import usable_tokens, is_overflow
-from foundry_app.agent.compaction import select, filter_compacted, process_compaction, prune
-from foundry_app.agent.context import trim_and_summarize
-from foundry_app.agent.core import create_agent, _do_compaction, _load_history
-from foundry_app.config import settings
+cd var && python -c "
+from var_app.agent.overflow import usable_tokens, is_overflow
+from var_app.agent.compaction import select, filter_compacted, process_compaction, prune
+from var_app.agent.context import trim_and_summarize
+from var_app.agent.core import create_agent, _do_compaction, _load_history
+from var_app.config import settings
 
 print('auto_compaction:', settings.auto_compaction)
 print('compaction_tail_turns:', settings.compaction_tail_turns)
@@ -1073,7 +1073,7 @@ print('All modules loaded OK')
 - [ ] **Step 2: 启动后端确认无 import 错误**
 
 ```bash
-cd foundry && python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000
+cd var && python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000
 ```
 
 在另一个终端测试 API：

@@ -1,4 +1,4 @@
-# Foundry
+# Var
 
 Full-stack AI Agent application with a FastAPI backend and terminal UI frontend.
 
@@ -26,7 +26,7 @@ Full-stack AI Agent application with a FastAPI backend and terminal UI frontend.
 
 ### Configuration
 
-Create `~/.config/foundry/config.yaml`:
+Create `~/.config/var/config.yaml`:
 
 ```yaml
 provider:
@@ -59,9 +59,9 @@ scripts\dev.ps1          # Windows PowerShell
 ./scripts/dev.sh         # Linux/macOS
 
 # Or run individually
-pip install -e foundry
-$env:FOUNDRY_WORK_DIR="D:\1-Project\4-github\develop-cli"
-python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir foundry/foundry_app
+pip install -e var
+$env:VAR_WORK_DIR="D:\1-Project\4-github\develop-cli"
+python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir var/var_app
 
 # default or web debug
 cd webui && bun install && bun run dev 
@@ -85,17 +85,17 @@ python scripts/build.py backend  # Backend only (PyInstaller)
 python scripts/build.py tui      # TUI only
 ```
 
-Output goes to `dist/foundry/` with a launcher script.
+Output goes to `dist/var/` with a launcher script.
 
 ## Project Structure
 
 ```
-foundry/
-├── foundry/                          # Backend
-│   └── foundry_app/
+var/
+├── var/                          # Backend
+│   └── var_app/
 │       ├── main.py                   # FastAPI entry point
 │       ├── config.py                 # Settings (env + yaml)
-│       ├── yaml_config.py            # ~/.config/foundry/config.yaml parser
+│       ├── yaml_config.py            # ~/.config/var/config.yaml parser
 │       ├── api/                      # REST + WS + SSE endpoints
 │       ├── agent/                    # Pydantic AI agent, tools, memory
 │       ├── db/                       # SQLite + sqlite-vec
@@ -151,21 +151,21 @@ foundry/
 
 ## Environment Variables
 
-All env vars use prefix `FOUNDRY_`:
+All env vars use prefix `VAR_`:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `FOUNDRY_OPENAI_API_KEY` | | OpenAI API key |
-| `FOUNDRY_ANTHROPIC_API_KEY` | | Anthropic API key |
-| `FOUNDRY_DEFAULT_MODEL` | `claude-sonnet` | Default model ID |
-| `FOUNDRY_DB_PATH` | `~/.foundry/foundry.db` | SQLite path |
-| `FOUNDRY_DEBUG` | `false` | Debug mode |
+| `VAR_OPENAI_API_KEY` | | OpenAI API key |
+| `VAR_ANTHROPIC_API_KEY` | | Anthropic API key |
+| `VAR_DEFAULT_MODEL` | `claude-sonnet` | Default model ID |
+| `VAR_DB_PATH` | `~/.var/var.db` | SQLite path |
+| `VAR_DEBUG` | `false` | Debug mode |
 
 Environment variables take precedence over `config.yaml` values.
 
 ## Configuration File
 
-The YAML config at `~/.config/foundry/config.yaml` supports:
+The YAML config at `~/.config/var/config.yaml` supports:
 
 - **Multiple providers** — Register any OpenAI-compatible or Anthropic-compatible API
 - **Custom endpoints** — Set `api` URL for each provider

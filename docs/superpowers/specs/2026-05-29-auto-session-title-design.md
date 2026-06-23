@@ -14,7 +14,7 @@ Automatically generate concise session titles after the first user message, usin
 
 ## Title Agent
 
-**Module**: `foundry_app/agent/title.py`
+**Module**: `var_app/agent/title.py`
 
 - Uses the session's current model (same as main chat)
 - No tools registered — pure text generation
@@ -60,9 +60,9 @@ generate_title(session_id, model_id, first_message):
 
 | File | Change |
 |------|--------|
-| `foundry_app/agent/title.py` | **New**: `generate_title()` async function |
-| `foundry_app/agent/core.py` | **Modified**: call title generation after `stream.done` |
-| `foundry_app/shared_protocol.py` | **Modified**: add `SessionTitleUpdated` dataclass |
+| `var_app/agent/title.py` | **New**: `generate_title()` async function |
+| `var_app/agent/core.py` | **Modified**: call title generation after `stream.done` |
+| `var_app/shared_protocol.py` | **Modified**: add `SessionTitleUpdated` dataclass |
 
 ## Error Handling
 

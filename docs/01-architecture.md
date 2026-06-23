@@ -59,8 +59,8 @@
 ## Project Structure
 
 ```
-foundry/
-├── foundry/                              # Backend
+var/
+├── var/                              # Backend
 │   ├── app/
 │   │   ├── main.py                       # FastAPI app, CORS, lifespan
 │   │   ├── config.py                     # Settings (model keys, DB path)

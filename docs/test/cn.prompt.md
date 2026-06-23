@@ -86,15 +86,15 @@ assistant: 在src/services/process.ts:712的`connectToServer`函数中,客户端
 </model_info>
 以下是关于您正在运行的环境的一些有用信息:
 <env>
-工作目录:D:\\1-Project\\foundry
-工作区根文件夹:D:\\1-Project\\foundry
+工作目录:D:\\1-Project\\var
+工作区根文件夹:D:\\1-Project\\var
 目录是git仓库吗:是
 平台:win32
 今天的日期:2026年5月31日星期日
 </env>
 
 <agents.md>
-说明来自:D:\\1-Project\\foundry\\AGENTS.md
+说明来自:D:\\1-Project\\var\\AGENTS.md
 # AGENTS.md--梦想铸造项目指南
 </agents.md>
 
@@ -109,6 +109,6 @@ Skills为特定任务提供专用指令与工作流程.
   <skill>
     <name>building-pydantic-ai-agents</name>
     <description>Build AI agents with Pydantic AI — tools, capabilities, structured output, streaming, testing, and multi-agent patterns. Use when the user mentions Pydantic AI, imports pydantic_ai, or asks to build an AI agent, add tools/capabilities, stream output, define agents from YAML, or test agent behavior.</description>
-    <location>file:///D:/1-Project/foundry/.opencode/skills/building-pydantic-ai-agents/SKILL.md</location>
+    <location>file:///D:/1-Project/var/.opencode/skills/building-pydantic-ai-agents/SKILL.md</location>
   </skill>
 </available_skills>

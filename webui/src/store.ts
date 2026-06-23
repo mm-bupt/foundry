@@ -2,7 +2,7 @@ import { create } from "zustand"
 import type { Session, Message, Model, AppStatus, ToolCall, StreamSegment, TextSegment, TaskCallSegment, SessionStats, TaskRecord, TodoItem, PendingQuestion } from "./types"
 import { fetchSessions, createSession, getSession, deleteSession, fetchModels, fetchActiveModel, updateSession } from "./api"
 
-const PERSIST_KEY = "foundry_webui_state"
+const PERSIST_KEY = "var_webui_state"
 
 interface PersistedState {
   sidebarCollapsed: boolean

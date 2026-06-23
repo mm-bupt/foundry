@@ -4,7 +4,7 @@
 
 ### Agent Factory
 
-The agent factory (`foundry/app/agent/core.py`) creates agents dynamically based on the active model and session context.
+The agent factory (`var/app/agent/core.py`) creates agents dynamically based on the active model and session context.
 
 ```python
 from pydantic_ai import Agent
@@ -23,7 +23,7 @@ def create_agent(model_id: str, system_prompt: str = "") -> Agent:
 ### Agent Instructions (System Prompt)
 
 ```
-You are Foundry AI, a helpful coding assistant.
+You are Var AI, a helpful coding assistant.
 
 You have access to long-term memory. Use `recall_memory` before responding
 to check for relevant user preferences and past context. Use `store_memory`
@@ -47,7 +47,7 @@ Be concise, direct, and helpful. Format code with markdown code blocks.
 ### Model Registry Implementation
 
 ```python
-# foundry/app/agent/registry.py
+# var/app/agent/registry.py
 
 from dataclasses import dataclass
 
@@ -171,7 +171,7 @@ session.messages = result.all_messages()
 | `preference` | User preferences | "User prefers Chinese responses" |
 | `fact` | Important facts | "Project uses Python 3.12" |
 | `decision` | Design decisions | "Decided to use SQLite over Postgres" |
-| `project` | Project details | "Working on foundry, an AI agent" |
+| `project` | Project details | "Working on var, an AI agent" |
 | `note` | General notes | "Deadline is next Friday" |
 
 ### Memory Summarization

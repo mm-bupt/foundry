@@ -323,7 +323,7 @@ export default function App() {
                 D
               </div>
               <Title level={5} style={{ margin: 0, fontSize: 15 }}>
-                Foundry
+                Var
               </Title>
             </div>
             <style>{`

@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "foundry-webui",
+      "name": "var-webui",
       "dependencies": {
         "@ant-design/x": "^2.1.0",
         "@ant-design/x-markdown": "^2.3.0",

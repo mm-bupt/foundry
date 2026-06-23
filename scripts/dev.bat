@@ -9,19 +9,19 @@ set ROOT_DIR=%~dp0..
 set TARGET=%1
 if "%TARGET%"=="" set TARGET=all
 
-echo Foundry Dev
+echo Var Dev
 echo.
 
 if "%TARGET%"=="all" (
     echo Starting backend...
     cd /d "%ROOT_DIR%"
-    start /B "" python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+    start /B "" python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload
 )
 
 if "%TARGET%"=="backend" (
     echo Starting backend...
     cd /d "%ROOT_DIR%"
-    python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+    python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload
     goto :eof
 )
 
@@ -47,7 +47,7 @@ if "%TARGET%"=="all" (
     cd /d "%ROOT_DIR%\tui"
     bun install
     bun run src/index.tsx
-    for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq python.exe" /FI "WINDOWTITLE eq foundry*" /NH 2^>nul ^| findstr /i python') do (
+    for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq python.exe" /FI "WINDOWTITLE eq var*" /NH 2^>nul ^| findstr /i python') do (
         taskkill /F /PID %%a >nul 2>&1
     )
 )

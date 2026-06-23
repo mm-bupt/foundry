@@ -2,7 +2,7 @@
 
 ## Overview
 
-Enhance the Foundry WebUI with three features:
+Enhance the Var WebUI with three features:
 1. Display AI thinking process in a collapsible panel
 2. Fix streaming to use true incremental deltas (not full-text-at-once)
 3. Render markdown in AI response bubbles
@@ -19,7 +19,7 @@ Enhance the Foundry WebUI with three features:
 
 ### 1. Thinking Process Display
 
-**Backend changes** (`foundry_app/agent/core.py`):
+**Backend changes** (`var_app/agent/core.py`):
 
 - Within `agent.iter()` node streaming, detect `ThinkingPart` from pydantic_ai's response parts
 - For Claude models with extended thinking: emit `thinking.delta` events with incremental text
@@ -41,7 +41,7 @@ Enhance the Foundry WebUI with three features:
 
 ### 2. True Streaming Deltas
 
-**Backend changes** (`foundry_app/agent/core.py`):
+**Backend changes** (`var_app/agent/core.py`):
 
 The current code sends `stream.delta` with full `TextPart.content` after the model finishes. Need to use pydantic_ai's stream events to send incremental text.
 
@@ -86,7 +86,7 @@ ai: {
 ## Files Changed
 
 ### Backend
-- `foundry/foundry_app/agent/core.py` — streaming delta logic, thinking detection, thinking events
+- `var/var_app/agent/core.py` — streaming delta logic, thinking detection, thinking events
 
 ### Frontend
 - `webui/package.json` — add react-markdown, remark-gfm

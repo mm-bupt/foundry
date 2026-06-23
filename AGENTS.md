@@ -1,11 +1,11 @@
-# AGENTS.md — Foundry Project Guide
+# AGENTS.md — Var Project Guide
 
 ## 使用中文交互
 
 ## Project Overview
 
-Foundry is a full-stack AI Agent application:
-- **Backend (foundry/)**: Python/FastAPI + Pydantic AI + SQLite
+Var is a full-stack AI Agent application:
+- **Backend (var/)**: Python/FastAPI + Pydantic AI + SQLite
 - **TUI Frontend (tui/)**: Python/Textual terminal UI (opencode-style)
 - **WebUI (webui/)**: React + Vite + Ant Design web interface
 - **Communication**: WebSocket (default) + SSE (fallback)
@@ -26,11 +26,11 @@ Foundry is a full-stack AI Agent application:
 ## Project Structure
 
 ```
-foundry/
-├── foundry/                         # Backend package (pip install -e foundry)
-│   ├── foundry_app/               # Python package (importable as foundry_app.*)
+var/
+├── var/                         # Backend package (pip install -e var)
+│   ├── var_app/               # Python package (importable as var_app.*)
 │   │   ├── main.py                  # FastAPI app entry, all routers registered
-│   │   ├── config.py                # Settings (env vars: FOUNDRY_*)
+│   │   ├── config.py                # Settings (env vars: VAR_*)
 │   │   ├── shared_protocol.py       # WS/SSE message type definitions
 │   │   ├── api/
 │   │   │   ├── sessions.py          # CRUD /api/sessions
@@ -54,7 +54,7 @@ foundry/
 │   │       └── memory.py            # Memory response models
 │   └── pyproject.toml
 ├── tui/                             # TUI frontend (not yet implemented)
-├── shared/                          # Original shared protocol (copied into foundry)
+├── shared/                          # Original shared protocol (copied into var)
 ├── docs/                            # Design documents
 └── AGENTS.md                        # This file
 ```
@@ -73,8 +73,8 @@ scripts\dev.ps1
 scripts\dev.bat
 
 # Individual components:
-pip install -e foundry                  # Install backend
-python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
+pip install -e var                  # Install backend
+python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload  # Backend only
 cd webui && npm install && npm run dev   # WebUI only
 cd tui && bun install && bun run src/index.tsx  # TUI only
 
@@ -84,9 +84,9 @@ python scripts/build.py backend  # Backend only (PyInstaller onefile)
 python scripts/build.py tui      # TUI only (sources + node_modules)
 python scripts/build.py bun      # Bundle Bun runtime only
 
-# Output: dist/foundry/
-#   foundry.bat (or .sh)  ← double-click to run
-#   bin/foundry-server    ← backend
+# Output: dist/var/
+#   var.bat (or .sh)  ← double-click to run
+#   bin/var-server    ← backend
 #   bin/bun                     ← Bun runtime (no install needed)
 #   lib/tui/                    ← TUI sources
 ```
@@ -130,15 +130,15 @@ Server → Client:
 
 ## Environment Variables
 
-All env vars use prefix `FOUNDRY_`:
-- `FOUNDRY_OPENAI_API_KEY` — OpenAI API key
-- `FOUNDRY_ANTHROPIC_API_KEY` — Anthropic API key
-- `FOUNDRY_DB_PATH` — SQLite database path (default: ~/.foundry/foundry.db)
-- `FOUNDRY_WORK_DIR` — Agent working directory for file operations (default: cwd)
-- `FOUNDRY_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
-- `FOUNDRY_DEBUG` — Enable debug mode
+All env vars use prefix `VAR_`:
+- `VAR_OPENAI_API_KEY` — OpenAI API key
+- `VAR_ANTHROPIC_API_KEY` — Anthropic API key
+- `VAR_DB_PATH` — SQLite database path (default: ~/.var/var.db)
+- `VAR_WORK_DIR` — Agent working directory for file operations (default: cwd)
+- `VAR_DEFAULT_MODEL` — Default model ID (default: claude-sonnet)
+- `VAR_DEBUG` — Enable debug mode
 
-Work dir priority: `--work-dir` CLI arg > `FOUNDRY_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
+Work dir priority: `--work-dir` CLI arg > `VAR_WORK_DIR` env > `workDir` in YAML config > `os.getcwd()`
 
 ## Available Models
 
@@ -172,14 +172,14 @@ All phases P1-P8 complete. Future work:
 ## Project Structure (Updated)
 
 ```
-foundry/
+var/
 ├── scripts/                        # Build & dev scripts
 │   ├── build.py                    # Production build (PyInstaller + Bun compile)
 │   ├── dev.bat                     # Windows CMD dev launcher
 │   ├── dev.ps1                     # PowerShell dev launcher
 │   └── dev.sh                      # Linux/macOS dev launcher
-├── foundry/                         # Backend (Python/FastAPI/Pydantic AI)
-│   └── foundry_app/
+├── var/                         # Backend (Python/FastAPI/Pydantic AI)
+│   └── var_app/
 │       ├── main.py, config.py
 │       ├── agent/ (core, registry, tools, memory, context)
 │       ├── api/ (sessions, models, ws, sse, memory)
@@ -206,8 +206,8 @@ foundry/
 
 ### 后端调试
 ```bash
-pip install -e foundry
-python -m uvicorn foundry_app.main:app --host 0.0.0.0 --port 8000 --reload
+pip install -e var
+python -m uvicorn var_app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 更新后使用 uvicorn --reload 自动重载。
 

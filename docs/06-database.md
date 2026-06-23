@@ -12,10 +12,10 @@
 ### Database File
 
 ```
-~/.foundry/foundry.db
+~/.var/var.db
 ```
 
-Configurable via `FOUNDRY_DB_PATH` environment variable.
+Configurable via `VAR_DB_PATH` environment variable.
 
 ## Tables
 
@@ -111,7 +111,7 @@ LIMIT ?;
 ## SQLModel Definitions
 
 ```python
-# foundry/app/db/models.py
+# var/app/db/models.py
 
 import uuid
 from datetime import datetime, timezone
@@ -170,12 +170,12 @@ class ToolCall(SQLModel, table=True):
 ## Database Initialization
 
 ```python
-# foundry/app/db/database.py
+# var/app/db/database.py
 
 import aiosqlite
 from pathlib import Path
 
-DB_PATH = Path.home() / ".foundry" / "foundry.db"
+DB_PATH = Path.home() / ".var" / "var.db"
 
 async def get_db() -> aiosqlite.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
